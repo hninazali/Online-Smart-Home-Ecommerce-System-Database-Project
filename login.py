@@ -32,7 +32,7 @@ class LoginWindow :
 
         # change the title of the window
         self.win.title("Online Smart Home Ecommerce System | Login Window ")
-        self.win.iconbitmap("static/shopping.ico")
+        # self.win.iconbitmap(r"images/welcome.png")
     
     def add_frame(self):
         self.frame = Frame(self.win, height=400, width=450)
@@ -48,7 +48,7 @@ class LoginWindow :
 
 
     # Designing window for registration
-    def register():
+    def register(self):
         global register_screen
         register_screen = Toplevel(main_screen)
         register_screen.title("Register")
@@ -72,12 +72,12 @@ class LoginWindow :
         password_entry = Entry(register_screen, textvariable=password, show='*')
         password_entry.pack()
         Label(register_screen, text="").pack()
-        Button(register_screen, text="Register", width=10, height=1, bg="blue", command = register_user).pack()
+        Button(register_screen, text="Register", width=10, height=1, bg="blue", command = self.register_user).pack()
 
 
     # Designing window for login 
 
-    def login():
+    def login(self):
         global login_screen
         login_screen = Toplevel(main_screen)
         login_screen.title("Login")
@@ -102,11 +102,11 @@ class LoginWindow :
         password_login_entry = Entry(login_screen, textvariable=password_verify, show= '*')
         password_login_entry.pack()
         Label(login_screen, text="").pack()
-        Button(login_screen, text="Login", width=10, height=1, command = login_verify).pack()
+        Button(login_screen, text="Login", width=10, height=1, command = self.login_verify).pack()
 
     # Implementing event on register button
 
-    def register_user():
+    def register_user(self):
 
         username_info = username.get()
         password_info = password.get()
@@ -123,7 +123,7 @@ class LoginWindow :
 
     # Implementing event on login button 
 
-    def login_verify():
+    def login_verify(self):
         username1 = username_verify.get()
         password1 = password_verify.get()
         username_login_entry.delete(0, END)
@@ -137,74 +137,75 @@ class LoginWindow :
             file1 = open(username1, "r")
             verify = file1.read().splitlines()
             if password1 in verify: 
-                login_sucess()
+                self.login_sucess()
 
             else:
-                password_not_recognised()
+                self.password_not_recognised()
 
         else:
-            user_not_found()
+            self.user_not_found()
 
     # Designing popup for login success
 
-    def login_sucess():
+    def login_sucess(self):
         global login_success_screen
         login_success_screen = Toplevel(login_screen)
         login_success_screen.title("Success")
         login_success_screen.geometry("150x100")
         Label(login_success_screen, text="Login Success").pack()
-        Button(login_success_screen, text="OK", command=delete_login_success).pack()
+        Button(login_success_screen, text="OK", command=self.delete_login_success).pack()
 
     # Designing popup for login invalid password
 
-    def password_not_recognised():
+    def password_not_recognised(self):
         global password_not_recog_screen
         password_not_recog_screen = Toplevel(login_screen)
         password_not_recog_screen.title("Success")
         password_not_recog_screen.geometry("150x100")
         Label(password_not_recog_screen, text="Invalid Password ").pack()
-        Button(password_not_recog_screen, text="OK", command=delete_password_not_recognised).pack()
+        Button(password_not_recog_screen, text="OK", command=self.delete_password_not_recognised).pack()
 
     # Designing popup for user not found
 
-    def user_not_found():
+    def user_not_found(self):
         global user_not_found_screen
         user_not_found_screen = Toplevel(login_screen)
         user_not_found_screen.title("Success")
         user_not_found_screen.geometry("150x100")
         Label(user_not_found_screen, text="User Not Found").pack()
-        Button(user_not_found_screen, text="OK", command=delete_user_not_found_screen).pack()
+        Button(user_not_found_screen, text="OK", command=self.delete_user_not_found_screen).pack()
 
     # Deleting popups
 
-    def delete_login_success():
+    def delete_login_success(self):
         login_success_screen.destroy()
 
 
-    def delete_password_not_recognised():
+    def delete_password_not_recognised(self):
         password_not_recog_screen.destroy()
 
 
-    def delete_user_not_found_screen():
+    def delete_user_not_found_screen(self):
         user_not_found_screen.destroy()
 
 
         # Designing Main(first) window
 
-    def main_account_screen():
+    def main_account_screen(self):
         global main_screen
         main_screen = Tk()
         main_screen.geometry("300x250")
         main_screen.title("Account Login")
         Label(text="Select Your Action", bg="gray", width="300", height="2", fg="white", font=("Calibri", 13)).pack()
         Label(text="").pack()
-        Button(text="Login", height="2", width="30", command=login).pack()
+        Button(text="Login", height="2", width="30", command=self.login).pack()
         Label(text="").pack()
-        Button(text="Register", height="2", width="30", command=register).pack()
+        Button(text="Register", height="2", width="30", command=self.register).pack()
 
         main_screen.mainloop()
 
+ 
 
-
-    main_account_screen()
+logmein = LoginWindow()
+logmein.main_account_screen()
 

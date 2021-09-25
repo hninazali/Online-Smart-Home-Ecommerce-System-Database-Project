@@ -5,7 +5,7 @@ import pymysql
 
 class SQLDatabase():
     def __init__(self):
-        self.connection = pymysql.connector.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        self.connection = pymysql.connect(host="localhost", port=3307, user="root", passwd="password", database="oshes")
         self.c = self.connection.cursor()
 
     # remaining : where to add the create tables codes 
