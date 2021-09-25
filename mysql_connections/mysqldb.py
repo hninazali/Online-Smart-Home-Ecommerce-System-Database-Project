@@ -5,7 +5,7 @@ import pymysql
 
 class SQLDatabase():
     def __init__(self):
-        self.connection = pymysql.connect(host="localhost", port=3307, user="root", passwd="password", database="oshes")
+        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
         self.c = self.connection.cursor()
 
     # remaining : where to add the create tables codes 
@@ -25,9 +25,9 @@ class SQLDatabase():
         self.c.execute(addAdmin, adminInfo)
         self.connection.commit()
 
-    def getCustLogin(self, id):
-        getCustLogin = ("SELECT * FROM customer WHERE customer_id = %s")
-        self.c.execute(getCustLogin, (id,))
+    def getCustomerLogin(self, email):
+        getCustomerLogin = ("SELECT * FROM customer WHERE customer_email = %s")
+        self.c.execute(getCustomerLogin, (email,))
         details = self.c.fetchone()
         return details
 
@@ -36,6 +36,26 @@ class SQLDatabase():
         self.c.execute(getAdminLogin, (id,))
         details = self.c.fetchone()
         return details
+
+    def customerLogin(self, userInputTuple):
+        try:
+            self.c.execute("SELECT * FROM `customer` WHERE `email`=%s AND `password`=%s",userInputTuple)
+            credentials = self.c.fetchone()
+            return (credentials)
+        except:
+            return False
+
+
+    def adminLogin(self, userInputTuple):
+        try:
+            self.c.execute("SELECT * FROM `admin` WHERE `email`=%s AND `password`=%s",userInputTuple)
+            credentials = self.c.fetchone()
+            return (credentials)
+        except:
+            return False
+
+
+
 
     def changePassword(self, newPass, username, isAdmin):
         if (isAdmin):

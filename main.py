@@ -6,7 +6,10 @@
 
 from tkinter import *
 import login
-import registerUser
+from dashboards.dashboard import CustomerDashboard
+from dashboards.adminDashboard import AdminDashboard
+from actions.registerAdmin import RegisterAdmin as registerAdmin
+from actions.registerUser import RegisterUser as registerUser
 
 class WelcomeWindow:
 
@@ -32,6 +35,14 @@ class WelcomeWindow:
 
         #change the title of the window
         self.win.title("Online Smart Home Ecommerce System | Welcome Window")
+
+    def frameSwitcher(self, frame_class, username):
+        newFrame = frame_class(self, username)
+        if self.frame is not None:
+            self.frame.destroy()
+            #can include conition for if is login screen
+        self.frame = newFrame
+        self.frame.pack()
 
     def add_frame(self):
         #create a inner frame
@@ -61,12 +72,16 @@ class WelcomeWindow:
     def login(self):
         # destroy current window
         self.win.destroy()
-
         #open the new window
         log = login.LoginWindow()
         log.add_frame()
+
+    def refresh(self):
+        self.destroy()
+        self.__init__()
 
 
 if __name__ == "__main__":
     x = WelcomeWindow()
     x.add_frame()
+    x.mainloop()
