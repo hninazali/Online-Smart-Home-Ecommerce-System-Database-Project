@@ -24,7 +24,7 @@ class SQLDatabase():
 
     def createAdmin(self, adminInfo):
         addAdmin = ("INSERT INTO admin "
-               "(adminID, name, gender, phoneNumber, password)"
+               "(adminID, password, name, gender, phonenumber)"
                "VALUES (%s, %s, %s, %s, %s)")  
         self.c.execute(addAdmin, adminInfo)
         self.connection.commit()

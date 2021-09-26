@@ -211,4 +211,10 @@ class RegisterPage(tk.Frame):
         self.domain = usertype
 
     def handleRegister(self):        
-        db.createCustomer([self.userID.get(), self.name.get(), self.email.get(), self.password.get(), self.address.get(), self.phoneNumber.get(), self.gender.get()])
+        if self.domain.get()=="Customer":
+            db.createCustomer([self.userID.get(), self.name.get(), self.email.get(), self.password.get(), self.address.get(), self.phoneNumber.get(), self.gender.get()])
+        elif self.domain.get()=="Administrator":
+            db.createAdmin([self.userID.get(), self.password.get(), self.name.get(), self.gender.get(), self.phoneNumber.get()])
+        else:
+            print("huh?")
+            db.createAdmin([self.userID.get(), self.password.get(), self.name.get(), self.gender.get(), self.phoneNumber.get()])
