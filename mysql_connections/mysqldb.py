@@ -5,18 +5,22 @@ import pymysql
 
 class SQLDatabase():
     def __init__(self):
-        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        self.connection = pymysql.connect(host="localhost", port=3307, user="root", passwd="root", database="oshes")
         self.c = self.connection.cursor()
 
     # remaining : where to add the create tables codes 
 
-    #login functions
+
+    # Create Customer - DONE
     def createCustomer(self, custInfo):
         addCust = ("INSERT INTO customer "
-               "(customer_id, customer_name, gender, email_address, phone_number, address, password) "
-               "VALUES (%s, %s, %s, %s, %s, %s, %s)")   
-        self.c.execute(addCust, custInfo)
-        self.connection.commit()
+               "(name, email, password, address, phoneNumber, gender) "
+               "VALUES (%s, %s, %s, %s, %s, %s)")
+        try:   
+            self.c.execute(addCust, custInfo)
+            self.connection.commit()
+        except Exception as e:
+            print(e)
 
     def createAdmin(self, adminInfo):
         addAdmin = ("INSERT INTO admin "
@@ -25,11 +29,24 @@ class SQLDatabase():
         self.c.execute(addAdmin, adminInfo)
         self.connection.commit()
 
-    def getCustomerLogin(self, email):
-        getCustomerLogin = ("SELECT * FROM customer WHERE customer_email = %s")
-        self.c.execute(getCustomerLogin, (email,))
+    # get Login
+    def getCustomerLogin(self, email, password):
+        getCustomerLogin = ("SELECT * FROM customer WHERE email = %s AND password=%s")
+        
+        self.c.execute(getCustomerLogin, (email,password))
         details = self.c.fetchone()
-        return details
+        if details:
+            return details
+        else:
+            getCustomerLogin = ("SELECT * FROM customer WHERE email = %s")
+            self.c.execute(getCustomerLogin, (email,))
+            details = self.c.fetchone()
+
+            if details:
+                return ("Incorrect Password")
+            else:
+                return ("User doesn't exist")
+        
 
     def getAdminLogin(self, id):
         getAdminLogin = ("SELECT * FROM admin WHERE admin_id = %s")
@@ -107,4 +124,19 @@ class SQLDatabase():
         results = self.c.fetchall()
         print(results)
         return results
-        
+
+if __name__ == "__main__":
+    db = SQLDatabase()
+
+    # Testing Functions
+
+    # Create customer
+    # db.createCustomer(["Brenda2","brenda2@gmail.com","password","1 Street", "4444", "F"])
+
+    # login
+    email = 'brenda2@gmail.com'
+    print(db.getCustomerLogin(email,"password")) # correct
+    print(db.getCustomerLogin(email,"Aassword")) # incoreect password
+    print(db.getCustomerLogin("a"+email,"password")) # user doesnt exist
+
+    

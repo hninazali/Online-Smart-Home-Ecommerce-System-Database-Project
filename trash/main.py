@@ -70,17 +70,15 @@ class WelcomeWindow:
         self.win.destroy()
 
         #open the new window
-        log = LoginWindow()
+        log = LoginWindow(self.domain)
         log.add_frame()
 
     def register(self):
         self.win.destroy()
 
-        regis = RegisterWindow()
+        regis = RegisterWindow(self.domain)
         regis.add_frame()
 
-    def getUserType(self):
-        return self.domain
 
 if __name__ == "__main__":
     x = WelcomeWindow()
