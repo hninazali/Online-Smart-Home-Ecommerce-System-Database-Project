@@ -1,3 +1,4 @@
+from tk_screens.customerPortal import CustomerPortal
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from mysql_connections.mysqldb import SQLDatabase
@@ -61,7 +62,7 @@ class LoginPage(tk.Frame):
         self.email = tk.StringVar()
         self.password = tk.StringVar()
 
-
+        self.controller = controller
 
         tk.Frame.__init__(self, parent)
         label = ttk.Label(self, text="Page 1", font=LARGEFONT)
@@ -105,7 +106,7 @@ class LoginPage(tk.Frame):
             res = db.getCustomerLogin(self.email.get(), self.password.get())
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
-                print("ok")
+                self.controller.show_frame(CustomerPortal)
             
             elif isinstance(res, str):
                 print("login failed", type(res))
@@ -115,7 +116,7 @@ class LoginPage(tk.Frame):
             res = db.getAdminLogin(self.email.get(), self.password.get())
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
-                print("ok")
+                self.controller.show_frame(CustomerPortal)
             elif isinstance(res, str):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)

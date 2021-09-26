@@ -5,6 +5,7 @@ from mysql_connections.mysqldb import SQLDatabase
 LARGEFONT = ("Verdana", 35)
 
 from tk_screens.authScreens import *
+from tk_screens.customerPortal import *
 
 class tkinterApp(tk.Tk):
 

@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # Testing Functions
 
     # Create customer
-    # db.createCustomer(["Brenda2","brenda2@gmail.com","password","1 Street", "4444", "F"])
+    db.createCustomer(["Brenda2","brenda2@gmail.com","password","1 Street", "4444", "F"])
 
     # login
     # email = 'brenda2@gmail.com'
