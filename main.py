@@ -1,7 +1,6 @@
 from tkinter import *
 from tk_screens.authScreen import LoginWindow, RegisterWindow
 
-
 class WelcomeWindow:
 
     #create a constructor
