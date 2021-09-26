@@ -6,7 +6,8 @@ class CustomerPortal(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         self.domain = tk.StringVar(self)
-        # Dropdown menu options
+        
+        #  Dummy Display 
         options = ("Customer", "Administrator")
 
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)

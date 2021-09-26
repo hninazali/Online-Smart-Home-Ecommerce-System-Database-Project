@@ -65,7 +65,7 @@ class LoginPage(tk.Frame):
         self.controller = controller
 
         tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text="Page 1", font=LARGEFONT)
+        label = ttk.Label(self, text="Login Page", font=LARGEFONT)
         label.grid(row=0, column=4, padx=10, pady=10)
 
 
@@ -141,7 +141,7 @@ class RegisterPage(tk.Frame):
         self.gender = tk.StringVar()
 
         tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text="Page 2", font=LARGEFONT)
+        label = ttk.Label(self, text="Register Page", font=LARGEFONT)
         label.grid(row=0, column=4, padx=10, pady=10)
 
         namelabel = ttk.Label(self, text="Name:")
