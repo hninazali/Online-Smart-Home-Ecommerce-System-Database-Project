@@ -5,7 +5,7 @@ import pymysql
 
 class SQLDatabase():
     def __init__(self):
-        self.connection = pymysql.connect(host="localhost", port=3307, user="root", passwd="root", database="oshes")
+        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
         self.c = self.connection.cursor()
 
     # remaining : where to add the create tables codes 
@@ -39,7 +39,7 @@ class SQLDatabase():
             return details
         else:
             getCustomerLogin = ("SELECT * FROM customer WHERE email = %s")
-            self.c.execute(getCustomerLogin, (email,))
+            self.c.execute(getCustomerLogin, (email))
             details = self.c.fetchone()
 
             if details:
@@ -48,30 +48,22 @@ class SQLDatabase():
                 return ("User doesn't exist")
         
 
-    def getAdminLogin(self, id):
-        getAdminLogin = ("SELECT * FROM admin WHERE admin_id = %s")
-        self.c.execute(getAdminLogin, (id,))
+    def getAdminLogin(self, email, password):
+        getAdminLogin = ("SELECT * FROM admin WHERE email = %s AND password=%s")
+        
+        self.c.execute(getAdminLogin, (email,password))
         details = self.c.fetchone()
-        return details
+        if details:
+            return details
+        else:
+            getAdminLogin = ("SELECT * FROM admin WHERE email = %s")
+            self.c.execute(getAdminLogin, (email))
+            details = self.c.fetchone()
 
-    def customerLogin(self, userInputTuple):
-        try:
-            self.c.execute("SELECT * FROM `customer` WHERE `email`=%s AND `password`=%s",userInputTuple)
-            credentials = self.c.fetchone()
-            return (credentials)
-        except:
-            return False
-
-
-    def adminLogin(self, userInputTuple):
-        try:
-            self.c.execute("SELECT * FROM `admin` WHERE `email`=%s AND `password`=%s",userInputTuple)
-            credentials = self.c.fetchone()
-            return (credentials)
-        except:
-            return False
-
-
+            if details:
+                return ("Incorrect Password")
+            else:
+                return ("Admin User doesn't exist")
 
 
     def changePassword(self, newPass, username, isAdmin):
@@ -134,9 +126,9 @@ if __name__ == "__main__":
     # db.createCustomer(["Brenda2","brenda2@gmail.com","password","1 Street", "4444", "F"])
 
     # login
-    email = 'brenda2@gmail.com'
-    print(db.getCustomerLogin(email,"password")) # correct
-    print(db.getCustomerLogin(email,"Aassword")) # incoreect password
-    print(db.getCustomerLogin("a"+email,"password")) # user doesnt exist
+    # email = 'brenda2@gmail.com'
+    # print(db.getCustomerLogin(email,"password")) # correct
+    # print(db.getCustomerLogin(email,"Aassword")) # incoreect password
+    # print(db.getCustomerLogin("a"+email,"password")) # user doesnt exist
 
     

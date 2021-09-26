@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, PhotoImage, Label
 from mysql_connections.mysqldb import SQLDatabase
 
 LARGEFONT = ("Verdana", 35)
@@ -29,6 +29,7 @@ class tkinterApp(tk.Tk):
 
         # iterating through a tuple consisting
         # of the different page layouts
+        # all new pages created add here
         for F in (StartPage, LoginPage, RegisterPage):
 
             frame = F(container, self)

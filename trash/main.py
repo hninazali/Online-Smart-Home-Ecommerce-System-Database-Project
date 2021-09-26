@@ -36,7 +36,7 @@ class WelcomeWindow:
 
         # place the photo in the frame
         # you can find the images from flaticon.com site
-        self.img = PhotoImage(file='images/welcome.png')
+        self.img = PhotoImage(file='images/login1.png')
         self.label = Label(self.frame, image=self.img)
         self.label.place(x=x+80, y=y+0)
 

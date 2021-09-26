@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, PhotoImage, Label
 from mysql_connections.mysqldb import SQLDatabase
-
+from PIL import Image, ImageTk
 db = SQLDatabase()
+
 LARGEFONT = ("Verdana", 35)
 # first window frame startpage
 
@@ -11,11 +12,18 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # label of frame Layout 2
-        label = ttk.Label(self, text="Startpage", font=LARGEFONT)
+        # label = ttk.Label(self, text="Startpage", font=LARGEFONT)
+        # place the photo in the frame
+        # you can find the images from flaticon.com site
+        
+        self.img = ImageTk.PhotoImage(Image.open("images/welcome.png").convert("RGB"))
+        self.label = ttk.Label(self, image=self.img)
+        self.label.grid(row=0, column=4, padx=10, pady=10)
+        
 
         # putting the grid in its place by using
         # grid
-        label.grid(row=0, column=4, padx=10, pady=10)
+        # label.grid(row=0, column=4, padx=10, pady=10)
 
         button1 = ttk.Button(self, text="Login",
                              command=lambda: controller.show_frame(LoginPage, self.domain))
@@ -74,21 +82,22 @@ class LoginPage(tk.Frame):
 
         # button to show frame 2 with text
         # layout2
-        button1 = ttk.Button(self, text="StartPage",
-                             command=lambda: controller.show_frame(StartPage))
-
-        # putting the button in its place
-        # by using grid
-        button1.grid(row=3, column=1, padx=10, pady=10)
-
-        # button to show frame 2 with text
-        # layout2
         button2 = ttk.Button(self, text="Sign In",
                              command=self.handleLogin)
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=4, column=1, padx=10, pady=10)
+        button2.grid(row=3, column=1, padx=10, pady=10)
+
+        # button to show frame 2 with text
+        # layout2
+        button1 = ttk.Button(self, text="Back to Home",
+                             command=lambda: controller.show_frame(StartPage))
+
+        # putting the button in its place
+        # by using grid
+        button1.grid(row=4, column=1, padx=10, pady=10)
+
 
     def handleLogin(self):
         if self.domain.get() == "Customer":
@@ -102,7 +111,14 @@ class LoginPage(tk.Frame):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)
         elif self.domain.get() == "Administrator":
-            print("logging in for admin")
+            print("logged in:", self.email.get(), self.password.get())
+            res = db.getAdminLogin(self.email.get(), self.password.get())
+            # if res.startswith('(') and res.endswith(')'):
+            if isinstance(res, tuple):
+                print("ok")
+            elif isinstance(res, str):
+                print("login failed", type(res))
+                messagebox.showerror(title="Login Failed", message=res)
     
 
     def setUserType(self, usertype):
@@ -173,12 +189,15 @@ class RegisterPage(tk.Frame):
 
         # button to show frame 3 with text
         # layout3
-        button2 = ttk.Button(self, text="Startpage",
+        button2 = ttk.Button(self, text="Back to Home",
                              command=lambda: controller.show_frame(StartPage))
 
         # putting the button in its place by
         # using grid
         button2.grid(row=8, column=1, padx=10, pady=10)
+
+    def setUserType(self,usertype):
+        self.domain = usertype
 
     def handleRegister(self):
         print("regsitered")

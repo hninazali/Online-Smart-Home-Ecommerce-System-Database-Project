@@ -1,0 +1,13 @@
+CREATE TABLE admin(
+
+adminID MEDIUMINT NOT NULL AUTO_INCREMENT,
+password VARCHAR(40) NOT NULL,
+name VARCHAR(128) NOT NULL,
+gender ENUM('F', 'M') NOT NULL,
+phoneNumber VARCHAR(8) NOT NULL,
+
+PRIMARY KEY(adminID)
+
+);
+
+
