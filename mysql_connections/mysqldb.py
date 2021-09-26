@@ -14,8 +14,8 @@ class SQLDatabase():
     # Create Customer - DONE
     def createCustomer(self, custInfo):
         addCust = ("INSERT INTO customer "
-               "(name, email, password, address, phoneNumber, gender) "
-               "VALUES (%s, %s, %s, %s, %s, %s)")
+               "(customerID, name, email, password, address, phoneNumber, gender) "
+               "VALUES (%s, %s, %s, %s, %s, %s, %s)")
         try:   
             self.c.execute(addCust, custInfo)
             self.connection.commit()
@@ -24,22 +24,22 @@ class SQLDatabase():
 
     def createAdmin(self, adminInfo):
         addAdmin = ("INSERT INTO admin "
-               "(admin_id, admin_name, gender, phone_number, password)"
+               "(adminID, name, gender, phoneNumber, password)"
                "VALUES (%s, %s, %s, %s, %s)")  
         self.c.execute(addAdmin, adminInfo)
         self.connection.commit()
 
     # get Login
-    def getCustomerLogin(self, email, password):
-        getCustomerLogin = ("SELECT * FROM customer WHERE email = %s AND password=%s")
+    def getCustomerLogin(self, customerID, password):
+        getCustomerLogin = ("SELECT * FROM customer WHERE customerID = %s AND password=%s")
         
-        self.c.execute(getCustomerLogin, (email,password))
+        self.c.execute(getCustomerLogin, (customerID,password))
         details = self.c.fetchone()
         if details:
             return details
         else:
-            getCustomerLogin = ("SELECT * FROM customer WHERE email = %s")
-            self.c.execute(getCustomerLogin, (email))
+            getCustomerLogin = ("SELECT * FROM customer WHERE customerID = %s")
+            self.c.execute(getCustomerLogin, (customerID))
             details = self.c.fetchone()
 
             if details:
@@ -48,16 +48,16 @@ class SQLDatabase():
                 return ("User doesn't exist")
         
 
-    def getAdminLogin(self, email, password):
-        getAdminLogin = ("SELECT * FROM admin WHERE email = %s AND password=%s")
+    def getAdminLogin(self, adminID, password):
+        getAdminLogin = ("SELECT * FROM admin WHERE adminID = %s AND password=%s")
         
-        self.c.execute(getAdminLogin, (email,password))
+        self.c.execute(getAdminLogin, (adminID,password))
         details = self.c.fetchone()
         if details:
             return details
         else:
-            getAdminLogin = ("SELECT * FROM admin WHERE email = %s")
-            self.c.execute(getAdminLogin, (email))
+            getAdminLogin = ("SELECT * FROM admin WHERE adminID = %s")
+            self.c.execute(getAdminLogin, (adminID))
             details = self.c.fetchone()
 
             if details:
@@ -123,7 +123,9 @@ if __name__ == "__main__":
     # Testing Functions
 
     # Create customer
-    db.createCustomer(["Brenda2","brenda2@gmail.com","password","1 Street", "4444", "F"])
+    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    db.createAdmin(["admin2","Admin2", "F", "5555", "password"])
+    
 
     # login
     # email = 'brenda2@gmail.com'

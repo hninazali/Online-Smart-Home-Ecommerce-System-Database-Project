@@ -59,7 +59,7 @@ class LoginPage(tk.Frame):
         self.domain = controller.getDomain()
 
         # input fields
-        self.email = tk.StringVar()
+        self.userID = tk.StringVar()
         self.password = tk.StringVar()
 
         self.controller = controller
@@ -69,11 +69,11 @@ class LoginPage(tk.Frame):
         label.grid(row=0, column=4, padx=10, pady=10)
 
 
-        emailLabel = ttk.Label(self, text="Email:")
-        emailLabel.grid(row=1, column=1, padx=10, pady=10)
+        userIDLabel = ttk.Label(self, text="User ID:")
+        userIDLabel.grid(row=1, column=1, padx=10, pady=10)
 
-        emailInput = ttk.Entry(self, textvariable=self.email)
-        emailInput.grid(row=1, column=3, padx=10, pady=10)
+        userIDInput = ttk.Entry(self, textvariable=self.userID)
+        userIDInput.grid(row=1, column=3, padx=10, pady=10)
 
         passwordLabel = ttk.Label(self, text="Password:")
         passwordLabel.grid(row=2, column=1, padx=10, pady=10)
@@ -102,20 +102,21 @@ class LoginPage(tk.Frame):
 
     def handleLogin(self):
         if self.domain.get() == "Customer":
-            print("logged in:", self.email.get(), self.password.get())
-            res = db.getCustomerLogin(self.email.get(), self.password.get())
+            print("logged in:", self.userID.get(), self.password.get())
+            res = db.getCustomerLogin(self.userID.get(), self.password.get())
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
+                messagebox.showinfo(title="Login Success", message="Successfully logged in")
                 self.controller.show_frame(CustomerPortal)
-            
             elif isinstance(res, str):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)
         elif self.domain.get() == "Administrator":
-            print("logged in:", self.email.get(), self.password.get())
-            res = db.getAdminLogin(self.email.get(), self.password.get())
+            print("logged in:", self.userID.get(), self.password.get())
+            res = db.getAdminLogin(self.userID.get(), self.password.get())
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
+                messagebox.showinfo(title="Login Success", message="Admin Successfully logged in")
                 self.controller.show_frame(CustomerPortal)
             elif isinstance(res, str):
                 print("login failed", type(res))
