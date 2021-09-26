@@ -11,3 +11,8 @@ pip install -r requirements.txt
 ```
 3. Change python environment in VSCode to ./env/bin..
 
+
+After you pull the codes
+1. Run the sql scripts to create databases and tables
+2. Create customer and admin
+3. Run gui.py file 

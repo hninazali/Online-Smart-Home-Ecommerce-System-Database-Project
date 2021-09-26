@@ -20,9 +20,9 @@ class SQLDatabase():
             self.c.execute(addCust, custInfo)
             self.connection.commit()
         except Exception as e:
-            print(e)
+            return e
 
-    def createAdmin(self, adminInfo):
+    def createAdmin(self, adminInfo): 
         addAdmin = ("INSERT INTO admin "
                "(adminID, password, name, gender, phonenumber)"
                "VALUES (%s, %s, %s, %s, %s)")  

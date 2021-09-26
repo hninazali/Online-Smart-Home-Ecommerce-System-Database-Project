@@ -11,6 +11,8 @@ LARGEFONT = ("Verdana", 35)
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.domain = tk.StringVar(self)
+        self.controller = controller
 
         # label of frame Layout 2
         # label = ttk.Label(self, text="Startpage", font=LARGEFONT)
@@ -35,20 +37,26 @@ class StartPage(tk.Frame):
 
         ## button to show frame 2 with text layout2
         button2 = ttk.Button(self, text="Register",
-                             command=lambda: controller.show_frame(RegisterPage, self.domain))
+                             command=lambda: self.handleRegister(self.domain))
 
         # putting the button in its place by
         # using grid
         button2.grid(row=2, column=1, padx=10, pady=10)
 
-        self.domain = tk.StringVar(self)
+
         # Dropdown menu options
         options = ("Customer", "Administrator")
 
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
         
         dropdownlist.grid(row=3, column=1, padx=10, pady=10)
-    
+
+    def handleRegister(self, domain):
+        if domain.get()=="Customer":
+            self.controller.show_frame(RegisterPage, self.domain)
+        else:
+            messagebox.showerror(title="Registration Failed", message= "Please log in first to create a new administrator account.")
+
 
 
 # second window frame page1
@@ -97,7 +105,7 @@ class LoginPage(tk.Frame):
 
         # putting the button in its place
         # by using grid
-        button1.grid(row=4, column=1, padx=10, pady=10)
+        button1.grid(row=3, column=3, padx=10, pady=10)
 
 
     def handleLogin(self):
@@ -146,7 +154,7 @@ class RegisterPage(tk.Frame):
         label = ttk.Label(self, text="Register Page", font=LARGEFONT)
         label.grid(row=0, column=4, padx=10, pady=10)
 
-        userIDlabel = ttk.Label(self, text="UserID:")
+        userIDlabel = ttk.Label(self, text="User ID:")
         userIDlabel.grid(row=1, column=1, padx=10, pady=10)
 
         userIDInput = ttk.Entry(self, textvariable=self.userID)
@@ -196,7 +204,7 @@ class RegisterPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button1.grid(row=7, column=1, padx=10, pady=10)
+        button1.grid(row=8, column=1, padx=10, pady=10)
 
         # button to show frame 3 with text
         # layout3
@@ -205,16 +213,30 @@ class RegisterPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=8, column=1, padx=10, pady=10)
+        button2.grid(row=8, column=3, padx=10, pady=10)
 
     def setUserType(self,usertype):
         self.domain = usertype
 
+    '''
+    Returns True if any of the fields are empty.
+    '''
+    def checkEmptyField(self):
+        for element in [self.userID.get(), self.name.get(), self.email.get(), self.password.get(), self.address.get(), self.phoneNumber.get(), self.gender.get()]:
+            if element=="" or element=='' or element==' ':
+                return True
+        return False
+
     def handleRegister(self):        
         if self.domain.get()=="Customer":
-            db.createCustomer([self.userID.get(), self.name.get(), self.email.get(), self.password.get(), self.address.get(), self.phoneNumber.get(), self.gender.get()])
-        elif self.domain.get()=="Administrator":
-            db.createAdmin([self.userID.get(), self.password.get(), self.name.get(), self.gender.get(), self.phoneNumber.get()])
-        else:
-            print("huh?")
-            db.createAdmin([self.userID.get(), self.password.get(), self.name.get(), self.gender.get(), self.phoneNumber.get()])
+            if self.checkEmptyField():
+                messagebox.showerror(title="Registration Failed", message="Please fill in all fields")
+            else:
+                res = db.createCustomer([self.userID.get(), self.name.get(), self.email.get(), self.password.get(), self.address.get(), self.phoneNumber.get(), self.gender.get()])
+                if res : 
+                    messagebox.showerror(title="Registration Failed", message=res)
+                else : 
+                    messagebox.showinfo(title="Registration Success", message= "Succesfully created a customer account!")
+        
+    
+            
