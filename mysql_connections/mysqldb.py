@@ -5,11 +5,28 @@ import os
 
 class SQLDatabase():
     def __init__(self):
-        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
-        self.c = self.connection.cursor()
+        try:
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+            self.c = self.connection.cursor()
+        except:
+            print("Oshes Database does not exist. Creating now")
+            tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+            tempcursor = tempconnection.cursor()
+            tempcursor.execute("CREATE DATABASE oshes;")
+
+            tempcursor.close()
+            tempconnection.close()
+
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+            self.c = self.connection.cursor()
+
 
     # remaining : where to add the create tables codes 
 
+    # TODO: Consider initializing the connection as None and invoke this function to connect
+    def connect(self, dbname = "oshes"):
+        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        self.c = self.connection.cursor()
 
     # Create Customer - DONE
     def createCustomer(self, custInfo):
@@ -130,6 +147,8 @@ class SQLDatabase():
             rootdir = "../db_scripts"
 
         files = ["table.sql", "customer.sql", "admin.sql"]
+
+        # TODO: Drop existing tables if there is
 
         for file in files:
             with open(os.path.join(rootdir, file)) as f:

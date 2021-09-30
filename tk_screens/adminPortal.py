@@ -1,20 +1,27 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
+from mysql_connections.mysqldb import SQLDatabase
+
+db = SQLDatabase()
 
 class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         self.domain = tk.StringVar(self)
-        
+
+        # Reset Button
+        resetButton = ttk.Button(self, text="Reset SQLDB", command=self.resetDB)
+        resetButton.grid(row=0, column=1, padx=10, pady=10)
         #  Dummy Display 
         options = ("Customer", "Administrator")
 
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
         
-        dropdownlist.grid(row=0, column=1, padx=10, pady=10)
+        dropdownlist.grid(row=1, column=1, padx=10, pady=10)
 
     def resetDB(self):
+        db.resetMySQLState()
 # In addition, provide a MYSQL database initialization function under the Administrator login. 
 # At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:
