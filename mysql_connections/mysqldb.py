@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import pymysql
-
+import os
 
 class SQLDatabase():
     def __init__(self):
@@ -22,9 +22,10 @@ class SQLDatabase():
         except Exception as e:
             return e
 
+    # DISABLED
     def createAdmin(self, adminInfo): 
         addAdmin = ("INSERT INTO admin "
-               "(adminID, password, name, gender, phonenumber)"
+               "(adminID, password, name, gender, phoneNumber)"
                "VALUES (%s, %s, %s, %s, %s)")  
         self.c.execute(addAdmin, adminInfo)
         self.connection.commit()
@@ -117,14 +118,35 @@ class SQLDatabase():
         print(results)
         return results
 
+    # Reset the whole database with the sql scripts in db_scripts/
+    def resetMySQLState(self):
+        rootdir = "./db_scripts"
+        # Just in case someone cd into this dir and run the script
+        # TODO: Specify the order of scripts to be executed
+        try:
+            files = os.listdir("./db_scripts")
+        except:
+            files = os.listdir("../db_scripts")
+            rootdir = "../db_scripts"
+
+        files = ["table.sql", "customer.sql", "admin.sql"]
+
+        for file in files:
+            with open(os.path.join(rootdir, file)) as f:
+                allCmd = f.read().split(';')
+                allCmd.pop()
+
+                for idx, sql_request in enumerate(allCmd):
+                    self.c.execute(sql_request + ';')
+
 if __name__ == "__main__":
     db = SQLDatabase()
-
+    db.resetMySQLState()
     # Testing Functions
 
     # Create customer
-    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    db.createAdmin(["admin2","Admin2", "F", "5555", "password"])
+    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    # db.createAdmin(["admin2","Admin2", "F", "5555", "password"])
     
 
     # login
