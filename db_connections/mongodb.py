@@ -60,10 +60,13 @@ class MongoDB():
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
             return list(cursor)
 
-    def purchase(self, ItemID):
-        return "LOL"
-    
 
+    # Returns instance of DeleteResult. Execute query.deleted_count for the number of deleted documents
+    # TODO: test
+    def purchase(self, ItemID, database_name="oshes"):
+        query = self.client[database_name]["items"].delete_one({"ItemID": ItemID})
+        return query
+    
 
 if __name__ == "__main__":
     db = MongoDB()
