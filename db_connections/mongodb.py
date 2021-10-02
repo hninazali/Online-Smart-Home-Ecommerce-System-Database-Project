@@ -67,6 +67,9 @@ class MongoDB():
         query = self.client[database_name]["items"].delete_one({"ItemID": ItemID})
         return query
     
+    # The input for now is a dictionary (item)
+    def insertItem(self, itemdict, database_name='oshes'):
+        query = self.client[database_name]["items"].insert_one(itemdict)
 
 if __name__ == "__main__":
     db = MongoDB()
