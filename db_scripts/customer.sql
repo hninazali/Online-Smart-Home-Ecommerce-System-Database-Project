@@ -10,4 +10,3 @@ gender ENUM('M', 'F') NOT NULL,
 
 PRIMARY KEY (customerID)
 );
-s

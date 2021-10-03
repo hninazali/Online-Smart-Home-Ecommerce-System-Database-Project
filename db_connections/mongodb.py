@@ -13,7 +13,7 @@ class MongoDB():
         except errors.ServerSelectionTimeoutError as err:
             print(err)
 
-    # Returns true if the collection was dropped successfully
+    # Returns true if the collection was dropped successfully, for data reinit function
     def dropCollection(self, collection_name, database_name="oshes"):
         return self.client[database_name][collection_name].drop()
 
