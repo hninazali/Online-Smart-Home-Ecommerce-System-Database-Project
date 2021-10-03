@@ -1,15 +1,32 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import pymysql
-
+import os
 
 class SQLDatabase():
     def __init__(self):
-        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="Oshes")
-        self.c = self.connection.cursor()
+        try:
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="Oshes")
+            self.c = self.connection.cursor()
+        except:
+            print("Oshes Database does not exist. Creating now")
+            tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+            tempcursor = tempconnection.cursor()
+            tempcursor.execute("CREATE DATABASE oshes;")
+
+            tempcursor.close()
+            tempconnection.close()
+
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+            self.c = self.connection.cursor()
+
 
     # remaining : where to add the create tables codes 
 
+    # TODO: Consider initializing the connection as None and invoke this function to connect
+    def connect(self, dbname = "oshes"):
+        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        self.c = self.connection.cursor()
 
     # Create Customer - DONE
     def createCustomer(self, custInfo):
@@ -20,14 +37,20 @@ class SQLDatabase():
             self.c.execute(addCust, custInfo)
             self.connection.commit()
         except Exception as e:
-            print(e)
+            return e
 
-    def createAdmin(self, adminInfo):
+    # DISABLED
+    def createAdmin(self, adminInfo): 
         addAdmin = ("INSERT INTO admin "
-               "(adminID, name, gender, phoneNumber, password)"
+               "(adminID, name, password, gender, phoneNumber)"
                "VALUES (%s, %s, %s, %s, %s)")  
-        self.c.execute(addAdmin, adminInfo)
-        self.connection.commit()
+        # self.c.execute(addAdmin, adminInfo)
+        # self.connection.commit()
+        try:   
+            self.c.execute(addAdmin, adminInfo)
+            self.connection.commit()
+        except Exception as e:
+            return e
 
     # get Login
     def getCustomerLogin(self, customerID, password):
@@ -117,21 +140,59 @@ class SQLDatabase():
         print(results)
         return results
 
+ 
+
+    # Reset the whole database with the sql scripts in db_scripts/
+    def resetMySQLState(self):
+        rootdir = "./db_scripts"
+        # Just in case someone cd into this dir and run the script
+        # TODO: Specify the order of scripts to be executed
+        try:
+            files = os.listdir("./db_scripts")
+        except:
+            files = os.listdir("../db_scripts")
+            rootdir = "../db_scripts"
+
+        files = ["table.sql", "customer.sql", "admin.sql"]
+
+        for file in files:
+            with open(os.path.join(rootdir, file)) as f:
+                allCmd = f.read().split(';')
+                allCmd.pop()
+
+                for idx, sql_request in enumerate(allCmd):
+                    self.c.execute(sql_request + ';')
+                    print("Executing:", sql_request)
+        self.connection.commit()
+    
+    # Temporary admin filter function
     def adminCategorySearch(self, category):
-        productsList = ("SELECT *, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) AS numSold, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) as inventoryLevel FROM product p WHERE category LIKE %s GROUP BY productID ORDER BY productID")
-        self.c.execute(productsList, ("sold", "available", category))
-        results = self.c.fetchall()
-        print(results)
-        return results
+         productsList = ("SELECT *, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) AS numSold, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) as inventoryLevel FROM product p WHERE category LIKE %s GROUP BY productID ORDER BY productID")
+         self.c.execute(productsList, ("sold", "available", category))
+         results = self.c.fetchall()
+         print(results)
+         return results
+
+# Exists outside of the class. Drops the oshes database if it exists
+def dropDatabase():
+    try:
+        tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        cur = tempc.cursor()
+        cur.execute("DROP DATABASE oshes;")
+    except:
+        print("DB oshes does not exist")
+
 
 if __name__ == "__main__":
+    dropDatabase()
     db = SQLDatabase()
-
+    db.resetMySQLState()
     # Testing Functions
 
-    # Create customer
+    # # Create customer
     db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    db.createAdmin(["admin2","Admin2", "F", "5555", "password"])
+    # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
+
     
 
     # login

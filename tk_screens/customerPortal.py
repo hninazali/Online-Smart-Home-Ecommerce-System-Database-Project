@@ -8,7 +8,7 @@ class CustomerPortal(tk.Frame):
 
         self.domain = tk.StringVar(self)
         
-        #  Dummy Display 
+        #  Dummy Display, need to be replaced 
         options = ("Customer", "Administrator")
 
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
