@@ -51,20 +51,6 @@ class StartPage(tk.Frame):
         
         dropdownlist.grid(row=3, column=1, padx=10, pady=10)
 
-        # tree = ttk.Treeview(self, column=("FName", "LName", "Roll No"), show='headings', height=5)
-        # tree.column("# 1", anchor="center")
-        # tree.heading("# 1", text="FName")
-        # tree.column("# 2", anchor="center")
-        # tree.heading("# 2", text="LName")
-        # tree.column("# 3", anchor="center")
-        # tree.heading("# 3", text="Roll No")
-
-        # # Insert the data in Treeview widget
-        # tree.insert('', 'end', text="1", values=('Amit', 'Kumar', '17701'))
-        # tree.insert('', 'end', text="1", values=('Ankush', 'Mathur', '17702'))
-        # tree.insert('', 'end', text="1", values=('Manisha', 'Joshi', '17703'))
-        # tree.insert('', 'end', text="1", values=('Shivam', 'Mehrotra', '17704'))
-
         table = Table(parent= parent,columns=("FName", "LName", "Roll No"))
         table.insertRow(('Amit', 'Kumar', '17701'))
         table.insertRow(('Ankush', 'Mathur', '17702'))

@@ -155,8 +155,6 @@ class SQLDatabase():
 
         files = ["table.sql", "customer.sql", "admin.sql"]
 
-        # TODO: Drop existing tables if there is
-
         for file in files:
             with open(os.path.join(rootdir, file)) as f:
                 allCmd = f.read().split(';')
@@ -164,15 +162,29 @@ class SQLDatabase():
 
                 for idx, sql_request in enumerate(allCmd):
                     self.c.execute(sql_request + ';')
+                    print("Executing:", sql_request)
+        self.connection.commit()
+
+# Exists outside of the class. Drops the oshes database if it exists
+def dropDatabase():
+    try:
+        tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        cur = tempc.cursor()
+        cur.execute("DROP DATABASE oshes;")
+    except:
+        print("DB oshes does not exist")
+
 
 if __name__ == "__main__":
+    dropDatabase()
     db = SQLDatabase()
     db.resetMySQLState()
     # Testing Functions
 
-    # Create customer
-    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
+    # # Create customer
+    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
+
     
 
     # login
