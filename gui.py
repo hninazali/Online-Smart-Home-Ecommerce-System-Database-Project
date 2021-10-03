@@ -2,7 +2,7 @@
 
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
-from mysql_connections.mysqldb import SQLDatabase
+from db_connections.mysqldb import SQLDatabase
 
 LARGEFONT = ("Verdana", 35)
 
