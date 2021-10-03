@@ -27,42 +27,27 @@ class AdminPortal(tk.Frame):
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:
 
 
-# Comment : more screns for the admin portal will be defined as individual page/ popup classes in this file
+# Winy can try with her table code too
 
-# DB_CONFIG = {
-#     'host': 'localhost',
-#     'user': 'loff',
-#     'pass': 'loff',
-#     'db': 'loff',
-#     'char': 'utf8',
-#     'file': 'create-db-loff.sql'
-# }
+ # table = Table(parent= parent,columns=("FName", "LName", "Roll No"))
+        # table.insertRow(('Amit', 'Kumar', '17701'))
+        # table.insertRow(('Ankush', 'Mathur', '17702'))
+        # tree = table.getTree()
+        # tree.grid(row=4, column=1, padx=10, pady=10)
 
-# def get_sql_from_file(filename=DB_CONFIG['file']):
-#     """
-#     Get the SQL instruction from a file
+# class Table:
+#     def __init__(self, parent, columns, num_visible_rows=5):
+#         self.tree = ttk.Treeview(parent, column=columns, show='headings', height=num_visible_rows)
+#         self.tree.column("# 1", anchor="center")
+#         self.tree.heading("# 1", text="FName")
+#         self.tree.column("# 2", anchor="center")
+#         self.tree.heading("# 2", text="LName")
+#         self.tree.column("# 3", anchor="center")
+#         self.tree.heading("# 3", text="Roll No")
 
-#     :return: a list of each SQL query whithout the trailing ";"
-#     """
-#     from os import path
 
-#     # File did not exists
-#     if path.isfile(filename) is False:
-#         print("File load error : {}".format(filename))
-#         return False
+#     def insertRow(self, values):
+#         self.tree.insert('', 'end', text="1", values=values)
 
-#     else:
-#         with open(filename, "r") as sql_file:
-#             # Split file in list
-#             ret = sql_file.read().split(';')
-#             # drop last empty entry
-#             ret.pop()
-#             return ret
-
-# request_list = self.get_sql_from_file()
-
-# if request_list is not False:
-
-#     for idx, sql_request in enumerate(request_list):
-#         self.message = self.MSG['request'].format(idx, sql_request)
-#         cursor.execute(sql_request + ';')
+#     def getTree(self):
+#         return self.tree

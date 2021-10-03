@@ -51,11 +51,11 @@ class StartPage(tk.Frame):
         
         dropdownlist.grid(row=3, column=1, padx=10, pady=10)
 
-        table = Table(parent= parent,columns=("FName", "LName", "Roll No"))
-        table.insertRow(('Amit', 'Kumar', '17701'))
-        table.insertRow(('Ankush', 'Mathur', '17702'))
-        tree = table.getTree()
-        tree.grid(row=4, column=1, padx=10, pady=10)
+        # table = Table(parent= parent,columns=("FName", "LName", "Roll No"))
+        # table.insertRow(('Amit', 'Kumar', '17701'))
+        # table.insertRow(('Ankush', 'Mathur', '17702'))
+        # tree = table.getTree()
+        # tree.grid(row=4, column=1, padx=10, pady=10)
 
     def handleRegister(self, domain):
         if domain.get()=="Customer":
@@ -63,22 +63,22 @@ class StartPage(tk.Frame):
         else:
             messagebox.showerror(title="Registration Failed", message= "Please log in first to create a new administrator account.")
 
-class Table:
-    def __init__(self, parent, columns, num_visible_rows=5):
-        self.tree = ttk.Treeview(parent, column=columns, show='headings', height=num_visible_rows)
-        self.tree.column("# 1", anchor="center")
-        self.tree.heading("# 1", text="FName")
-        self.tree.column("# 2", anchor="center")
-        self.tree.heading("# 2", text="LName")
-        self.tree.column("# 3", anchor="center")
-        self.tree.heading("# 3", text="Roll No")
+# class Table:
+#     def __init__(self, parent, columns, num_visible_rows=5):
+#         self.tree = ttk.Treeview(parent, column=columns, show='headings', height=num_visible_rows)
+#         self.tree.column("# 1", anchor="center")
+#         self.tree.heading("# 1", text="FName")
+#         self.tree.column("# 2", anchor="center")
+#         self.tree.heading("# 2", text="LName")
+#         self.tree.column("# 3", anchor="center")
+#         self.tree.heading("# 3", text="Roll No")
 
 
-    def insertRow(self, values):
-        self.tree.insert('', 'end', text="1", values=values)
+#     def insertRow(self, values):
+#         self.tree.insert('', 'end', text="1", values=values)
 
-    def getTree(self):
-        return self.tree
+#     def getTree(self):
+#         return self.tree
 
 # second window frame page
 class LoginPage(tk.Frame):
