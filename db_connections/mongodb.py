@@ -17,8 +17,8 @@ class MongoDB():
     def dropCollection(self, collection_name, database_name="oshes"):
         return self.client[database_name][collection_name].drop()
 
-    def resetDB(self, database_name="oshes"):
-        # If accidentally put in the file outside, it will go to a folder before 
+    def resetMongoState(self, database_name="oshes"):
+        # if called from db_connections and if called from tk-screens 
         try:
             files = os.listdir("./JSON_files")
             rootdir = "./JSON_files"
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     db = MongoDB()
     # db.dropCollection("products")
     # db.dropCollection("items")
-    # db.resetDB()
+    # db.resetMongoState()
     # print(db.findItems(category="Lights", model="Light1", domain="Administrator"))
     # print(db.findProducts(category="Lights", model="Light1", domain="Customer"))
     

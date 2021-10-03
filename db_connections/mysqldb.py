@@ -42,10 +42,15 @@ class SQLDatabase():
     # DISABLED
     def createAdmin(self, adminInfo): 
         addAdmin = ("INSERT INTO admin "
-               "(adminID, password, name, gender, phoneNumber)"
+               "(adminID, name, password, gender, phoneNumber)"
                "VALUES (%s, %s, %s, %s, %s)")  
-        self.c.execute(addAdmin, adminInfo)
-        self.connection.commit()
+        # self.c.execute(addAdmin, adminInfo)
+        # self.connection.commit()
+        try:   
+            self.c.execute(addAdmin, adminInfo)
+            self.connection.commit()
+        except Exception as e:
+            return e
 
     # get Login
     def getCustomerLogin(self, customerID, password):
@@ -135,6 +140,8 @@ class SQLDatabase():
         print(results)
         return results
 
+ 
+
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
         rootdir = "./db_scripts"
@@ -160,12 +167,12 @@ class SQLDatabase():
 
 if __name__ == "__main__":
     db = SQLDatabase()
-    db.resetMySQLState()
+    # db.resetMySQLState()
     # Testing Functions
 
     # Create customer
     # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    # db.createAdmin(["admin2","Admin2", "F", "5555", "password"])
+    db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
     
 
     # login
