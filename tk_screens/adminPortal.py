@@ -69,40 +69,40 @@ class AdminPortal(tk.Frame):
         # table = Table(self, ['#1', '#2', '#3']).getTree()
         # table.grid(row=2, column=1, padx=10, pady=10)
 
-        columns = ('#1', '#2', '#3')
+        # columns = ('#1', '#2', '#3')
 
-        tree = ttk.Treeview(self, columns=columns, show='headings')
+        # tree = ttk.Treeview(self, columns=columns, show='headings')
 
-        # define headings
-        tree.heading('#1', text='First Name')
-        tree.heading('#2', text='Last Name')
-        tree.heading('#3', text='Email')
+        # # define headings
+        # tree.heading('#1', text='First Name')
+        # tree.heading('#2', text='Last Name')
+        # tree.heading('#3', text='Email')
 
-        # generate sample data
-        contacts = []
-        for n in range(1, 100):
-            contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com'))
+        # # generate sample data
+        # contacts = []
+        # for n in range(1, 100):
+        #     contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com'))
 
-        # adding data to the treeview
-        for contact in contacts:
-            tree.insert('', tk.END, values=contact)
-
-
-        # bind the select event
-        def item_selected(event):
-            for selected_item in tree.selection():
-                # dictionary
-                item = tree.item(selected_item)
-                # list
-                record = item['values']
-                #
-                tk.showinfo(title='Information',
-                        message=','.join(record))
+        # # adding data to the treeview
+        # for contact in contacts:
+        #     tree.insert('', tk.END, values=contact)
 
 
-        tree.bind('<<TreeviewSelect>>', item_selected)
+        # # bind the select event
+        # def item_selected(event):
+        #     for selected_item in tree.selection():
+        #         # dictionary
+        #         item = tree.item(selected_item)
+        #         # list
+        #         record = item['values']
+        #         #
+        #         tk.showinfo(title='Information',
+        #                 message=','.join(record))
 
-        tree.grid(row=2, column=0, sticky='nsew')
+
+        # tree.bind('<<TreeviewSelect>>', item_selected)
+
+        # tree.grid(row=2, column=0, sticky='nsew')
 
 
     def resetDB(self):
