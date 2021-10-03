@@ -5,7 +5,7 @@ import pymysql
 
 class SQLDatabase():
     def __init__(self):
-        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="Oshes")
         self.c = self.connection.cursor()
 
     # remaining : where to add the create tables codes 
@@ -113,6 +113,13 @@ class SQLDatabase():
     def retrieveService(self):
         allReq = ("SELECT requests.request_id, items.item_id, items.category, items.model, requests.request_date, service.service_status FROM ((service INNER JOIN requests ON service.request_id = requests.request_id) INNER JOIN items ON service.item_id = items.item_id)")
         self.c.execute(allReq, ())
+        results = self.c.fetchall()
+        print(results)
+        return results
+
+    def adminCategorySearch(self, category):
+        productsList = ("SELECT *, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) AS numSold, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) as inventoryLevel FROM product p WHERE category LIKE %s GROUP BY productID ORDER BY productID")
+        self.c.execute(productsList, ("sold", "available", category))
         results = self.c.fetchall()
         print(results)
         return results
