@@ -2,11 +2,12 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import pymysql
 import os
+import json
 
 class SQLDatabase():
     def __init__(self):
         try:
-            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="Oshes")
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
             self.c = self.connection.cursor()
         except:
             print("Oshes Database does not exist. Creating now")
@@ -153,7 +154,7 @@ class SQLDatabase():
             files = os.listdir("../db_scripts")
             rootdir = "../db_scripts"
 
-        files = ["table.sql", "customer.sql", "admin.sql"]
+        files = ["customer.sql", "admin.sql", "table.sql"]
 
         for file in files:
             with open(os.path.join(rootdir, file)) as f:
@@ -164,6 +165,31 @@ class SQLDatabase():
                     self.c.execute(sql_request + ';')
                     print("Executing:", sql_request)
         self.connection.commit()
+
+    def dataInit(self):
+        try:
+            files = os.listdir("./JSON_files")
+            rootdir = "./JSON_files"
+        except:
+            files = os.listdir("../JSON_files")
+            rootdir = "../JSON_files"
+
+        fullpath = os.path.join(rootdir, "products.json")
+        json_obj = json.loads(open(fullpath).read())
+        for product in enumerate(json_obj):
+            products = (product[1]["ProductID"], product[1]["Category"], product[1]["Model"], product[1]["Price ($)"], product[1]["Warranty (months)"], product[1]["Cost ($)"])
+            initProduct = ("INSERT INTO PRODUCT (productID, category, model, price, warranty, cost) VALUES (%s, %s, %s, %s, %s, %s)")
+            self.c.execute(initProduct, products)
+            self.connection.commit()
+
+        fullpath = os.path.join(rootdir, "items.json")
+        json_obj = json.loads(open(fullpath).read())
+        for item in enumerate(json_obj):
+            productID = ("SELECT productID FROM Product WHERE model = %s AND category = %s")
+            productID = self.c.execute(productID, (item[1]["Model"], item[1]["Category"]))
+            items = (item[1]["ItemID"], item[1]["Color"], item[1]["Factory"], item[1]["PowerSupply"], item[1]["ProductionYear"], item[1]["PurchaseStatus"], productID)
+            initItem = ("INSERT INTO ITEM (itemID, color, factory, powerSupply, productionYear, purchaseStatus, productID) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+            self.c.execute(initItem, items)
     
     # Temporary admin filter function
     def adminCategorySearch(self, category):
@@ -187,6 +213,7 @@ if __name__ == "__main__":
     dropDatabase()
     db = SQLDatabase()
     db.resetMySQLState()
+    db.dataInit()
     # Testing Functions
 
     # # Create customer
