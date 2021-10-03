@@ -182,7 +182,7 @@ if __name__ == "__main__":
     # Testing Functions
 
     # # Create customer
-    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
     # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
 
     
