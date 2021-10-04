@@ -1,12 +1,12 @@
-CREATE TABLE customer(
+CREATE TABLE Customer(
 
 customerID VARCHAR(16) NOT NULL UNIQUE,
-name VARCHAR(40) NOT NULL,
+name VARCHAR(128) NOT NULL,
 email VARCHAR(30) NOT NULL UNIQUE,
-password VARCHAR(128) NOT NULL,
+password VARCHAR(40) NOT NULL,
 address VARCHAR(200) NOT NULL,
 phoneNumber VARCHAR(8) NOT NULL,
-gender ENUM('F', 'M') NOT NULL,
+gender ENUM('M', 'F') NOT NULL,
 
 PRIMARY KEY (customerID)
 );

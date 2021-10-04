@@ -1,6 +1,8 @@
+# code referenced and modified from this tutorial : https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/
+
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
-from mysql_connections.mysqldb import SQLDatabase
+from db_connections.mysqldb import SQLDatabase
 
 LARGEFONT = ("Verdana", 35)
 
