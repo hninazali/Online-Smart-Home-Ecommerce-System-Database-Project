@@ -192,7 +192,7 @@ class SQLDatabase():
             self.c.execute(initItem, items)
     
     # Temporary admin filter function
-    def adminCategorySearch(self, category):
+    def adminProductSearch(self, category):
          productsList = ("SELECT *, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) AS numSold, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) as inventoryLevel FROM product p WHERE category LIKE %s GROUP BY productID ORDER BY productID")
          self.c.execute(productsList, ("sold", "available", category))
          results = self.c.fetchall()

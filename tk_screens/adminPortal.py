@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label, Entry
 from db_connections.mysqldb import SQLDatabase
-from tk_screens.adminCategorySearch import AdminCategorySearch 
+from tk_screens.adminProductSearch import AdminProductSearch 
 from tk_screens.adminItemSearch import AdminItemSearch
 
 db = SQLDatabase()
@@ -23,7 +23,7 @@ class AdminPortal(tk.Frame):
         dropdownlist.grid(row=1, column=1, padx=10, pady=10)
 
         button1 = ttk.Button(self, text="Search Product",
-                             command=lambda: controller.show_frame(AdminCategorySearch))
+                             command=lambda: controller.show_frame(AdminProductSearch))
         button1.grid(row=4, column=1, padx=10, pady=10)
 
         button2 = ttk.Button(self, text="Search Item",

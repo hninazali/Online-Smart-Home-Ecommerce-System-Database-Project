@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
-from tk_screens.adminCategorySearch import AdminCategorySearch 
+from tk_screens.adminProductSearch import AdminProductSearch 
 from tk_screens.adminItemSearch import AdminItemSearch
 
 class CustomerPortal(tk.Frame):
@@ -17,7 +17,7 @@ class CustomerPortal(tk.Frame):
         dropdownlist.grid(row=0, column=1, padx=10, pady=10)
 
         button1 = ttk.Button(self, text="Search Product",
-                             command=lambda: controller.show_frame(AdminCategorySearch))
+                             command=lambda: controller.show_frame(AdminProductSearch))
         button1.grid(row=4, column=1, padx=10, pady=10)
 
         button2 = ttk.Button(self, text="Search Item",

@@ -65,6 +65,17 @@ class MongoDB():
         cursor = self.client[database_name]["items"].find({"ItemID": itemID})
         return list(cursor)
 
+    def adminProductSearch(self, category, model, database_name="oshes"):
+        if category == "All" and model == "All":
+            cursor = self.client[database_name]["products"].find()
+        elif category == "All":
+            cursor = self.client[database_name]["products"].find({"Model": model})
+        elif model == "All":
+            cursor = self.client[database_name]["products"].find({"Category": category})
+        else:
+            cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
+        return list(cursor)
+
     # Returns instance of DeleteResult. Execute query.deleted_count for the number of deleted documents
     # TODO: test
     def purchase(self, ItemID, database_name="oshes"):
