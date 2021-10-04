@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label, Entry
 from db_connections.mysqldb import SQLDatabase
+from tk_screens.adminCategorySearch import AdminCategorySearch 
+from tk_screens.adminItemSearch import AdminItemSearch
 
 db = SQLDatabase()
 
@@ -20,8 +22,17 @@ class AdminPortal(tk.Frame):
         
         dropdownlist.grid(row=1, column=1, padx=10, pady=10)
 
+        button1 = ttk.Button(self, text="Search Product",
+                             command=lambda: controller.show_frame(AdminCategorySearch))
+        button1.grid(row=4, column=1, padx=10, pady=10)
+
+        button2 = ttk.Button(self, text="Search Item",
+                             command=lambda: controller.show_frame(AdminItemSearch))
+        button2.grid(row=4, column=2, padx=10, pady=10)
+
     def resetDB(self):
         db.resetMySQLState()
+        db.dataInit()
 # In addition, provide a MYSQL database initialization function under the Administrator login. 
 # At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:

@@ -1,12 +1,13 @@
 from pymongo import MongoClient, errors
 import os
 import json
+import certifi
 
 class MongoDB():
     def __init__(self):
         try:
             # try to instantiate a client instance
-            self.client = MongoClient("mongodb+srv://user:oshespassword@singapore.gznlc.mongodb.net/test")
+            self.client = MongoClient("mongodb://localhost:27017")
             # print the version of MongoDB server if connection successful
             print ("server version:", self.client.server_info()["version"])
 
@@ -60,6 +61,9 @@ class MongoDB():
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
             return list(cursor)
 
+    def findItemByID(self, itemID, database_name="oshes"):
+        cursor = self.client[database_name]["items"].find({"ItemID": itemID})
+        return list(cursor)
 
     # Returns instance of DeleteResult. Execute query.deleted_count for the number of deleted documents
     # TODO: test

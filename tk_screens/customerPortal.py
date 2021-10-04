@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
-from tk_screens.adminCategorySearch import AdminCategorySearch
+from tk_screens.adminCategorySearch import AdminCategorySearch 
+from tk_screens.adminItemSearch import AdminItemSearch
 
 class CustomerPortal(tk.Frame):
     def __init__(self, parent, controller):
@@ -15,10 +16,11 @@ class CustomerPortal(tk.Frame):
         
         dropdownlist.grid(row=0, column=1, padx=10, pady=10)
 
-        button1 = ttk.Button(self, text="Search Page",
+        button1 = ttk.Button(self, text="Search Product",
                              command=lambda: controller.show_frame(AdminCategorySearch))
-
-        # putting the button in its place
-        # by using grid
         button1.grid(row=4, column=1, padx=10, pady=10)
+
+        button2 = ttk.Button(self, text="Search Item",
+                             command=lambda: controller.show_frame(AdminItemSearch))
+        button2.grid(row=4, column=2, padx=10, pady=10)
     

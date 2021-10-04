@@ -196,7 +196,6 @@ class SQLDatabase():
          productsList = ("SELECT *, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) AS numSold, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) as inventoryLevel FROM product p WHERE category LIKE %s GROUP BY productID ORDER BY productID")
          self.c.execute(productsList, ("sold", "available", category))
          results = self.c.fetchall()
-         print(results)
          return results
 
 # Exists outside of the class. Drops the oshes database if it exists
@@ -213,12 +212,11 @@ if __name__ == "__main__":
     dropDatabase()
     db = SQLDatabase()
     db.resetMySQLState()
-    db.dataInit()
     # Testing Functions
 
     # # Create customer
     db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
+    db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
 
     
 
