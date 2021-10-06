@@ -36,7 +36,7 @@ class tkinterApp(tk.Tk):
         # iterating through a tuple consisting
         # of the different page layouts
         # all new pages created add here
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, AdminProductSearch, AdminItemSearch):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch):
 
             frame = F(container, self)
 

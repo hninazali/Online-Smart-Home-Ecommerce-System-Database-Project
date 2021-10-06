@@ -76,6 +76,13 @@ class MongoDB():
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
         return list(cursor)
 
+    def adminAdvancedSearch(self, search, database_name="oshes"):
+        if search == "":
+            cursor = self.client[database_name]["items"].find()
+        else:
+            cursor = self.client[database_name]["items"].find(search)
+        return list(cursor)
+
     # Returns instance of DeleteResult. Execute query.deleted_count for the number of deleted documents
     # TODO: test
     def purchase(self, ItemID, database_name="oshes"):

@@ -35,7 +35,6 @@ class AdminItemSearch(tk.Frame):
                              command=self.renderItemsList)
         button1.grid(row=1, column=2, padx=10, pady=10)
 
-        # Treeview to show product result based on filter
         global cols
         cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status', 'Service Status')
 
@@ -50,23 +49,18 @@ class AdminItemSearch(tk.Frame):
             result = self.mongoToTree(r)
             tree.insert("", "end", values=result)
         tree.grid(row=6, column=1, columnspan=1)
-        tree.bind("<ButtonRelease-1>", self.clicker)
+        # tree.bind("<ButtonRelease-1>", self.clicker)
 
-        # Attach scrollbar to treeview
-        # Scrollbar only works if there are many items (can duplicate line 48-49 to try it out if amount of data is not sufficient)
         scrollbar = ttk.Scrollbar(wrapper2, orient="vertical", command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
         scrollbar.grid(row=6, column=2, sticky="ns")
 
     def renderItemsList(self):
-        # Delete existing data from table
         for r in tree.get_children():
             tree.delete(r)
 
-        # Get data from db
         res = mongo.findItemByID(self.itemID.get())
 
-        # Set heading and load new data results
         for col in cols:
             tree.heading(col, text=col)
         for r in res:
@@ -74,15 +68,6 @@ class AdminItemSearch(tk.Frame):
             tree.insert("", "end", values=result)
 
         tree.grid(row=6, column=1, columnspan=1)
-
-    # When a row is  clicked, this method will get the item from the selected row
-    def clicker(self, event):
-        # Grab record number
-        selected = tree.focus()
-        # Grab record values
-        values = tree.item(selected, 'values')
-        # Can use the return value to query data eg values[0] returns itemID
-        print(values)
 
     def mongoToTree(self, r):
         serviceStatus = ""
