@@ -16,7 +16,6 @@ CREATE TABLE Item (
 	powerSupply 	VARCHAR(7) 		NOT NULL,
 	purchaseStatus  ENUM("Unsold", "Sold") NOT NULL, 
 	productionYear 	VARCHAR(4) 		NOT NULL,
-	serviceStatus 	ENUM("", "Waiting for approval", "In progress", "Completed"),
 	warrantyExpiry 	DATE,
     customerID 		VARCHAR(16), 
     productID 		INT 			NOT NULL,
@@ -34,7 +33,15 @@ CREATE TABLE ServiceRequest (
 	dateOfPayment 	DATE,
 	adminID 		VARCHAR(40),
 	PRIMARY KEY (requestID),
-	FOREIGN KEY (itemID) REFERENCES Item(itemID),
+	FOREIGN KEY (itemID) REFERENCES Item(itemID));
+
+CREATE TABLE Service(
+	serviceStatus 	ENUM("waiting for approval", "in progress", "completed"),
+    itemID 			VARCHAR(4)  	NOT NULL,
+    requestID 		INT 			NOT NULL,
+	adminID 		VARCHAR(40),
+    FOREIGN KEY (itemID) REFERENCES Item(itemID),
+    FOREIGN KEY (requestID) REFERENCES ServiceRequest(requestID)
 	FOREIGN KEY (adminID) REFERENCES Admin(adminID));
 
 

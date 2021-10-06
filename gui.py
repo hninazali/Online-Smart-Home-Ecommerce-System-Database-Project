@@ -8,6 +8,7 @@ LARGEFONT = ("Verdana", 35)
 
 from tk_screens.authScreens import *
 from tk_screens.customerPortal import *
+from tk_screens.adminPortal import *
 from tk_screens.adminProductSearch import *
 from tk_screens.adminItemSearch import *
 
@@ -35,7 +36,7 @@ class tkinterApp(tk.Tk):
         # iterating through a tuple consisting
         # of the different page layouts
         # all new pages created add here
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminProductSearch, AdminItemSearch):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, AdminProductSearch, AdminItemSearch):
 
             frame = F(container, self)
 

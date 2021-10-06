@@ -1,4 +1,5 @@
 from tk_screens.customerPortal import CustomerPortal
+from tk_screens.adminPortal import AdminPortal
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from db_connections.mysqldb import SQLDatabase
@@ -146,7 +147,7 @@ class LoginPage(tk.Frame):
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
                 messagebox.showinfo(title="Login Success", message="Admin Successfully logged in")
-                self.controller.show_frame(CustomerPortal)
+                self.controller.show_frame(AdminPortal)
             elif isinstance(res, str):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)

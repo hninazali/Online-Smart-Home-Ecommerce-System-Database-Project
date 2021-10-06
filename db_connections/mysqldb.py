@@ -197,6 +197,18 @@ class SQLDatabase():
          self.c.execute(productsList, ("sold", "available", category))
          results = self.c.fetchall()
          return results
+    
+    def itemUnderService(self):
+        itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Item i, Product p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
+        self.c.execute(itemsList)
+        results = self.c.fetchall()
+        return results
+    
+    def custWithUnpaidFees(self):
+        custList  =  ("SELECT customerID, name, email, requestID, serviceFee, (DATEDIFF(r.dateOfRequest, CURDATE())+ 10) as daysLeft FROM Customer c, ServiceRequest r WHERE requestStatus = %s ORDER BY customerID")
+        self.c.execute(custList, ("Submitted and Waiting for payment"))
+        results = self.c.fetchall()
+        return results
 
 # Exists outside of the class. Drops the oshes database if it exists
 def dropDatabase():

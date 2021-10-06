@@ -15,12 +15,4 @@ class CustomerPortal(tk.Frame):
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
         
         dropdownlist.grid(row=0, column=1, padx=10, pady=10)
-
-        button1 = ttk.Button(self, text="Search Product",
-                             command=lambda: controller.show_frame(AdminProductSearch))
-        button1.grid(row=4, column=1, padx=10, pady=10)
-
-        button2 = ttk.Button(self, text="Search Item",
-                             command=lambda: controller.show_frame(AdminItemSearch))
-        button2.grid(row=4, column=2, padx=10, pady=10)
     
