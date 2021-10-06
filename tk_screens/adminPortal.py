@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox, PhotoImage, Label, Entry, LabelFrame, IntVa
 from db_connections.mysqldb import SQLDatabase
 from tk_screens.adminProductSearch import AdminProductSearch 
 from tk_screens.adminItemSearch import AdminItemSearch
+from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
 
 db = SQLDatabase()
 
@@ -43,8 +44,8 @@ class AdminPortal(tk.Frame):
         button3.grid(row=0, column=3, padx=10, pady=10)
 
         button4 = ttk.Button(self.wrapper1, text="Advanced Search",
-                             command=lambda: controller.show_frame(AdvancedSearch))
-        button4.grid(row=0, column=3, padx=10, pady=10)
+                             command=lambda: controller.show_frame(AdminAdvancedSearch))
+        button4.grid(row=0, column=4, padx=10, pady=10)
 
     def display(self):
         if self.domain.get() == "Items Under Service":

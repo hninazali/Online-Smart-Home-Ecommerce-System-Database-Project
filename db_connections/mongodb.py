@@ -66,11 +66,11 @@ class MongoDB():
         return list(cursor)
 
     def adminProductSearch(self, category, model, database_name="oshes"):
-        if category == "All" and model == "All":
+        if category == "" and model == "":
             cursor = self.client[database_name]["products"].find()
-        elif category == "All":
+        elif category == "":
             cursor = self.client[database_name]["products"].find({"Model": model})
-        elif model == "All":
+        elif model == "":
             cursor = self.client[database_name]["products"].find({"Category": category})
         else:
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})

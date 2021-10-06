@@ -9,7 +9,7 @@ mongo.resetMongoState()
 
 LARGEFONT = ("Verdana", 35)
 
-class AdminProductSearch(tk.Frame):
+class AdminAdvancedSearch(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -30,29 +30,22 @@ class AdminProductSearch(tk.Frame):
         optionsCategory = ("All", "Lights", "Locks")
         optionsModel = ("All", "Light1", "Light2", "SmartHome1", "Safe1", "Safe2", "Safe3")
 
-        vModel=[]
-        self.modelBox = ttk.Combobox(wrapper1, values = vModel)
-        self.modelBox.configure(cursor='arrow', state='readonly', takefocus=False)
-        self.modelBox.grid(row=2, column=1, sticky=tk.E, padx=10, pady=10)
+        categoryListLabel = ttk.Label(wrapper1, text="Category:")
+        categoryListLabel.grid(row=1, column=0, padx=10, pady=10)
+        categoryList = ttk.OptionMenu(wrapper1, self.category, optionsCategory[0], *optionsCategory)
+        categoryList.grid(row=1, column=1, sticky=tk.E, padx=10, pady=10)
 
-        def categoryAndModel(event):
-            if self.categoryBox.get()=="Lights":
-                vModel = ["Light1", "Light2", "SmartHome1",""]
-            elif self.categoryBox.get()=="Locks":
-                vModel = ["Safe1", "Safe2", "Safe3", "SmartHome1",""]
-            else:
-                vModel = []
-            self.modelBox.configure(values = vModel)
-
-        self.categoryBox = ttk.Combobox(wrapper1, values = ["Lights", "Locks",""])
-        self.categoryBox.bind('<<ComboboxSelected>>', categoryAndModel)
-        self.categoryBox.configure(state='readonly')
-        self.categoryBox.grid(row=1, column=1, sticky=tk.E, padx=10, pady=10)
+        modelListLabel = ttk.Label(wrapper1, text="Model:")
+        modelListLabel.grid(row=2, column=0, padx=10, pady=10)
+        modelList = ttk.OptionMenu(wrapper1, self.model, optionsModel[0], *optionsModel)
+        modelList.grid(row=2, column=1, sticky=tk.E, padx=10, pady=10)
 
         button2 = ttk.Button(wrapper1, text="Filter",
                              command=self.renderProductsList)
         button2.grid(row=3, column=1, padx=10, pady=10)
 
+        
+        # Treeview to show product result based on filter
         global cols
         cols = ('Product ID', 'Category', 'Model', 'Price', 'Cost', 'Warranty (months)', 'Inventory Level', 'Number sold')
 
@@ -67,18 +60,23 @@ class AdminProductSearch(tk.Frame):
             result = self.mongoToTree(r)
             tree.insert("", "end", values=result)
         tree.grid(row=6, column=1, columnspan=2)
-        # tree.bind("<ButtonRelease-1>", self.clicker)
+        tree.bind("<ButtonRelease-1>", self.clicker)
 
+        # Attach scrollbar to treeview
+        # Scrollbar only works if there are many items (can duplicate line 48-49 to try it out if amount of data is not sufficient)
         scrollbar = ttk.Scrollbar(wrapper2, orient="vertical", command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
         scrollbar.grid(row=6, column=2, sticky="ns")
 
     def renderProductsList(self):
+        # Delete existing data from table
         for r in tree.get_children():
             tree.delete(r)
 
-        res = mongo.adminProductSearch(self.categoryBox.get(), self.modelBox.get())
+        # Get data from db
+        res = mongo.adminProductSearch(self.category.get(), self.model.get())
 
+        # Set heading and load new data results
         for col in cols:
             tree.heading(col, text=col)
         for r in res:
@@ -87,9 +85,7 @@ class AdminProductSearch(tk.Frame):
 
         tree.grid(row=6, column=1, columnspan=1)
 
+
     def mongoToTree(self, r):
         re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"])
         return re
-
-        
-
