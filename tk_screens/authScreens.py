@@ -13,27 +13,27 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.domain = tk.StringVar(self)
         self.controller = controller
-
+        
         # label of frame Layout 2
         # label = ttk.Label(self, text="Startpage", font=LARGEFONT)
         # place the photo in the frame
         # you can find the images from flaticon.com site
         
-        self.img = ImageTk.PhotoImage(Image.open("images/welcome.png").convert("RGB"))
+        self.img = ImageTk.PhotoImage(Image.open("images/main.jpg").convert("RGB"))
         self.label = ttk.Label(self, image=self.img)
-        self.label.grid(row=0, column=4, padx=10, pady=10)
+        self.label.grid(row=0, column=0, padx=5, pady=5)
         
-
         # putting the grid in its place by using
         # grid
         # label.grid(row=0, column=4, padx=10, pady=10)
 
         button1 = ttk.Button(self, text="Login",
                              command=lambda: controller.show_frame(LoginPage, self.domain))
+        
 
         # putting the button in its place by
         # using grid
-        button1.grid(row=1, column=1, padx=10, pady=10)
+        button1.grid(row=1, column=0, padx=5, pady=5)
 
         ## button to show frame 2 with text layout2
         button2 = ttk.Button(self, text="Register",
@@ -41,7 +41,7 @@ class StartPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=2, column=1, padx=10, pady=10)
+        button2.grid(row=2, column=0, padx=5, pady=5)
 
 
         # Dropdown menu options
@@ -49,7 +49,7 @@ class StartPage(tk.Frame):
 
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
         
-        dropdownlist.grid(row=3, column=1, padx=10, pady=10)
+        dropdownlist.grid(row=3, column=0, padx=5, pady=5)
 
         # table = Table(parent= parent,columns=("FName", "LName", "Roll No"))
         # table.insertRow(('Amit', 'Kumar', '17701'))
