@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, PhotoImage, Label, Entry, LabelFrame
+from tkinter import ttk, messagebox, PhotoImage, Label, Entry, LabelFrame, IntVar
 from db_connections.mysqldb import SQLDatabase
 from tk_screens.adminProductSearch import AdminProductSearch 
 from tk_screens.adminItemSearch import AdminItemSearch
@@ -55,49 +55,44 @@ class AdminPortal(tk.Frame):
             self.renderInventoryList()
 
     def renderInventoryList(self):
-        # Get data from mongo
-        # res = mongo.inventoryList()
         cols = ('Item ID', 'Sold', 'Unsold')
         tree = ttk.Treeview(self.wrapper2, columns=cols, show='headings', height="6")
-        for col in cols:
-            tree.column(col, anchor="center", width=240)
-            tree.heading(col, text=col)
-        tree.grid(row=6, column=1, columnspan=1)
+        self.produceTree(cols, "inventory",tree)
 
+    def renderItemService(self):
+        cols = ('Item ID', 'Category', 'Model', 'Service Status', 'Admin Assigned')
+        tree = ttk.Treeview(self.wrapper2, columns=cols, show='headings', height="6")
+        self.produceTree(cols, "service", tree)
+
+    def renderCustWithFee(self):
+        cols = ('Customer ID', 'Name', 'Email', 'Request ID', 'Amount ($)', 'Days left for Payment')
+        tree = ttk.Treeview(self.wrapper2, columns=cols, show='headings', height="6")
+        self.produceTree(cols, "fee", tree)
+
+    def produceTree(self, cols, func, tree):
+        w = tk.IntVar(self)
+        res = []
+        if func == "inventory":
+            w = 240
+        elif func == "service":
+            w = 144
+            res = db.itemUnderService()
+        else:
+            w = 120
+            res = db.custWithUnpaidFees()
+        for col in cols:
+            tree.column(col, anchor="center", width=w)
+            tree.heading(col, text=col)
+        for r in res:
+            tree.insert("", "end", values=r)
+
+        tree.grid(row=6, column=1, columnspan=1)
+        self.setScrollbar(tree)
+
+    def setScrollbar(self,tree):
         scrollbar = ttk.Scrollbar(self.wrapper2, orient="vertical", command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
         scrollbar.grid(row=6, column=2, sticky="ns")
-
-    def renderItemService(self):
-        # Get data from db
-        res = db.itemUnderService()
-
-        # Set heading and load new data results
-        cols = ('Item ID', 'Category', 'Model', 'Service Status', 'Admin Assigned')
-        tree = ttk.Treeview(self.wrapper2, columns=cols, show='headings', height="6")
-        for col in cols:
-            tree.column(col, anchor="center", width=144)
-            tree.heading(col, text=col)
-        for r in res:
-            tree.insert("", "end", values=r)
-
-        tree.grid(row=6, column=1, columnspan=1)
-
-    def renderCustWithFee(self):
-        
-        # Get data from db
-        cols = ('Customer ID', 'Name', 'Email', 'Request ID', 'Amount ($)', 'Days left for Payment')
-        tree = ttk.Treeview(self.wrapper2, columns=cols, show='headings', height="6")
-        res = db.custWithUnpaidFees()
-
-        # Set heading and load new data results
-        for col in cols:
-            tree.column(col, anchor="center", width=120)
-            tree.heading(col, text=col)
-        for r in res:
-            tree.insert("", "end", values=r)
-
-        tree.grid(row=6, column=1, columnspan=1)
 
     def resetDB(self):
         db.resetMySQLState()
