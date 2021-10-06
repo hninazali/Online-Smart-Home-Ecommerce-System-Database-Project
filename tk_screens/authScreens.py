@@ -19,7 +19,7 @@ class StartPage(tk.Frame):
         # place the photo in the frame
         # you can find the images from flaticon.com site
         
-        self.img = ImageTk.PhotoImage(Image.open("images/main.jpg").convert("RGB"))
+        self.img = ImageTk.PhotoImage(Image.open("images/main_1.jpeg").convert("RGB"))
         self.label = ttk.Label(self, image=self.img)
         self.label.grid(row=0, column=0, padx=5, pady=5)
         
