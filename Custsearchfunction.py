@@ -11,6 +11,8 @@ global client
 client = pymongo.MongoClient("mongodb://localhost:27017")
 global db
 db = client["assignment1"]
+global products
+products = db["products"]
 
 #connect to mysql database to register purchases
 global con
@@ -130,27 +132,26 @@ class searchFunction:
         self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1')
 
         cols = ("itemID","Category","Model", "Price", "Color","Factory", "Production Year", "Power Supply")
-        scroll_y = Scrollbar(self.treeFrame, orient = VERTICAL)
-        self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings',
-        yscrollcommand = scroll_y.set)
+        
+        self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
+        self.itemTree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview)
         scroll_y.pack(side = RIGHT, fill = Y)
-        self.itemTree.pack(expand='false', fill='both', side='top')
+        self.itemTree.configure(yscrollcommand = scroll_y.set)
+
         
         for col in cols:
             self.itemTree.column(col, anchor="center", width=110)
             self.itemTree.heading(col, text=col)
 
 
-
-        self.availItems = ttk.Label(self.searchFunction)
-        self.availItems.configure(text='Number of items available:')
+        self.availItems = ttk.Label(self.searchFunction, font=("Arial", 14))
+        self.availItems.configure(text='Search Results')
         self.availItems.grid(column='2', columnspan='2', row='9')
         
         
         # Main widget
         self.mainwindow = self.searchFunction
-    
-
     
 
      #take inputs from comboboxes and bring to searchResults frame
@@ -165,11 +166,10 @@ class searchFunction:
         factory = self.factoryBox.get()
         productionYear = self.productionYearBox.get()
         powerSupply = self.powerSupplyBox.get()
-        print(price)
 
         ##special handeling for price
         if price:
-            catandmod = self.findCatNModfromPrice(price)
+            catandmod = self.findModelfromPrice(price)
             if category and category != catandmod[0]:
                 category = "no output"
             if model and model != catandmod[1]:
@@ -189,7 +189,7 @@ class searchFunction:
         if productionYear:
             mongoSearch += "'ProductionYear': " + "'{}'".format(productionYear) + ", "
         if powerSupply:
-            mongoSearch += "'PowerSupply': " + "'{}'".format(powerSupply)
+            mongoSearch += "'PowerSupply': " + "'{}'".format(powerSupply) + ", "
         
         mongoSearch = "{" + mongoSearch + "'PurchaseStatus': 'Unsold'" + "}"
 
@@ -200,24 +200,22 @@ class searchFunction:
         allrecords = items.find(eval(mongoSearch))
         allrecordsList = list(allrecords)
         #uncomment to print records in terminal
-        #print(allrecordsList)
+        messagebox.showinfo(title="Search Results", message= "{} items available based on your search!".format(len(allrecordsList)))
 
         if len(allrecordsList) == 0:
-            messagebox.showerror(title="No Available Items", message= "Sorry there are no such items available! Please try another search.")
+            pass
         else:
             for record in allrecordsList:
                 result = self.mongoToTree(record)
                 self.itemTree.insert("", "end", values=result)
     
-    def findCatNModfromPrice(self, price):
-        products = db["products"]
-        product = products.find({'Price ($)': price})[0]
-        category = product['Category']
-        model = product['Model']
-        return(category, model)
+    def findModelfromPrice(self, price):
+        product = products.find({'Price ($)': int(price)})[0]
+        Category = product['Category']
+        Model = product['Model']
+        return (Category, Model)
 
     def findPrice(self, category, model):
-        products = db["products"]
         product = products.find({'Category': category, 'Model': model})[0]
         price = product['Price ($)']
         return (price)
@@ -225,16 +223,17 @@ class searchFunction:
     def buyItem(self, a):
         curItem = self.itemTree.focus()
         extractID = self.itemTree.item(curItem)['values'][0]
-
-
+        
         #update mysql database, need to get current customer id
         updateStatement = "UPDATE Item SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s"
         val = (date.today().isoformat(),"001", extractID)
+
         con.ping()  # reconnecting mysql
         with con.cursor() as cursor:         
-            cursor.execute(updateStatement , val)
+            cursor.execute(updateStatement, val)
         con.commit()
         con.close()
+
 
 
         #delete item and show purchase success

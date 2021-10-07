@@ -1,4 +1,0 @@
-1. buyItem function(line 225) needs to update customerID of customer that is currently logged in.
-2. need to debug function findCatNModfromPrice (line 212) to get category and module from products collection,
-for some reason findprice (line 219) works but not this function
-3. Scrollbar(line 133) has some minor issues - can scroll but cant drag
