@@ -94,21 +94,25 @@ class LoginPage(tk.Frame):
         self.controller = controller
 
         tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text="Login Page", font=LARGEFONT)
-        label.grid(row=0, column=4, padx=10, pady=10)
-
-
+        label = ttk.Label(self, text="Login Page", font=LARGEFONT, anchor='center')
+        label.grid(row=6, column=7, padx=5, pady=5, columnspan=7)
+        # self.grid_rowconfigure(1, weight=1)
+        # self.grid_columnconfigure(1, weight=1)
+            
         userIDLabel = ttk.Label(self, text="User ID:")
-        userIDLabel.grid(row=1, column=1, padx=10, pady=10)
+        userIDLabel.grid(row=7, column=7, padx=5, pady=5)
+        
 
         userIDInput = ttk.Entry(self, textvariable=self.userID)
-        userIDInput.grid(row=1, column=3, padx=10, pady=10)
+        userIDInput.grid(row=7, column=8, padx=5, pady=5)
+        
 
         passwordLabel = ttk.Label(self, text="Password:")
-        passwordLabel.grid(row=2, column=1, padx=10, pady=10)
+        passwordLabel.grid(row=8, column=7, padx=5, pady=5)
 
         passwordInput = ttk.Entry(self,show="*", textvariable=self.password)
-        passwordInput.grid(row=2, column=3, padx=10, pady=10)
+        passwordInput.grid(row=8, column=8, padx=5, pady=5)
+        
 
         # button to show frame 2 with text
         # layout2
@@ -117,7 +121,7 @@ class LoginPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=3, column=1, padx=10, pady=10)
+        button2.grid(row=9, column=7, padx=5, pady=5)
 
         # button to show frame 2 with text
         # layout2
@@ -126,7 +130,7 @@ class LoginPage(tk.Frame):
 
         # putting the button in its place
         # by using grid
-        button1.grid(row=3, column=3, padx=10, pady=10)
+        button1.grid(row=9, column=8, padx=5, pady=5)
 
 
     def handleLogin(self):
@@ -173,50 +177,50 @@ class RegisterPage(tk.Frame):
 
         tk.Frame.__init__(self, parent)
         label = ttk.Label(self, text="Register Page", font=LARGEFONT)
-        label.grid(row=0, column=4, padx=10, pady=10)
+        label.grid(row=2, column=3, padx=5, pady=5, columnspan=11)
 
         userIDlabel = ttk.Label(self, text="User ID:")
-        userIDlabel.grid(row=1, column=1, padx=10, pady=10)
+        userIDlabel.grid(row=3, column=3, padx=5, pady=5)
 
         userIDInput = ttk.Entry(self, textvariable=self.userID)
-        userIDInput.grid(row=1, column=3, padx=10, pady=10)
+        userIDInput.grid(row=3, column=4,  padx=5, pady=5)
 
 
         namelabel = ttk.Label(self, text="Name:")
-        namelabel.grid(row=2, column=1, padx=10, pady=10)
+        namelabel.grid(row=4, column=3, padx=5, pady=5)
 
         nameInput = ttk.Entry(self, textvariable=self.name)
-        nameInput.grid(row=2, column=3, padx=10, pady=10)
+        nameInput.grid(row=4, column=4,  padx=5, pady=5)
 
         emailLabel = ttk.Label(self, text="Email:")
-        emailLabel.grid(row=3, column=1, padx=10, pady=10)
+        emailLabel.grid(row=5, column=3,  padx=5, pady=5)
 
         emailInput = ttk.Entry(self, textvariable=self.email)
-        emailInput.grid(row=3, column=3, padx=10, pady=10)
+        emailInput.grid(row=5, column=4,  padx=5, pady=5)
 
         passwordLabel = ttk.Label(self, text="Password:")
-        passwordLabel.grid(row=4, column=1, padx=10, pady=10)
+        passwordLabel.grid(row=6, column=3,  padx=5, pady=5)
 
         passwordInput = ttk.Entry(self,show="*", textvariable=self.password)
-        passwordInput.grid(row=4, column=3, padx=10, pady=10)
+        passwordInput.grid(row=6, column=4,  padx=5, pady=5)
 
         addressLabel = ttk.Label(self, text="Address:")
-        addressLabel.grid(row=5, column=1, padx=10, pady=10)
+        addressLabel.grid(row=7, column=3, padx=5, pady=5)
 
         addressInput = ttk.Entry(self, textvariable=self.address)
-        addressInput.grid(row=5, column=3, padx=10, pady=10)
+        addressInput.grid(row=7, column=4,  padx=5, pady=5)
 
         phoneNumberLabel = ttk.Label(self, text="Phone:")
-        phoneNumberLabel.grid(row=6, column=1, padx=10, pady=10)
+        phoneNumberLabel.grid(row=8, column=3,  padx=5, pady=5)
 
         phoneNumberInput = ttk.Entry(self, textvariable=self.phoneNumber)
-        phoneNumberInput.grid(row=6, column=3, padx=10, pady=10)
+        phoneNumberInput.grid(row=8, column=4,  padx=5, pady=5)
 
         genderLabel = ttk.Label(self, text="Gender:")
-        genderLabel.grid(row=7, column=1, padx=10, pady=10)
+        genderLabel.grid(row=9, column=3,  padx=5, pady=5)
 
         genderOptions = ttk.OptionMenu(self, self.gender, 'M', *("M","F"))
-        genderOptions.grid(row=7, column=3, padx=10, pady=10)
+        genderOptions.grid(row=9, column=4,  padx=5, pady=5)
 
         # button to show frame 2 with text
         # layout2
@@ -225,7 +229,7 @@ class RegisterPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button1.grid(row=8, column=1, padx=10, pady=10)
+        button1.grid(row=10, column=3,  padx=5, pady=5)
 
         # button to show frame 3 with text
         # layout3
@@ -234,7 +238,7 @@ class RegisterPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=8, column=3, padx=10, pady=10)
+        button2.grid(row=10, column=4,  padx=5, pady=5)
 
     def setUserType(self,usertype):
         self.domain = usertype
