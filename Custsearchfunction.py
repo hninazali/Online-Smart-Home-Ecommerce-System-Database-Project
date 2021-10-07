@@ -4,7 +4,7 @@ import tkinter.messagebox as messagebox
 from tkinter import *
 import pymongo
 import pymysql
-
+from datetime import date
 
 #connect to mongoDB to search
 global client
@@ -13,7 +13,8 @@ global db
 db = client["assignment1"]
 
 #connect to mysql database to register purchases
-pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+global con
+con = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
 
 
 class searchFunction:
@@ -224,9 +225,22 @@ class searchFunction:
     def buyItem(self, a):
         curItem = self.itemTree.focus()
         extractID = self.itemTree.item(curItem)['values'][0]
+
+
+        #update mysql database, need to get current customer id
+        updateStatement = "UPDATE Item SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s"
+        val = (date.today().isoformat(),"001", extractID)
+        con.ping()  # reconnecting mysql
+        with con.cursor() as cursor:         
+            cursor.execute(updateStatement , val)
+        con.commit()
+        con.close()
+
+
+        #delete item and show purchase success
         self.itemTree.delete(self.itemTree.focus())
         messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
-        print(extractID)
+        
 
     def mongoToTree(self, r):
         price = self.findPrice(r["Category"], r["Model"])
