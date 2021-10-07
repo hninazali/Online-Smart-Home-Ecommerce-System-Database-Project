@@ -3,11 +3,23 @@ import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 from tkinter import *
 import pymongo
+import pymysql
+
+
+#connect to mongoDB to search
+global client
+client = pymongo.MongoClient("mongodb://localhost:27017")
+global db
+db = client["assignment1"]
+
+#connect to mysql database to register purchases
+pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+
 
 class searchFunction:
     def __init__(self):
         self.searchFunction = tk.Tk()
-        self.searchFunction.geometry('1200x600')
+        self.searchFunction.geometry('1050x600')
         self.searchFunction.grid_propagate(0)
         #self.searchFunction.resizable(False, False)
 
@@ -25,6 +37,8 @@ class searchFunction:
         self.buyButton = ttk.Button(self.searchFunction)
         self.buyButton.configure(text='Buy')
         self.buyButton.grid(column='7', pady='20', row='11', sticky='e')
+        self.buyButton.bind('<Button-1>', self.buyItem)
+
         
 
         ####Comboboxes####
@@ -114,18 +128,17 @@ class searchFunction:
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1')
 
-        cols = ("Category","Model", "Price", "Color","Factory", "Production Year", "Power Supply")
+        cols = ("itemID","Category","Model", "Price", "Color","Factory", "Production Year", "Power Supply")
         scroll_y = Scrollbar(self.treeFrame, orient = VERTICAL)
-        scroll_x = Scrollbar(self.treeFrame, orient = HORIZONTAL)
         self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings',
-        yscrollcommand = scroll_y.set, xscrollcommand = scroll_x.set)
+        yscrollcommand = scroll_y.set)
         scroll_y.pack(side = RIGHT, fill = Y)
-        scroll_x.pack(side = BOTTOM, fill = X)
         self.itemTree.pack(expand='false', fill='both', side='top')
-
+        
         for col in cols:
-            self.itemTree.column(col, anchor="center", width=150)
+            self.itemTree.column(col, anchor="center", width=110)
             self.itemTree.heading(col, text=col)
+
 
 
         self.availItems = ttk.Label(self.searchFunction)
@@ -137,11 +150,11 @@ class searchFunction:
         self.mainwindow = self.searchFunction
     
 
-    def run(self):
-        self.mainwindow.mainloop()
+    
 
      #take inputs from comboboxes and bring to searchResults frame
     def search(self, event):
+        self.itemTree.delete(*self.itemTree.get_children())
         mongoSearch = ""
         
         category = self.categoryBox.get()
@@ -151,13 +164,23 @@ class searchFunction:
         factory = self.factoryBox.get()
         productionYear = self.productionYearBox.get()
         powerSupply = self.powerSupplyBox.get()
-        
+        print(price)
+
+        ##special handeling for price
+        if price:
+            catandmod = self.findCatNModfromPrice(price)
+            if category and category != catandmod[0]:
+                category = "no output"
+            if model and model != catandmod[1]:
+                model = "no output"
+            else:
+                category = catandmod[0]
+                model = catandmod[1]       
+
         if category:
             mongoSearch += "'Category': " + "'{}'".format(category) + ", "
         if model:
             mongoSearch += "'Model': " + "'{}'".format(model) + ", "
-        if price:
-            mongoSearch += "'Color': " + "'{}'".format(price) + ", "
         if color:
             mongoSearch += "'Color': " + "'{}'".format(color) + ", "
         if factory:
@@ -166,36 +189,52 @@ class searchFunction:
             mongoSearch += "'ProductionYear': " + "'{}'".format(productionYear) + ", "
         if powerSupply:
             mongoSearch += "'PowerSupply': " + "'{}'".format(powerSupply)
-        mongoSearch = "{" + mongoSearch + "}"
+        
+        mongoSearch = "{" + mongoSearch + "'PurchaseStatus': 'Unsold'" + "}"
 
-        #uncomment printstatement to show output in terminal
-        print(mongoSearch)
+        #uncomment print statement to show output in terminal
+        #print(mongoSearch)
 
-        #connect to mongoDB to search
-        client = pymongo.MongoClient("mongodb://localhost:27017")
-        db = client["assignment1"]
         items = db["items"]
         allrecords = items.find(eval(mongoSearch))
-
-        #uncomment to print records in terminal
         allrecordsList = list(allrecords)
-        print(allrecordsList)
+        #uncomment to print records in terminal
+        #print(allrecordsList)
 
         if len(allrecordsList) == 0:
             messagebox.showerror(title="No Available Items", message= "Sorry there are no such items available! Please try another search.")
         else:
-            for record in allrecords:
+            for record in allrecordsList:
                 result = self.mongoToTree(record)
                 self.itemTree.insert("", "end", values=result)
+    
+    def findCatNModfromPrice(self, price):
+        products = db["products"]
+        product = products.find({'Price ($)': price})[0]
+        category = product['Category']
+        model = product['Model']
+        return(category, model)
 
+    def findPrice(self, category, model):
+        products = db["products"]
+        product = products.find({'Category': category, 'Model': model})[0]
+        price = product['Price ($)']
+        return (price)
+
+    def buyItem(self, a):
+        curItem = self.itemTree.focus()
+        extractID = self.itemTree.item(curItem)['values'][0]
+        self.itemTree.delete(self.itemTree.focus())
+        messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
+        print(extractID)
 
     def mongoToTree(self, r):
-        #need to figure a way to get price from products collection
-        price =  "N/A"
-        re = (r["ItemID"], r["Model"], r["Category"], r["Color"], r["Factory"], r["PowerSupply"], r["ProductionYear"], r["PurchaseStatus"], price)
+        price = self.findPrice(r["Category"], r["Model"])
+        re = (r["ItemID"], r["Category"], r["Model"], price, r["Color"], r["Factory"], r["ProductionYear"], r["PowerSupply"])
         return re
 
-
+    def run(self):
+        self.mainwindow.mainloop()
 
 
 if __name__ == '__main__':
