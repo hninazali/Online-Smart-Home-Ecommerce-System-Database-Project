@@ -11,32 +11,35 @@ class AdminPortal(tk.Frame):
 
         # self.domain = tk.StringVar(self)
 
-        def menuBar(self,root):
-            menubar = tk.Menu(self)
-            homeMenu = tk.Menu(self)
-            purchaseMenu = tk.Menu(self)
-            requestMenu = tk.Menu(self)
-            profileMenu = tk.Menu(self)
-            nestedHomeMenu = tk.Menu(self)
-            nestedPurchaseMenu = tk.Menu(self)
-            nestedRequestMenu = tk.Menu(self)
-            nestedProfileMenu = tk.Menu(self)
+    def menuBar(self,root):
+        menubar = tk.Menu(self)
+        productMenu = tk.Menu(self)
+        itemMenu = tk.Menu(self)
+        requestMenu = tk.Menu(self)
+        serviceMenu = tk.Menu(self)
+        profileMenu = tk.Menu(self)
+        nestedProductMenu = tk.Menu(self)
+        nestedItemMenu = tk.Menu(self)
+        nestedRequestMenu = tk.Menu(self)
+        nestedServiceMenu = tk.Menu(self)
+        nestedProfileMenu = tk.Menu(self)
 
 
-            menubar.add_cascade(label="Home", menu=homeMenu)
-            homeMenu.add_cascade(label="hehehe", menu=nestedHomeMenu)
+        menubar.add_cascade(label="Products", menu=productMenu)
+        productMenu.add_cascade(label="hehehe", menu=nestedProductMenu)
             # menubar.add_separator()
-            menubar.add_cascade(label="Purchases", menu=purchaseMenu)
-            purchaseMenu.add_cascade(label="wowooow",menu=nestedPurchaseMenu)
+        menubar.add_cascade(label="Items", menu=itemMenu)
+        itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
 
-            menubar.add_cascade(label="Service Requests", menu=requestMenu)
-            requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+        menubar.add_cascade(label="Service Requests", menu=requestMenu)
+        requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
-            menubar.add_cascade(label="My Profile", menu=profileMenu)
-            profileMenu.add_cascade(label="View Profile", menu=nestedProfileMenu)
-            profileMenu.add_cascade(label="Change Password", menu=nestedProfileMenu)
-            return menubar
+        menubar.add_cascade(label="Services", menu=serviceMenu)
+        serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
 
+        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        profileMenu.add_cascade(label="View Profile", menu=nestedProfileMenu)
+        return menubar
 
 
         # Reset Button
