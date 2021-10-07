@@ -1,4 +1,4 @@
-# Online-Smart-Home-Ecommerce-System-Database-Project
+# Group 9 - Online-Smart-Home-Ecommerce-System-Database-Project
 
 ## Python Environment Setup
 1. cd to directory of your choice and use the following commands to install through `requirements.txt` file. 
