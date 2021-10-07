@@ -14,5 +14,9 @@ pip install -r requirements.txt
 
 After you pull the codes
 1. Run the sql scripts to create databases and tables
+``` 
+cd db_connections
+python3 mysqldb.py
+```
 2. Create customer and admin in SQL
 3. Run gui.py file 
