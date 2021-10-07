@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, PhotoImage, Label, Entry
+from tkinter import *
+from tkinter import ttk
 from db_connections.mysqldb import SQLDatabase
 
 db = SQLDatabase()
@@ -8,17 +9,46 @@ class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.domain = tk.StringVar(self)
+        # self.domain = tk.StringVar(self)
+
+        def menuBar(self,root):
+            menubar = tk.Menu(self)
+            homeMenu = tk.Menu(self)
+            purchaseMenu = tk.Menu(self)
+            requestMenu = tk.Menu(self)
+            profileMenu = tk.Menu(self)
+            nestedHomeMenu = tk.Menu(self)
+            nestedPurchaseMenu = tk.Menu(self)
+            nestedRequestMenu = tk.Menu(self)
+            nestedProfileMenu = tk.Menu(self)
+
+
+            menubar.add_cascade(label="Home", menu=homeMenu)
+            homeMenu.add_cascade(label="hehehe", menu=nestedHomeMenu)
+            # menubar.add_separator()
+            menubar.add_cascade(label="Purchases", menu=purchaseMenu)
+            purchaseMenu.add_cascade(label="wowooow",menu=nestedPurchaseMenu)
+
+            menubar.add_cascade(label="Service Requests", menu=requestMenu)
+            requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+
+            menubar.add_cascade(label="My Profile", menu=profileMenu)
+            profileMenu.add_cascade(label="View Profile", menu=nestedProfileMenu)
+            profileMenu.add_cascade(label="Change Password", menu=nestedProfileMenu)
+            return menubar
+
+
 
         # Reset Button
         resetButton = ttk.Button(self, text="Reset SQLDB", command=self.resetDB)
         resetButton.grid(row=0, column=1, padx=10, pady=10)
-        #  Dummy Display 
-        options = ("Customer", "Administrator")
-
-        dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
         
-        dropdownlist.grid(row=1, column=1, padx=10, pady=10)
+        #  Dummy Display 
+        # options = ("Customer", "Administrator")
+
+        # dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
+        
+        # dropdownlist.grid(row=1, column=1, padx=10, pady=10)
 
     def resetDB(self):
         db.resetMySQLState()

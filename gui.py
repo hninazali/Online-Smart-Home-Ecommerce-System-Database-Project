@@ -8,6 +8,7 @@ LARGEFONT = ("Verdana", 35)
 
 from tk_screens.authScreens import *
 from tk_screens.customerPortal import *
+from tk_screens.adminPortal import *
 
 class tkinterApp(tk.Tk):
 
@@ -33,7 +34,7 @@ class tkinterApp(tk.Tk):
         # iterating through a tuple consisting
         # of the different page layouts
         # all new pages created add here
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal):
 
             frame = F(container, self)
 
@@ -51,14 +52,24 @@ class tkinterApp(tk.Tk):
     def show_frame(self, cont, domain=None):
         frame = self.frames[cont]
         frame.tkraise()
+
         if domain:
             frame = self.frames[cont]
+            
             frame.setUserType(domain)
             frame.tkraise()
             self.domain = domain
         else:
             frame = self.frames[cont]
             frame.tkraise()
+
+        if (cont == CustomerPortal): 
+            menubar = frame.menuBar(self)
+            self.configure(menu=menubar)
+
+        if (cont == AdminPortal): 
+            menubar = frame.menuBar(self)
+            self.configure(menu=menubar)
 
     def getDomain(self):
         return self.domain
