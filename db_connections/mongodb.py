@@ -71,6 +71,9 @@ class MongoDB():
     def insertItem(self, itemdict, database_name='oshes'):
         query = self.client[database_name]["items"].insert_one(itemdict)
 
+    def getClient(self):
+        return self.client
+
     
     def convertJSONtoSQL():
         itemsSQL = []  # Array of SQL Commands to load items

@@ -165,6 +165,9 @@ class SQLDatabase():
                     print("Executing:", sql_request)
         self.connection.commit()
 
+    def getConnection(self):
+        return self.connection
+
 # Exists outside of the class. Drops the oshes database if it exists
 def dropDatabase():
     try:
