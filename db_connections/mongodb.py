@@ -71,6 +71,42 @@ class MongoDB():
     def insertItem(self, itemdict, database_name='oshes'):
         query = self.client[database_name]["items"].insert_one(itemdict)
 
+    
+    def convertJSONtoSQL():
+        itemsSQL = []  # Array of SQL Commands to load items
+        productsSQL = []  # Array of SQL commands to load products
+        items = open("../JSON_files/items.json")
+        arr = json.load(items)
+
+        for item in arr:
+            if item["ServiceStatus"] == '':
+                item["ServiceStatus"] = 'Completed'  # Change this later
+            string = "INSERT INTO items VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
+                item["ItemID"], item["Category"], item["Color"], item["Factory"], item["PowerSupply"], item["PurchaseStatus"], item["ProductionYear"], item["Model"], item["ServiceStatus"])
+            itemsSQL.append(string)
+
+        items.close()
+
+        products = open("../JSON_files/products.json")
+        arr2 = json.load(products)
+
+        for product in arr2:
+            string = "INSERT INTO products VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
+                product["Category"], product["Cost ($)"], product["Model"], product["Price ($)"], product["ProductID"], product["Warranty (months)"],)
+            productsSQL.append(string)
+
+        products.close()
+
+        with open("../db_scripts/items.sql", 'w+') as f:
+            for item in itemsSQL:
+                f.write(item+"\n")
+
+        with open("../db_scripts/products.sql", 'w+') as f:
+            for product in productsSQL:
+                f.write(product+"\n")
+
+        return itemsSQL, productsSQL
+
 if __name__ == "__main__":
     db = MongoDB()
     # db.dropCollection("products")

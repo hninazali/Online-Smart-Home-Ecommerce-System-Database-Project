@@ -1,5 +1,4 @@
 # code referenced and modified from this tutorial : https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/
-
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from db_connections.mysqldb import SQLDatabase
@@ -9,6 +8,7 @@ LARGEFONT = ("Verdana", 35)
 from tk_screens.authScreens import *
 from tk_screens.customerPortal import *
 from tk_screens.adminPortal import *
+
 
 class tkinterApp(tk.Tk):
 
@@ -34,7 +34,7 @@ class tkinterApp(tk.Tk):
         # iterating through a tuple consisting
         # of the different page layouts
         # all new pages created add here
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage):
 
             frame = F(container, self)
 

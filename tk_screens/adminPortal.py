@@ -5,11 +5,15 @@ from db_connections.mysqldb import SQLDatabase
 
 db = SQLDatabase()
 
+LARGEFONT = ("Verdana", 35)
+
 class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        # self.domain = tk.StringVar(self)
+        tk.Frame.__init__(self, parent)
+        self.domain = tk.StringVar(self)
+        self.controller = controller
 
     def menuBar(self,root):
         menubar = tk.Menu(self)
@@ -44,9 +48,16 @@ class AdminPortal(tk.Frame):
 
         # Reset Button
         resetButton = ttk.Button(self, text="Reset SQLDB", command=self.resetDB)
-        resetButton.grid(row=0, column=1, padx=10, pady=10)
-        
-        #  Dummy Display 
+        resetButton.grid(row=2, column=6, padx=10, pady=10)
+
+
+        createAdminButton = ttk.Button(self, text="Create New Admin",
+                             command=lambda: controller.show_frame(CreateAdminPage, self.domain))
+
+        createAdminButton.grid(row=2, column=7, padx=10, pady=10)
+
+
+        # #  Dummy Display 
         # options = ("Customer", "Administrator")
 
         # dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
@@ -58,6 +69,107 @@ class AdminPortal(tk.Frame):
 # In addition, provide a MYSQL database initialization function under the Administrator login. 
 # At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:
+
+
+class CreateAdminPage(tk.Frame):
+    def __init__(self, parent, controller):
+        self.domain = controller.getDomain()
+
+        self.adminID = tk.StringVar()
+        self.name = tk.StringVar()
+        self.password = tk.StringVar()
+        self.gender = tk.StringVar()   
+        self.phoneNumber = tk.StringVar()
+        
+
+        tk.Frame.__init__(self, parent)
+        label = ttk.Label(self, text="Create new Admin", font=LARGEFONT)
+        label.grid(row=2, column=3, padx=5, pady=5, columnspan=11)
+
+        adminIDlabel = ttk.Label(self, text="Admin ID:")
+        adminIDlabel.grid(row=3, column=3, padx=5, pady=5)
+
+        adminIDInput = ttk.Entry(self, textvariable=self.adminID)
+        adminIDInput.grid(row=3, column=4,  padx=5, pady=5)
+
+        namelabel = ttk.Label(self, text="Name:")
+        namelabel.grid(row=4, column=3, padx=5, pady=5)
+
+        nameInput = ttk.Entry(self, textvariable=self.name)
+        nameInput.grid(row=4, column=4,  padx=5, pady=5)
+
+        passwordLabel = ttk.Label(self, text="Password:")
+        passwordLabel.grid(row=6, column=3,  padx=5, pady=5)
+
+        passwordInput = ttk.Entry(self,show="*", textvariable=self.password)
+        passwordInput.grid(row=6, column=4,  padx=5, pady=5)
+
+        genderLabel = ttk.Label(self, text="Gender:")
+        genderLabel.grid(row=9, column=3,  padx=5, pady=5)
+
+        genderOptions = ttk.OptionMenu(self, self.gender, 'M', *("M","F"))
+        genderOptions.grid(row=9, column=4,  padx=5, pady=5)
+
+
+        phoneNumberLabel = ttk.Label(self, text="Phone:")
+        phoneNumberLabel.grid(row=8, column=3,  padx=5, pady=5)
+
+        phoneNumberInput = ttk.Entry(self, textvariable=self.phoneNumber)
+        phoneNumberInput.grid(row=8, column=4,  padx=5, pady=5)
+
+        # button to show frame 2 with text
+        # layout2
+        button1 = ttk.Button(self, text="Register",
+                             command=self.handleRegister)
+
+        # putting the button in its place by
+        # using grid
+        button1.grid(row=10, column=3,  padx=5, pady=5)
+
+        # button to show frame 3 with text
+        # layout3
+        backToAdminPortalButton = ttk.Button(self, text="Back to Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+
+        # putting the button in its place by
+        # using grid
+        backToAdminPortalButton.grid(row=10, column=4,  padx=5, pady=5)
+
+        # # button to show frame 3 with text
+        # # layout3
+        # button2 = ttk.Button(self, text="Back to Home",
+        #                      command=lambda: controller.show_frame(StartPage))
+
+        # putting the button in its place by
+        # using grid
+        # button2.grid(row=10, column=4,  padx=5, pady=5)
+
+    def setUserType(self,usertype):
+        self.domain = usertype
+
+    '''
+    Returns True if any of the fields are empty.
+    '''
+    def checkEmptyField(self):
+        for element in [self.adminID.get(), self.name.get(), self.password.get(), self.gender.get(), self.phoneNumber.get()]:
+            if element=='' or element==' ':
+                return True
+        return False
+
+    def handleRegister(self):        
+        print("Register button clicked")
+        # if self.domain.get()=="Administrator":
+        if self.checkEmptyField():
+            print("Incomeplete fields")
+            messagebox.showerror(title="Registration Failed", message="Please fill in all fields")
+        else:
+            res = db.createAdmin([self.adminID.get(), self.name.get(), self.password.get(), self.gender.get(), self.phoneNumber.get()])
+            if res : 
+                messagebox.showerror(title="Registration Failed", message=res)
+            else : 
+                print("Register success")
+                messagebox.showinfo(title="Registration Success", message= "Succesfully created an admin account!")
+
 
 
 # Winy can try with her table code too
@@ -84,3 +196,5 @@ class AdminPortal(tk.Frame):
 
 #     def getTree(self):
 #         return self.tree
+
+

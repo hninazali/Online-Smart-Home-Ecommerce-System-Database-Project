@@ -1,9 +1,11 @@
+from tk_screens.adminPortal import AdminPortal
 from tk_screens.customerPortal import CustomerPortal
 from tk_screens.adminPortal import AdminPortal
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from db_connections.mysqldb import SQLDatabase
 from PIL import Image, ImageTk
+
 db = SQLDatabase()
 
 LARGEFONT = ("Verdana", 35)
@@ -20,7 +22,9 @@ class StartPage(tk.Frame):
         # place the photo in the frame
         # you can find the images from flaticon.com site
         
+        # self.img = ImageTk.PhotoImage(Image.open("images/welcome.png").convert("RGB"))
         self.img = ImageTk.PhotoImage(Image.open("images/main_1.jpeg").convert("RGB"))
+        # self.img = tk.PhotoImage(file = "images/main_1.jpeg")
         self.label = ttk.Label(self, image=self.img)
         self.label.grid(row=0, column=0, padx=5, pady=5)
         
@@ -126,7 +130,7 @@ class LoginPage(tk.Frame):
 
         # button to show frame 2 with text
         # layout2
-        button1 = ttk.Button(self, text="Back to Home",
+        button1 = ttk.Button(self, text="Back to Welcome Page",
                              command=lambda: controller.show_frame(StartPage))
 
         # putting the button in its place
