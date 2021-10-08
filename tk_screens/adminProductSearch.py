@@ -67,7 +67,6 @@ class AdminProductSearch(tk.Frame):
             result = self.mongoToTree(r)
             tree.insert("", "end", values=result)
         tree.grid(row=6, column=1, columnspan=2)
-        # tree.bind("<ButtonRelease-1>", self.clicker)
 
         scrollbar = ttk.Scrollbar(wrapper2, orient="vertical", command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
@@ -78,6 +77,16 @@ class AdminProductSearch(tk.Frame):
             tree.delete(r)
 
         res = mongo.adminProductSearch(self.categoryBox.get(), self.modelBox.get())
+        # resSold = mongo.soldLevel()
+        # resUnsold = mongo.unsoldLevel()
+
+        # for index, r in enumerate(res):
+        #     res[index]["Unsold"] = resSold[r["ProductID"]]["total"]
+        #     res[index]["Sold"] = resUnsold[r["ProductID"]]["total"]
+        #     print("index")
+        #     print(resSold[r["ProductID"]]["total"])
+        #     print(resUnsold[r["ProductID"]]["total"])
+        #     print(r)
 
         for col in cols:
             tree.heading(col, text=col)
@@ -88,7 +97,10 @@ class AdminProductSearch(tk.Frame):
         tree.grid(row=6, column=1, columnspan=1)
 
     def mongoToTree(self, r):
-        re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"])
+        resSold = mongo.soldLevel()
+        resUnsold = mongo.unsoldLevel()
+
+        re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], resSold[r["ProductID"]-1]["total"], resUnsold[r["ProductID"]-1]["total"])
         return re
 
         

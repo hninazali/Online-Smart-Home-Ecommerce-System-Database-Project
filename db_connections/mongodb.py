@@ -75,9 +75,49 @@ class MongoDB():
         else:
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
         return list(cursor)
+    
+    def soldLevel(self, database_name="oshes"):
+        cursor = self.client[database_name]["products"].aggregate([{ "$lookup": { "from": "items", "localField": "Model", "foreignField": "Model", "as": "relation"}},
+        { "$project": {
+                "ProductID": 1,
+                "relation": {
+                    "$filter": {
+                        "input": "$relation",
+                        "as": "r",
+                        "cond": { 
+                            "$eq": [ "$$r.PurchaseStatus", "Sold" ] 
+                            }
+                    }
+                }
+            }
+        } ,
+        { "$group": { "_id": "$ProductID", "total": { "$sum": { "$size":"$relation" } }}},
+        { "$sort": { "_id" : 1 } }])
+        return list(cursor)
+    
+    def unsoldLevel(self, database_name="oshes"):
+        cursor = self.client[database_name]["products"].aggregate([{ "$lookup": { "from": "items", "localField": "Model", "foreignField": "Model", "as": "relation"}},
+        { "$project": {
+                "ProductID": 1,
+                "relation": {
+                    "$filter": {
+                        "input": "$relation",
+                        "as": "r",
+                        "cond": { 
+                            "$eq": [ "$$r.PurchaseStatus", "Unsold" ] 
+                            }
+                    }
+                }
+            }
+        } ,
+        { "$group": { "_id": "$ProductID", "total": { "$sum": { "$size":"$relation" } }}},
+        { "$sort": { "_id" : 1 } }])
+        return list(cursor)
 
     def adminAdvancedSearch(self, search, database_name="oshes"):
-        if search == "":
+        print("in")
+        print(search)
+        if search == "" or search == "{}":
             cursor = self.client[database_name]["items"].find()
         else:
             cursor = self.client[database_name]["items"].find(search)
@@ -98,6 +138,5 @@ if __name__ == "__main__":
     # db.dropCollection("products")
     # db.dropCollection("items")
     # db.resetMongoState()
-    # print(db.findItems(category="Lights", model="Light1", domain="Administrator"))
     # print(db.findProducts(category="Lights", model="Light1", domain="Customer"))
     

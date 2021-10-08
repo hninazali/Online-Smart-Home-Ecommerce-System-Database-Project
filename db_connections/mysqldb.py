@@ -237,5 +237,3 @@ if __name__ == "__main__":
     # print(db.getCustomerLogin(email,"password")) # correct
     # print(db.getCustomerLogin(email,"Aassword")) # incoreect password
     # print(db.getCustomerLogin("a"+email,"password")) # user doesnt exist
-
-    

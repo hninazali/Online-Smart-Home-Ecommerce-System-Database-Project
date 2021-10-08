@@ -4,8 +4,14 @@ from db_connections.mysqldb import SQLDatabase
 from tk_screens.adminProductSearch import AdminProductSearch 
 from tk_screens.adminItemSearch import AdminItemSearch
 from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
-
+from db_connections.mongodb import MongoDB
+from PIL import Image, ImageTk
+mongo = MongoDB()
+mongo.dropCollection("items")
+mongo.dropCollection("products")
+mongo.resetMongoState()
 db = SQLDatabase()
+
 
 class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
@@ -75,12 +81,33 @@ class AdminPortal(tk.Frame):
         res = []
         if func == "inventory":
             w = 240
+            resSold = mongo.soldLevel()
+            resUnsold = mongo.unsoldLevel()
+            self.inventoryTable(w, cols, tree, resSold, resUnsold)
         elif func == "service":
             w = 144
             res = db.itemUnderService()
+            self.normalTable(w, cols, tree, res)
         else:
             w = 120
             res = db.custWithUnpaidFees()
+            self.normalTable(w, cols, tree, res)
+
+    def inventoryTable(self, w, cols, tree, resSold, resUnsold):
+        for index, unsold in enumerate(resUnsold):
+            resSold[index]["unsold"] = unsold["total"]
+            print(resSold)
+        for col in cols:
+            tree.column(col, anchor="center", width=w)
+            tree.heading(col, text=col)
+        for r in resSold:
+            r = self.mongoToTree(r)
+            tree.insert("", "end", values=r)
+
+        tree.grid(row=6, column=1, columnspan=1)
+        self.setScrollbar(tree)
+
+    def normalTable(self, w, cols, tree, res):
         for col in cols:
             tree.column(col, anchor="center", width=w)
             tree.heading(col, text=col)
@@ -94,6 +121,10 @@ class AdminPortal(tk.Frame):
         scrollbar = ttk.Scrollbar(self.wrapper2, orient="vertical", command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
         scrollbar.grid(row=6, column=2, sticky="ns")
+    
+    def mongoToTree(self, r):
+        re = (r["_id"], r["total"], r["unsold"])
+        return re
 
     def resetDB(self):
         db.resetMySQLState()

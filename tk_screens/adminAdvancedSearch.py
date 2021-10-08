@@ -95,10 +95,19 @@ class AdminAdvancedSearch(tk.Frame):
         for r in self.itemTree.get_children():
             self.itemTree.delete(r)
 
-        res = mongo.adminAdvancedSearch(self.mongoSearch())
-        for r in res:
-            result = self.mongoToTree(r)
-            self.itemTree.insert("", "end", values=result)
+        stringsearch = self.mongoSearch()
+        print(stringsearch)
+        allrecordsList = mongo.adminAdvancedSearch(stringsearch)
+        print("out")
+        print(allrecordsList)
+        messagebox.showinfo(title="Search Results", message= "{} items available based on your search!".format(len(allrecordsList)))
+
+        if len(allrecordsList) == 0:
+            pass
+        else:
+            for record in allrecordsList:
+                result = self.mongoToTree(record)
+                self.itemTree.insert("", "end", values=result)
 
         self.itemTree.grid(row=6, column=1, columnspan=1)
 
@@ -110,12 +119,10 @@ class AdminAdvancedSearch(tk.Frame):
         factory = self.factoryBox.get()
         productionYear = self.productionYearBox.get()
         powerSupply = self.powerSupplyBox.get()
-        listSearch = []
+        listSearch = []   
 
-        # if price:
-        #     mongoSearch += "'Price': " + "'{}'".format(price) + ", "
         if color:
-            listSearch.append('"Color": '+ '"{}"'.format(color))
+             listSearch.append('"Color": '+ '"{}"'.format(color))
         if factory:
             listSearch.append('"Factory": ' + '"{}"'.format(factory))
         if productionYear:
