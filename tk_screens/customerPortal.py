@@ -4,43 +4,52 @@ from tkinter import *
 class CustomerPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-
-        # self.domain = tk.StringVar(self)
-
-        def hello():
-            print("hello!")
+        self.domain = tk.StringVar(self)
+        self.controller = controller
 
     # file new function
     # def file_new():
     #     file_new_frame.pack(fill="both", expand=1)
 
+    def hello(self):
+        print("hello")
+
 
     def menuBar(self,root):
-        menubar = tk.Menu(self)
-        homeMenu = tk.Menu(self)
-        purchaseMenu = tk.Menu(self)
-        requestMenu = tk.Menu(self)
-        profileMenu = tk.Menu(self)
-        nestedHomeMenu = tk.Menu(self)
-        nestedPurchaseMenu = tk.Menu(self)
-        nestedRequestMenu = tk.Menu(self)
-        nestedProfileMenu = tk.Menu(self)
+        menubar = tk.Menu(root)
+        # nestedProductMenu = tk.Menu(self)
+        # nestedItemMenu = tk.Menu(self)
+        # nestedRequestMenu = tk.Menu(self)
+        # nestedServiceMenu = tk.Menu(self)
+        # nestedProfileMenu = tk.Menu(self)
 
-        # pageMenu.add_command(label="PageOne")
-        # menubar.add_cascade(label="PageOne", menu=pageMenu)
+        #home - view products
+        productMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Home", menu=productMenu)
+        productMenu.add_command(label="View Products", command=self.hello)
+        # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
 
-        menubar.add_cascade(label="Home", menu=homeMenu)
-        homeMenu.add_cascade(label="hehehe", menu=nestedHomeMenu)
-        # menubar.add_separator()
+
+        #purchases
+        purchaseMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Purchases", menu=purchaseMenu)
-        purchaseMenu.add_cascade(label="wowooow",menu=nestedPurchaseMenu)
-
+        purchaseMenu.add_command(label="View My Purchases", command=self.hello)
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #service requests
+        requestMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Service Requests", menu=requestMenu)
-        requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+        requestMenu.add_command(label="View My Service Requests", command=self.hello)
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
+
+        #profile
+        profileMenu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="My Profile", menu=profileMenu)
-        profileMenu.add_cascade(label="View Profile", menu=nestedProfileMenu)
-        profileMenu.add_cascade(label="Change Password", menu=nestedProfileMenu)
+        profileMenu.add_command(label="View Profile", command=self.hello)
+        profileMenu.add_separator()
+        profileMenu.add_command(label="Logout", command=self.hello)      
+        
         return menubar
 
 
@@ -63,15 +72,6 @@ class CustomerPortal(tk.Frame):
 
         # self.config(menu=my_menu)
 
-
-
-
-        #  Dummy Display, need to be replaced 
-        # options = ("Customer", "Administrator")
-
-        # dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
-        
-        # dropdownlist.grid(row=0, column=1, padx=10, pady=10)
 
         
 

@@ -2,6 +2,7 @@ import tkinter as tk
 # from tkinter import *
 from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
 from db_connections.mysqldb import SQLDatabase
+# from tk_screens.authScreens import StartPage -- Circular import with authScreens
 
 db = SQLDatabase()
 
@@ -24,50 +25,61 @@ class AdminPortal(tk.Frame):
         createAdminButton.grid(row=3, column=7, padx=10, pady=10)
 
 
+    def hello(self):
+        print("hello")
+    
     def menuBar(self,root):
-        menubar = tk.Menu(self)
-        productMenu = tk.Menu(self)
-        itemMenu = tk.Menu(self)
-        requestMenu = tk.Menu(self)
-        serviceMenu = tk.Menu(self)
-        profileMenu = tk.Menu(self)
-        nestedProductMenu = tk.Menu(self)
-        nestedItemMenu = tk.Menu(self)
-        nestedRequestMenu = tk.Menu(self)
-        nestedServiceMenu = tk.Menu(self)
-        nestedProfileMenu = tk.Menu(self)
+        menubar = tk.Menu(root)
+        # nestedProductMenu = tk.Menu(self)
+        # nestedItemMenu = tk.Menu(self)
+        # nestedRequestMenu = tk.Menu(self)
+        # nestedServiceMenu = tk.Menu(self)
+        # nestedProfileMenu = tk.Menu(self)
 
-
+        #product
+        productMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Products", menu=productMenu)
-        productMenu.add_cascade(label="hehehe", menu=nestedProductMenu)
-            # menubar.add_separator()
+        productMenu.add_command(label="View Products", command=self.hello)
+        # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
+
+
+        #items
+        itemMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Items", menu=itemMenu)
-        itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
-
+        itemMenu.add_command(label="View Items", command=self.hello)
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #service requests
+        requestMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Service Requests", menu=requestMenu)
-        requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+        requestMenu.add_command(label="View Service Requests", command=self.hello)
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
-        menubar.add_cascade(label="Services", menu=serviceMenu)
-        serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
+        #service 
+        serviceMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Services", menu=requestMenu)
+        serviceMenu.add_command(label="View Services", command=self.hello)
+        # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
 
+        #profile
+        profileMenu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="My Profile", menu=profileMenu)
-        profileMenu.add_cascade(label="View Profile", menu=nestedProfileMenu)
+        profileMenu.add_command(label="View Profile", command=self.hello)
+        profileMenu.add_separator()
+        profileMenu.add_command(label="Logout", command=self.hello)      
+        
         return menubar
 
-
-        # #  Dummy Display 
-        # options = ("Customer", "Administrator")
-
-        # dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
-        
-        # dropdownlist.grid(row=1, column=1, padx=10, pady=10)
 
     def resetDB(self):
         db.resetMySQLState()
 # In addition, provide a MYSQL database initialization function under the Administrator login. 
 # At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:
-
+    
+    # def logout(self):
+    #     self.domain = tk.StringVar(self)
+    #     self.controller.show_frame(StartPage)
 
 class CreateAdminPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -133,14 +145,6 @@ class CreateAdminPage(tk.Frame):
         # using grid
         backToAdminPortalButton.grid(row=10, column=4,  padx=5, pady=5)
 
-        # # button to show frame 3 with text
-        # # layout3
-        # button2 = ttk.Button(self, text="Back to Home",
-        #                      command=lambda: controller.show_frame(StartPage))
-
-        # putting the button in its place by
-        # using grid
-        # button2.grid(row=10, column=4,  padx=5, pady=5)
 
     def setUserType(self,usertype):
         self.domain = usertype
