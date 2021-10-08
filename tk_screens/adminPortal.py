@@ -1,6 +1,6 @@
 import tkinter as tk
-from tkinter import *
-from tkinter import ttk
+# from tkinter import *
+from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
 from db_connections.mysqldb import SQLDatabase
 
 db = SQLDatabase()
@@ -10,10 +10,19 @@ LARGEFONT = ("Verdana", 35)
 class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-
-        tk.Frame.__init__(self, parent)
         self.domain = tk.StringVar(self)
         self.controller = controller
+
+        # Reset Button
+        resetButton = ttk.Button(self, text="Reset SQLDB", command=self.resetDB)
+        resetButton.grid(row=3, column=6, padx=10, pady=10)
+
+
+        createAdminButton = ttk.Button(self, text="Create New Admin",
+                             command=lambda: controller.show_frame(CreateAdminPage, self.domain))
+
+        createAdminButton.grid(row=3, column=7, padx=10, pady=10)
+
 
     def menuBar(self,root):
         menubar = tk.Menu(self)
@@ -44,17 +53,6 @@ class AdminPortal(tk.Frame):
         menubar.add_cascade(label="My Profile", menu=profileMenu)
         profileMenu.add_cascade(label="View Profile", menu=nestedProfileMenu)
         return menubar
-
-
-        # Reset Button
-        resetButton = ttk.Button(self, text="Reset SQLDB", command=self.resetDB)
-        resetButton.grid(row=2, column=6, padx=10, pady=10)
-
-
-        createAdminButton = ttk.Button(self, text="Create New Admin",
-                             command=lambda: controller.show_frame(CreateAdminPage, self.domain))
-
-        createAdminButton.grid(row=2, column=7, padx=10, pady=10)
 
 
         # #  Dummy Display 
