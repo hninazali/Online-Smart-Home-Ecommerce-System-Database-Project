@@ -8,6 +8,8 @@ LARGEFONT = ("Verdana", 35)
 
 from tk_screens.authScreens import *
 from tk_screens.customerPortal import *
+from tk_screens.adminApproveRequestsPage import *
+from tk_screens.adminCompleteServicesPage import *
 
 class tkinterApp(tk.Tk):
 
@@ -33,7 +35,7 @@ class tkinterApp(tk.Tk):
         # iterating through a tuple consisting
         # of the different page layouts
         # all new pages created add here
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminApproveRequestsPage, AdminCompleteServicesPage):
 
             frame = F(container, self)
 
@@ -44,7 +46,7 @@ class tkinterApp(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(StartPage)
+        self.show_frame(AdminCompleteServicesPage)
 
     # to display the current frame passed as
     # parameter

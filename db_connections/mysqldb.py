@@ -3,6 +3,8 @@ import tkinter.ttk as ttk
 import pymysql
 import os
 
+from pymysql.connections import MySQLResult
+
 class SQLDatabase():
     def __init__(self):
         try:
@@ -119,19 +121,45 @@ class SQLDatabase():
         self.c.execute(changeCustAddress, (newAddress, username))
         self.connection.commit()
 
-    def beginService(self, serviceReq):
-        beginService = ("UPDATE service SET service_status = %s WHERE request_id = %s")
-        beginRequest = ("UPDATE requests SET request_status = %s WHERE request_id = %s")
-        self.c.execute(beginService, ("In progress", serviceReq[0]))
-        self.c.execute(beginRequest, ("Approved", serviceReq[0]))
-        self.connection.commit()
+    def retrieveRequestsForApproval(self):
+        retrieveRequestsForApproval = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.serviceFee, r.requestStatus, s.serviceStatus FROM request r, service s WHERE s.requestID = r.requestID AND (r.requestStatus='Submitted' OR r.requestStatus='In progress') AND s.serviceStatus = 'waiting for approval' ORDER BY requestID")
+        self.c.execute(retrieveRequestsForApproval, ())
+        results = self.c.fetchall()
+        return results
 
-    def completeService(self, serviceReq):
-        completeService = ("UPDATE service SET service_status = %s WHERE request_id = %s")
-        completeRequest = ("UPDATE requests set request_status = %s WHERE request_id = %s")
-        self.c.execute(completeService, ("Completed", serviceReq[0]))
-        self.c.execute(completeRequest, ("Completed", serviceReq[0]))
+    def approveRequests(self, requestIDs, serviceIDs):
+        approveRequests = ("UPDATE request SET requestStatus = 'Approved' WHERE requestID = %s")
+        result = self.c.executemany(approveRequests, requestIDs)
+        if result != len(requestIDs):
+            self.connection.rollback()
+            return False
+        serviceItems = ("UPDATE service SET serviceStatus = 'in progress' WHERE serviceID = %s")
+        result = self.c.executemany(serviceItems, serviceIDs)
+        if result != len(serviceIDs):
+            self.connection.rollback()
+            return False
         self.connection.commit()
+        return True
+
+    def retrieveServicesToComplete(self):
+        retrieveServicesToComplete = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.requestStatus, s.serviceStatus FROM request r, service s WHERE s.requestID = r.requestID AND s.serviceStatus = 'in progress' AND r.requestStatus = 'Approved' ORDER BY r.requestID")
+        self.c.execute(retrieveServicesToComplete, ())
+        results = self.c.fetchall()
+        return results
+
+    def completeService(self, requestIDs, serviceIDs):
+        completeService = ("UPDATE service SET serviceStatus = 'completed' WHERE serviceID = %s")
+        result = self.c.executemany(completeService, serviceIDs)
+        if result != len(serviceIDs):
+            self.connection.rollback()
+            return False
+        completeRequest = ("UPDATE request SET requestStatus = 'Completed' WHERE requestID = %s")
+        result = self.c.executemany(completeRequest, requestIDs)
+        if result != len(requestIDs):
+            self.connection.rollback()
+            return False
+        self.connection.commit()
+        return True
 
     def retrieveService(self):
         allReq = ("SELECT requests.request_id, items.item_id, items.category, items.model, requests.request_date, service.service_status FROM ((service INNER JOIN requests ON service.request_id = requests.request_id) INNER JOIN items ON service.item_id = items.item_id)")
@@ -139,8 +167,6 @@ class SQLDatabase():
         results = self.c.fetchall()
         print(results)
         return results
-
- 
 
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
@@ -153,7 +179,7 @@ class SQLDatabase():
             files = os.listdir("../db_scripts")
             rootdir = "../db_scripts"
 
-        files = ["table.sql", "customer.sql", "admin.sql"]
+        files = ["table.sql", "customer.sql", "admin.sql", "product.sql", "item.sql", "request.sql", "service.sql"]
 
         for file in files:
             with open(os.path.join(rootdir, file)) as f:
@@ -182,7 +208,7 @@ if __name__ == "__main__":
     # Testing Functions
 
     # # Create customer
-    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
     # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
 
     

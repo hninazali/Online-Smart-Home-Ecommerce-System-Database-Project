@@ -10,3 +10,5 @@ gender ENUM('M', 'F') NOT NULL,
 
 PRIMARY KEY (customerID)
 );
+
+INSERT INTO customer VALUES("brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F");

@@ -133,6 +133,7 @@ class LoginPage(tk.Frame):
         if self.domain.get() == "Customer":
             print("logged in:", self.userID.get(), self.password.get())
             res = db.getCustomerLogin(self.userID.get(), self.password.get())
+
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
                 messagebox.showinfo(title="Login Success", message="Successfully logged in")
