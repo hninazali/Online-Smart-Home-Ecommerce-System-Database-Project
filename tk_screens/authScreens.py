@@ -23,7 +23,7 @@ class StartPage(tk.Frame):
         # you can find the images from flaticon.com site
         
         # self.img = ImageTk.PhotoImage(Image.open("images/welcome.png").convert("RGB"))
-        self.img = ImageTk.PhotoImage(Image.open("images/main_1.jpeg").convert("RGB"))
+        self.img = ImageTk.PhotoImage(Image.open("images/main_final.png").convert("RGB"))
         # self.img = tk.PhotoImage(file = "images/main_1.jpeg")
         self.label = ttk.Label(self, image=self.img)
         self.label.grid(row=0, column=0, padx=5, pady=5)
