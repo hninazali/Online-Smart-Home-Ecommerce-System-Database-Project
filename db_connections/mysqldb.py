@@ -88,15 +88,15 @@ class SQLDatabase():
             else:
                 return ("Admin User doesn't exist")
 
-
-    def changePassword(self, newPass, username, isAdmin):
-        if (isAdmin):
-            changeAdminPass = ("UPDATE admin SET password = %s WHERE admin_id = %s")
-            self.c.execute(changeAdminPass, (newPass, username))
+    # DONE: Changed to send to mysql
+    def changePassword(self, newPassword, userID, domain):
+        if domain == "Administrator":
+            changeAdminPass = ("UPDATE admin SET password = %s WHERE adminID = %s")
+            self.c.execute(changeAdminPass, (newPassword, userID))
             self.connection.commit()
-        else:
-            changeCustPass = ("UPDATE customer SET password = %s WHERE customer_id = %s")
-            self.c.execute(changeCustPass, (newPass, username))
+        elif domain == "Customer":
+            changeCustPass = ("UPDATE Customer SET password = %s WHERE customerID = %s")
+            self.c.execute(changeCustPass, (newPassword, userID))
             self.connection.commit()
 
     def changeNum(self, newNum, username, isAdmin):
@@ -179,15 +179,16 @@ def dropDatabase():
 
 
 if __name__ == "__main__":
-    dropDatabase()
+    # dropDatabase()
     db = SQLDatabase()
-    db.resetMySQLState()
+    db.changePassword('bb', 'aa', "Customer")
+    # db.resetMySQLState()
     # Testing Functions
 
     # # Create customer
-    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
     # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
-
+    
     
 
     # login
