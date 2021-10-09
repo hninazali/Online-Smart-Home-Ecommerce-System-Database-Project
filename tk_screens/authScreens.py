@@ -145,6 +145,8 @@ class LoginPage(tk.Frame):
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
                 messagebox.showinfo(title="Login Success", message="Successfully logged in")
+                self.controller.setUserID(self.userID.get()) # Change the auth state
+                self.controller.setDomain(self.domain.get())
                 self.controller.show_frame(CustomerPortal)
             elif isinstance(res, str):
                 print("login failed", type(res))
@@ -155,6 +157,8 @@ class LoginPage(tk.Frame):
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
                 messagebox.showinfo(title="Login Success", message="Admin Successfully logged in")
+                self.controller.setUserID(self.userID.get()) # Change the auth state
+                self.controller.setDomain(self.domain.get())
                 self.controller.show_frame(AdminPortal)
             elif isinstance(res, str):
                 print("login failed", type(res))
