@@ -26,7 +26,7 @@ class StartPage(tk.Frame):
         self.img = ImageTk.PhotoImage(Image.open("images/main_final.png").convert("RGB"))
         # self.img = tk.PhotoImage(file = "images/main_1.jpeg")
         self.label = ttk.Label(self, image=self.img)
-        self.label.grid(row=0, column=0, padx=5, pady=5)
+        self.label.grid(row=0, column=0, padx=100, pady=20)
         
         # putting the grid in its place by using
         # grid
