@@ -9,3 +9,5 @@ class ViewProfileWindow(Toplevel):
         self.title("Search Products")
         self.geometry('1050x600')
 
+        
+

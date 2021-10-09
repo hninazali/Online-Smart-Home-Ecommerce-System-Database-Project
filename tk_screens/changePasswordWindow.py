@@ -12,7 +12,7 @@ class ChangePasswordWindow(Toplevel):
         self.db = SQLDatabase()
 
         self.title("Search Products")
-        self.geometry('1050x600')
+        self.geometry('400x300')
         self.master = master # Controller in frames
 
         self.oldPassword = tk.StringVar()
@@ -46,10 +46,10 @@ class ChangePasswordWindow(Toplevel):
             raise Exception("Check User type in changePasswordwindow.py")
 
     def handleChangePassword(self):
-        if self.checkAuthState()[0] == "User doesn't exist" or self.checkAuthState()[0] =="Incorrect Password":
-            print("Auth Error! Please check password"+self.checkAuthState()[0]) # TODO: Change to popup or warning
+        if self.checkAuthState() == "User doesn't exist" or self.checkAuthState() =="Incorrect Password":
+            print("Auth Error! Please check password"+self.checkAuthState()) # TODO: Change to popup or warning
         else:
-            print("Password Change Approved:", self.checkAuthState()[0])
-            self.db.changePassword(self.newPassword, self.master.getUserID(), self.master.getDomain())
+            print("Password Change Approved:", self.checkAuthState())
+            self.db.changePassword(self.newPassword.get(), self.master.getUserID(), self.master.getDomain())
 
 

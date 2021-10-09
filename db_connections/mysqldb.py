@@ -95,9 +95,11 @@ class SQLDatabase():
             self.c.execute(changeAdminPass, (newPassword, userID))
             self.connection.commit()
         elif domain == "Customer":
-            changeCustPass = ("UPDATE Customer SET password = %s WHERE customerID = %s")
+            changeCustPass = ("UPDATE customer SET password = %s WHERE customerID = %s")
             self.c.execute(changeCustPass, (newPassword, userID))
             self.connection.commit()
+        else:
+            raise Exception("Check domain in changePassword")
 
     def changeNum(self, newNum, username, isAdmin):
         if (isAdmin):
@@ -181,7 +183,9 @@ def dropDatabase():
 if __name__ == "__main__":
     # dropDatabase()
     db = SQLDatabase()
-    db.changePassword('bb', 'aa', "Customer")
+    # db.changePassword('aa', 'bb', "Customer")
+    print(db.getCustomerLogin('aa','aa'))
+
     # db.resetMySQLState()
     # Testing Functions
 
