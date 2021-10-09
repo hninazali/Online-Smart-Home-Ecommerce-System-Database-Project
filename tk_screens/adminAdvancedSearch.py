@@ -68,38 +68,35 @@ class AdminAdvancedSearch(tk.Frame):
         self.powerSupplyLabel = ttk.Label(self.wrapper1)
         self.powerSupplyLabel.configure(text='Power Supply')
         self.powerSupplyLabel.grid(column='0', padx='5', pady='5', row='6')
-        
-        self.treeFrame= ttk.Frame(self)
-        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
 
+        global cols 
         cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status", "Service Status")
-        scroll_y = ttk.Scrollbar(self.treeFrame, orient = "vertical")
-        scroll_x = ttk.Scrollbar(self.treeFrame, orient = "horizontal")
-        self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings',
-        yscrollcommand = scroll_y.set, xscrollcommand = scroll_x.set)
-        scrollbar = ttk.Scrollbar(self.wrapper2, orient="vertical", command=self.itemTree.yview)
-        self.itemTree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=6, column=2, sticky="ns")
-
+        
+        global tree
+        tree = ttk.Treeview(self.wrapper2, columns=cols, show='headings', height="6")
+        
         for col in cols:
-            self.itemTree.column(col, anchor="center", width=150)
-            self.itemTree.heading(col, text=col)
+            tree.column(col, anchor="center", width=150)
+            tree.heading(col, text=col)
+        scrollbar = ttk.Scrollbar(self.wrapper2, orient="vertical", command=tree.yview)
+        tree.configure(yscroll=scrollbar.set)
+        scrollbar.grid(row=6, column=2, sticky="ns")
 
         res = mongo.adminAdvancedSearch(self.mongoSearch())
         for r in  res:
             result = self.mongoToTree(r)
-            self.itemTree.insert("", "end", values=result)
-        self.itemTree.grid(row=6, column=1, columnspan=2)
+            tree.insert("", "end", values=result)
+        tree.grid(row=6, column=1, columnspan=2)
     
     def search(self):
-        for r in self.itemTree.get_children():
-            self.itemTree.delete(r)
+        for r in tree.get_children():
+            tree.delete(r)
+
+        for col in cols:
+            tree.heading(col, text=col)
 
         stringsearch = self.mongoSearch()
-        print(stringsearch)
         allrecordsList = mongo.adminAdvancedSearch(stringsearch)
-        print("out")
-        print(allrecordsList)
         messagebox.showinfo(title="Search Results", message= "{} items available based on your search!".format(len(allrecordsList)))
 
         if len(allrecordsList) == 0:
@@ -107,9 +104,9 @@ class AdminAdvancedSearch(tk.Frame):
         else:
             for record in allrecordsList:
                 result = self.mongoToTree(record)
-                self.itemTree.insert("", "end", values=result)
+                tree.insert("", "end", values=result)
 
-        self.itemTree.grid(row=6, column=1, columnspan=1)
+        tree.grid(row=6, column=1, columnspan=1)
 
     def mongoSearch(self):
         mongoSearch = ""
@@ -119,28 +116,42 @@ class AdminAdvancedSearch(tk.Frame):
         factory = self.factoryBox.get()
         productionYear = self.productionYearBox.get()
         powerSupply = self.powerSupplyBox.get()
-        listSearch = []   
+        category = ""
+        model = ""
 
+        if price:
+            catandmod = self.findModelfromPrice(price)
+            if category and category != catandmod[0]:
+                category = "no output"
+            if model and model != catandmod[1]:
+                model = "no output"
+            else:
+                category = catandmod[0]
+                model = catandmod[1]   
+        dictSearch = {}   
+
+        if category:
+             dictSearch["Category"] = category
+        if model:
+            dictSearch["Model"] = model
         if color:
-             listSearch.append('"Color": '+ '"{}"'.format(color))
+             dictSearch["Color"] = color
         if factory:
-            listSearch.append('"Factory": ' + '"{}"'.format(factory))
+            dictSearch["Factory"] = factory
         if productionYear:
-            listSearch.append('"ProductionYear": ' + '"{}"'.format(productionYear))
+            dictSearch["ProductionYear"] = productionYear
         if powerSupply:
-            listSearch.append('"PowerSupply": ' + '"{}"'.format(powerSupply))
-        print(listSearch)
-        if not listSearch:
-            return ""
-        elif len(listSearch) == 1:
-            return "{" + listSearch[0]+ "}"
-        else:
-            for s in listSearch[:-1]:
-                mongoSearch = "{" + s + "}, "
-            mongoSearch += "{" + str(listSearch[:-1]) + "}"
-        return mongoSearch
+            dictSearch["PowerSupply"] = powerSupply
+        return dictSearch
+
+    def findModelfromPrice(self, price):
+        product = mongo.findModelfromPrice(price)
+        Category = product["Category"]
+        Model = product["Model"]
+        return (Category, Model)
 
     def mongoToTree(self, r):
-        price = cost = warranty = 0
-        re = (r["ItemID"], r["Category"], r["Model"], price, cost, r["Color"], r["Factory"], warranty, r["ProductionYear"], r["PowerSupply"], r["PurchaseStatus"], r["ServiceStatus"])
+        # To get price, cost, warranty from product (not avail in item)
+        pcw = mongo.findPriceCostWarranty(r["Category"], r["Model"])
+        re = (r["ItemID"], r["Category"], r["Model"], pcw["Price"], pcw["Cost"], r["Color"], r["Factory"], pcw["Warranty"], r["ProductionYear"], r["PowerSupply"], r["PurchaseStatus"], r["ServiceStatus"])
         return re

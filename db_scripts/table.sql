@@ -31,7 +31,7 @@ CREATE TABLE ServiceRequest (
 	dateOfRequest 	DATE,
 	itemID 			VARCHAR(4)  	NOT NULL,
 	dateOfPayment 	DATE,
-	adminID 		VARCHAR(40),
+	-- adminID 		VARCHAR(40),
 	PRIMARY KEY (requestID),
 	FOREIGN KEY (itemID) REFERENCES Item(itemID));
 

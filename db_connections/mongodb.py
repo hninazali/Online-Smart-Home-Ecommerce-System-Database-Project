@@ -115,13 +115,27 @@ class MongoDB():
         return list(cursor)
 
     def adminAdvancedSearch(self, search, database_name="oshes"):
-        print("in")
-        print(search)
         if search == "" or search == "{}":
             cursor = self.client[database_name]["items"].find()
         else:
             cursor = self.client[database_name]["items"].find(search)
         return list(cursor)
+
+    def findModelfromPrice(self, price, database_name="oshes"):
+        cursor = self.client[database_name]["products"].find({"Price ($)": int(price)})
+        product = list(cursor)
+        result =  {}
+        result["Category"] = product[0]['Category']
+        result["Model"] = product[0]['Model']
+        return result
+
+    def findPriceCostWarranty(self, category, model, database_name="oshes"):
+        product = self.client[database_name]["products"].find({'Category': category, 'Model': model})[0]
+        result = {}
+        result["Price"] = product['Price ($)']
+        result["Cost"] = product['Cost ($)']
+        result["Warranty"] = product['Warranty (months)']
+        return (result)
 
     # Returns instance of DeleteResult. Execute query.deleted_count for the number of deleted documents
     # TODO: test
@@ -137,6 +151,5 @@ if __name__ == "__main__":
     db = MongoDB()
     # db.dropCollection("products")
     # db.dropCollection("items")
-    # db.resetMongoState()
+    # print(db.adminAdvancedSearch({"Color": "Blue"}))
     # print(db.findProducts(category="Lights", model="Light1", domain="Customer"))
-    
