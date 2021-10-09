@@ -74,6 +74,9 @@ class tkinterApp(tk.Tk):
     def getDomain(self):
         return self.domain
 
+    def logout(self):
+        self.show_frame(StartPage)
+
 
 
 # Driver Code
