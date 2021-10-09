@@ -6,7 +6,8 @@ import tkinter.messagebox as messagebox
 from datetime import date
 from db_connections.mysqldb import SQLDatabase
 from db_connections.mongodb import MongoDB
-
+from tk_screens.viewProfileWindow import ViewProfileWindow
+from tk_screens.changePasswordWindow import ChangePasswordWindow
 #connect to mongoDB to search
 global client
 global db
@@ -288,12 +289,14 @@ class CustomerPortal(tk.Frame):
         #profile
         profileMenu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="My Profile", menu=profileMenu)
-        profileMenu.add_command(label="View Profile", command=self.hello)
+        profileMenu.add_command(label="View Profile", command= lambda: ViewProfileWindow(master=self.controller))
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
         profileMenu.add_separator()
         profileMenu.add_command(label="Logout", command=self.handleLogout)
 
         
         return menubar
+    
 
 
     # def menuBar(self,root):
