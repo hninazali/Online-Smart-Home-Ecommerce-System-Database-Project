@@ -1,9 +1,9 @@
 CREATE TABLE request(
   requestID MEDIUMINT NOT NULL AUTO_INCREMENT,
-  serviceFee Int NOT NULL DEFAULT 0,
+  serviceFee INT NOT NULL DEFAULT 0,
   requestStatus ENUM('Submitted', 'Submitted and Waiting for payment', 'In progress', 'Approved', 'Canceled', 'Completed') NOT NULL,
-  dateOfRequest Date NOT NULL,
-  dateOfPayment Date,
+  dateOfRequest DATE NOT NULL,
+  dateOfPayment DATE,
   customerID VARCHAR(16) NOT NULL,
   
   PRIMARY KEY (requestID),

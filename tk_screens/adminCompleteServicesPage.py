@@ -10,21 +10,18 @@ LARGEFONT = ("Verdana", 35)
 class AdminCompleteServicesPage(tk.Frame):
 
     def __init__(self, parent, controller):
+        
         tk.Frame.__init__(self, parent)
-        self.domain = tk.StringVar(self)
+
         self.controller = controller
-
-        results = db.retrieveServicesToComplete()
-
-        wrapper1 = LabelFrame(self, text="")
-        wrapper2 = LabelFrame(self, text="Services under you")
-        wrapper1.pack(fill=tk.X)
-        wrapper2.pack(fill="both", expand="yes", padx=20, pady=10)
+        self.domain = tk.StringVar()
 
         # set style to classic so that background can be changed, error on macbooks
         # tk.Frame.__init__(self, parent)
         # style = ttk.Style(self)
         # style.theme_use('classic')
+        wrapper1 = LabelFrame(self, text="")
+        wrapper1.pack(fill=tk.X)
         label = ttk.Label(wrapper1, text="Complete Services", font=LARGEFONT, background='white')
         label.grid(row=0, column=1, padx=10, pady=10)
 
@@ -32,11 +29,20 @@ class AdminCompleteServicesPage(tk.Frame):
         global cols 
         cols = ('Request ID', 'Service ID', 'Item ID', 'Request Date', 'Request Status', 'Service Status')
 
-        global tree
-        tree = ttk.Treeview(wrapper2, columns=cols, show='headings', height="20")
-
         self.selectedRequests = []
         self.selectedServices = []
+
+    def showTree(self):
+        
+        wrapper2 = LabelFrame(self, text="Services under you")
+        wrapper2.pack(fill="both", expand="yes", padx=20, pady=10)
+
+        print("test: " + self.domain.get())
+
+        results = db.retrieveServicesToComplete(self.domain.get())
+
+        global tree
+        tree = ttk.Treeview(wrapper2, columns=cols, show='headings', height="20")
 
         for col in cols:
             tree.column(col, anchor="center", width=150)
@@ -63,9 +69,6 @@ class AdminCompleteServicesPage(tk.Frame):
             self.selectedRequests.append(tree.item(v)['values'][0])
             self.selectedServices.append(tree.item(v)['values'][1])
 
-        print(self.selectedRequests)
-        print(self.selectedServices)
-
         res = db.completeService(self.selectedRequests, self.selectedServices)
 
         if res:
@@ -77,3 +80,10 @@ class AdminCompleteServicesPage(tk.Frame):
         
         self.selectedRequests.clear()
         self.selectedServices.clear()
+    
+    def setUserType(self, userID):
+        self.domain = userID
+        # Log
+        print("gui.py>AdminCompleteServicesPage> Domain Set:", self.domain.get())
+
+        self.showTree()

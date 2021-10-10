@@ -10,8 +10,8 @@ LARGEFONT = ("Verdana", 35)
 class AdminApproveRequestsPage(tk.Frame):
 
     def __init__(self, parent, controller):
+        
         tk.Frame.__init__(self, parent)
-        self.domain = tk.StringVar(self)
         self.controller = controller
 
         results = db.retrieveRequestsForApproval()
@@ -75,7 +75,7 @@ class AdminApproveRequestsPage(tk.Frame):
             self.selectedRequests.append(tree.item(v)['values'][0])
             self.selectedServices.append(tree.item(v)['values'][1])     
 
-        res = db.approveRequests(self.selectedRequests, self.selectedServices)
+        res = db.approveRequests(self.selectedRequests, self.selectedServices, self.domain.get())
 
         if res:
             messagebox.showinfo(title="Requests Approval", message="Selected record(s) have been approved successfully!")
@@ -86,3 +86,8 @@ class AdminApproveRequestsPage(tk.Frame):
         
         self.selectedRequests.clear()
         self.selectedServices.clear()
+
+    def setUserType(self, userID):
+        self.domain = userID
+        # Log
+        print("gui.py>AdminApproveRequestsPage> Domain Set:",self.domain.get())

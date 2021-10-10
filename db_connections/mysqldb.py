@@ -127,13 +127,15 @@ class SQLDatabase():
         results = self.c.fetchall()
         return results
 
-    def approveRequests(self, requestIDs, serviceIDs):
+    def approveRequests(self, requestIDs, serviceIDs, adminID):
         approveRequests = ("UPDATE request SET requestStatus = 'Approved' WHERE requestID = %s")
         result = self.c.executemany(approveRequests, requestIDs)
         if result != len(requestIDs):
             self.connection.rollback()
             return False
-        serviceItems = ("UPDATE service SET serviceStatus = 'in progress' WHERE serviceID = %s")
+        queryString1 = ("UPDATE service SET serviceStatus = 'in progress', adminID = ")
+        queryString2 = (" WHERE serviceID = %s")
+        serviceItems = queryString1 + "'" + adminID + "'" + queryString2
         result = self.c.executemany(serviceItems, serviceIDs)
         if result != len(serviceIDs):
             self.connection.rollback()
@@ -141,9 +143,9 @@ class SQLDatabase():
         self.connection.commit()
         return True
 
-    def retrieveServicesToComplete(self):
-        retrieveServicesToComplete = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.requestStatus, s.serviceStatus FROM request r, service s WHERE s.requestID = r.requestID AND s.serviceStatus = 'in progress' AND r.requestStatus = 'Approved' ORDER BY r.requestID")
-        self.c.execute(retrieveServicesToComplete, ())
+    def retrieveServicesToComplete(self, adminID):
+        retrieveServicesToComplete = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.requestStatus, s.serviceStatus FROM request r, service s WHERE s.requestID = r.requestID AND s.serviceStatus = 'in progress' AND r.requestStatus = 'Approved' AND s.adminID = %s ORDER BY r.requestID")
+        self.c.execute(retrieveServicesToComplete, (adminID))
         results = self.c.fetchall()
         return results
 

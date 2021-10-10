@@ -1,3 +1,4 @@
+from tk_screens.adminPortal import AdminPortal
 from tk_screens.customerPortal import CustomerPortal
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
@@ -12,6 +13,7 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.domain = tk.StringVar(self)
+        self.userID = tk.StringVar(self)
         self.controller = controller
 
         # label of frame Layout 2
@@ -147,7 +149,7 @@ class LoginPage(tk.Frame):
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
                 messagebox.showinfo(title="Login Success", message="Admin Successfully logged in")
-                self.controller.show_frame(CustomerPortal)
+                self.controller.show_frame(AdminPortal, self.userID)
             elif isinstance(res, str):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)
