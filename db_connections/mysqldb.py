@@ -13,6 +13,7 @@ class SQLDatabase():
             tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
             tempcursor = tempconnection.cursor()
             tempcursor.execute("CREATE DATABASE oshes;")
+            tempconnection.commit()
 
             tempcursor.close()
             tempconnection.close()
@@ -27,6 +28,15 @@ class SQLDatabase():
     def connect(self, dbname = "oshes"):
         self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
         self.c = self.connection.cursor()
+
+    def createDB(self):
+        print("createDB: Oshes Database does not exist. Creating now")
+        tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+        tempcursor = tempconnection.cursor()
+        tempcursor.execute("CREATE DATABASE oshes;")
+        tempconnection.commit()
+        tempcursor.close()
+        tempconnection.close()
 
     # Create Customer - DONE
     def createCustomer(self, custInfo):
@@ -101,51 +111,11 @@ class SQLDatabase():
         else:
             raise Exception("Check domain in changePassword")
 
-    def changeNum(self, newNum, username, isAdmin):
-        if (isAdmin):
-            changeAdminNum = ("UPDATE admin SET phone_number = %s WHERE admin_id = %s")
-            self.c.execute(changeAdminNum, (newNum, username))
-            self.connection.commit()
-        else:
-            changeCustNum = ("UPDATE customer SET password = %s WHERE customer_id = %s")
-            self.c.execute(changeCustNum, (newNum, username))
-            self.connection.commit()
-    
-    def changeEmail(self, newEmail, username):
-        changeCustEmail = ("UPDATE customer SET email_address = %s WHERE customer_id = %s")
-        self.c.execute(changeCustEmail, (newEmail, username))
-        self.connection.commit()
-
-    def changeAddress(self, newAddress, username):
-        changeCustAddress = ("UPDATE customer SET address = %s WHERE customer_id = %s")
-        self.c.execute(changeCustAddress, (newAddress, username))
-        self.connection.commit()
-
-    def beginService(self, serviceReq):
-        beginService = ("UPDATE service SET service_status = %s WHERE request_id = %s")
-        beginRequest = ("UPDATE requests SET request_status = %s WHERE request_id = %s")
-        self.c.execute(beginService, ("In progress", serviceReq[0]))
-        self.c.execute(beginRequest, ("Approved", serviceReq[0]))
-        self.connection.commit()
-
-    def completeService(self, serviceReq):
-        completeService = ("UPDATE service SET service_status = %s WHERE request_id = %s")
-        completeRequest = ("UPDATE requests set request_status = %s WHERE request_id = %s")
-        self.c.execute(completeService, ("Completed", serviceReq[0]))
-        self.c.execute(completeRequest, ("Completed", serviceReq[0]))
-        self.connection.commit()
-
-    def retrieveService(self):
-        allReq = ("SELECT requests.request_id, items.item_id, items.category, items.model, requests.request_date, service.service_status FROM ((service INNER JOIN requests ON service.request_id = requests.request_id) INNER JOIN items ON service.item_id = items.item_id)")
-        self.c.execute(allReq, ())
-        results = self.c.fetchall()
-        print(results)
-        return results
-
- 
 
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
+        # dropDatabase()
+        # self.createDB()
         rootdir = "./db_scripts"
         # Just in case someone cd into this dir and run the script
         # TODO: Specify the order of scripts to be executed
@@ -154,6 +124,13 @@ class SQLDatabase():
         except:
             files = os.listdir("../db_scripts")
             rootdir = "../db_scripts"
+        
+        # Drop Tables
+        tables = ["items","products","Customer","admin"]
+        for table in tables:
+            sql = "DROP TABLE IF EXISTS `%s`"
+            self.c.execute(sql, (table))
+            self.connection.commit()
 
         #table.sql creates admin, customer, product and item table while customer and admin sqls create new users
         files = ["table.sql", "customer.sql", "admin.sql"]
@@ -182,23 +159,48 @@ class SQLDatabase():
     def getConnection(self):
         return self.connection
 
-# Exists outside of the class. Drops the oshes database if it exists
-def dropDatabase():
-    try:
-        tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
-        cur = tempc.cursor()
-        cur.execute("DROP DATABASE oshes;")
-    except:
-        print("DB oshes does not exist")
+# # this methods will be callable without any requirements for the database
+# class DBOps():
+#     def dropDatabase(self):
+#         print("Dropping Databases")
+#         try:
+#             tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+#             cur = tempc.cursor()
+#             print("check1")
+#             cur.execute("CREATE DATABASE oshes;")
+#             tempc.commit()
+
+#             tempc.select_db("oshes")
+
+#             cur.execute("DROP DATABASE oshes;")
+#             tempc.commit()
+#             print("check2")
+            
+#         except:
+#             raise Exception("DB oshes does not exist")
+
+
+# # Exists outside of the class. Drops the oshes database if it exists
+# def dropDatabase():
+#     print("Dropping Databases")
+#     try:
+#         tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+#         cur = tempc.cursor()
+#         # print("check1")
+#         cur.execute("DROP DATABASE oshes;")
+#         tempc.commit()
+#         # print("check2")
+        
+#     except:
+#         print("DB oshes does not exist")
 
 
 if __name__ == "__main__":
-    # dropDatabase()
-    dropDatabase()
     db = SQLDatabase()
     # db.changePassword('aa', 'bb', "Customer")
     # print(db.getCustomerLogin('aa','aa'))
     db.resetMySQLState()
+
 
     # db.resetMySQLState()
     # Testing Functions

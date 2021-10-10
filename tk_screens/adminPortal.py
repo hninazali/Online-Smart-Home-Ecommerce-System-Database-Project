@@ -78,9 +78,10 @@ class AdminPortal(tk.Frame):
     def resetDB(self):
         print("Reloading databases")
         dropDatabase()
+        db.createDB()
         db.resetMySQLState()
-        items, products = mongodb.convertMongotoSQL()
-        db.loadMongo(items, products)
+        # items, products = mongodb.convertMongotoSQL()
+        # db.loadMongo(items, products)
 # In addition, provide a MYSQL database initialization function under the Administrator login. 
 # At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:
