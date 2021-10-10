@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, PhotoImage, Label, LabelFrame
+from tkinter import *
+import tkinter.ttk as ttk
 from db_connections.mongodb import MongoDB
 from PIL import Image, ImageTk
 mongo = MongoDB()
@@ -17,23 +18,21 @@ class AdminProductSearch(tk.Frame):
         self.category = tk.StringVar(self)
         self.model = tk.StringVar(self)
         
-        wrapper1 = LabelFrame(self, text="Header")
-        wrapper2 = LabelFrame(self, text="Products List")
-
-        wrapper1.pack(fill=tk.X)
-        wrapper2.pack(fill="both", expand="yes", padx=20, pady=10)
-
-        label = ttk.Label(wrapper1, text="Products List", font=LARGEFONT)
-        label.grid(row=0, column=1, padx=10, pady=10)
+        self['background']='#F6F4F1'
+        
+        self.label = ttk.Label(self, text="Products List", font=LARGEFONT)
+        self.label.grid(row=0, column=3, padx=10, pady=10)
 
         # Dropdown menu options
         optionsCategory = ("All", "Lights", "Locks")
         optionsModel = ("All", "Light1", "Light2", "SmartHome1", "Safe1", "Safe2", "Safe3")
 
         vModel=[]
-        self.modelBox = ttk.Combobox(wrapper1, values = vModel)
+        self.modelLabel = ttk.Label(self, text="Model:")
+        self.modelLabel.grid(row=2, column=1, padx=5, pady=5)
+        self.modelBox = ttk.Combobox(self, values = vModel)
         self.modelBox.configure(cursor='arrow', state='readonly', takefocus=False)
-        self.modelBox.grid(row=2, column=1, sticky=tk.E, padx=10, pady=10)
+        self.modelBox.grid(row=2, column=2, sticky=tk.E, padx=10, pady=10)
 
         def categoryAndModel(event):
             if self.categoryBox.get()=="Lights":
@@ -44,57 +43,50 @@ class AdminProductSearch(tk.Frame):
                 vModel = []
             self.modelBox.configure(values = vModel)
 
-        self.categoryBox = ttk.Combobox(wrapper1, values = ["Lights", "Locks",""])
+        self.catLabel = ttk.Label(self, text="Model:")
+        self.catLabel.grid(row=1, column=1, padx=5, pady=5)
+        self.categoryBox = ttk.Combobox(self, values = ["Lights", "Locks",""])
         self.categoryBox.bind('<<ComboboxSelected>>', categoryAndModel)
         self.categoryBox.configure(state='readonly')
-        self.categoryBox.grid(row=1, column=1, sticky=tk.E, padx=10, pady=10)
+        self.categoryBox.grid(row=1, column=2, sticky=tk.E, padx=10, pady=10)
 
-        button2 = ttk.Button(wrapper1, text="Filter",
+        button2 = ttk.Button(self, text="Filter",
                              command=self.renderProductsList)
-        button2.grid(row=3, column=1, padx=10, pady=10)
+        button2.grid(row=2, column=3, padx=10, pady=10)
 
-        global cols
-        cols = ('Product ID', 'Category', 'Model', 'Price', 'Cost', 'Warranty (months)', 'Inventory Level', 'Number sold')
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='1', columnspan='6', row='10', rowspan='1')
 
-        global tree
-        tree = ttk.Treeview(wrapper2, columns=cols, show='headings', height="6")
+        self.cols = ('Product ID', 'Category', 'Model', 'Price', 'Cost', 'Warranty (months)', 'Inventory Level', 'Number sold')
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
 
         res = mongo.adminProductSearch(self.category.get(), self.model.get())
-        for col in cols:
-            tree.column(col, anchor="center", width=150)
-            tree.heading(col, text=col)
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
         for r in  res:
             result = self.mongoToTree(r)
-            tree.insert("", "end", values=result)
-        tree.grid(row=6, column=1, columnspan=2)
-
-        scrollbar = ttk.Scrollbar(wrapper2, orient="vertical", command=tree.yview)
-        tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=6, column=2, sticky="ns")
+            self.tree.insert("", "end", values=result)
 
     def renderProductsList(self):
-        for r in tree.get_children():
-            tree.delete(r)
+        for r in self.tree.get_children():
+            self.tree.delete(r)
 
         res = mongo.adminProductSearch(self.categoryBox.get(), self.modelBox.get())
-        # resSold = mongo.soldLevel()
-        # resUnsold = mongo.unsoldLevel()
 
-        # for index, r in enumerate(res):
-        #     res[index]["Unsold"] = resSold[r["ProductID"]]["total"]
-        #     res[index]["Sold"] = resUnsold[r["ProductID"]]["total"]
-        #     print("index")
-        #     print(resSold[r["ProductID"]]["total"])
-        #     print(resUnsold[r["ProductID"]]["total"])
-        #     print(r)
-
-        for col in cols:
-            tree.heading(col, text=col)
+        for col in self.cols:
+            self.tree.heading(col, text=col)
         for r in res:
             result = self.mongoToTree(r)
-            tree.insert("", "end", values=result)
+            self.tree.insert("", "end", values=result)
 
-        tree.grid(row=6, column=1, columnspan=1)
+        # self.tree.grid(row=6, column=1, columnspan=1)
 
     def mongoToTree(self, r):
         resSold = mongo.soldLevel()

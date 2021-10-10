@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, PhotoImage, Label, LabelFrame
+from tkinter import *
+import tkinter.ttk as ttk
 from db_connections.mongodb import MongoDB
 from PIL import Image, ImageTk
 mongo = MongoDB()
@@ -13,87 +14,85 @@ class AdminAdvancedSearch(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        
-        self.wrapper1 = LabelFrame(self, text="Header")
-        self.wrapper2 = LabelFrame(self, text="Products List")
 
-        self.wrapper1.pack(fill=tk.X)
-        self.wrapper2.pack(fill="both", expand="yes", padx=20, pady=10)
+        label = ttk.Label(self, text="Products List", font=LARGEFONT)
+        label.grid(row=0, column=3, padx=10, pady=10)
 
-        label = ttk.Label(self.wrapper1, text="Products List", font=LARGEFONT)
-        label.grid(row=0, column=1, padx=10, pady=10)
+        self['background']='#F6F4F1'
 
-        self.priceBox = ttk.Combobox(self.wrapper1 ,values = ["50", "60",
+        self.priceBox = ttk.Combobox(self ,values = ["50", "60",
         "70","100","120","125","200",""])
         self.priceBox.configure(cursor='arrow', state='readonly', takefocus=False)
-        self.priceBox.grid(column='1', padx='5', pady='5', row='2')
+        self.priceBox.grid(column='2', padx='5', pady='5', row='2')
         
-        self.colorBox = ttk.Combobox(self.wrapper1, values = ["White", "Blue",
+        self.colorBox = ttk.Combobox(self, values = ["White", "Blue",
         "Yellow", "Green", "Black",""])
         self.colorBox.configure(cursor='arrow', state='readonly', takefocus=False)
-        self.colorBox.grid(column='1', padx='5', pady='5', row='3')
+        self.colorBox.grid(column='2', padx='5', pady='5', row='3')
 
-        self.factoryBox = ttk.Combobox(self.wrapper1, values = ["Malaysia", "China", "Philippines",""])
+        self.factoryBox = ttk.Combobox(self, values = ["Malaysia", "China", "Philippines",""])
         self.factoryBox.configure(cursor='arrow', state='readonly', takefocus=False)
-        self.factoryBox.grid(column='1', padx='5', pady='5', row='4')
+        self.factoryBox.grid(column='2', padx='5', pady='5', row='4')
 
-        self.productionYearBox = ttk.Combobox(self.wrapper1, values = ["2014", "2015",
+        self.productionYearBox = ttk.Combobox(self, values = ["2014", "2015",
         "2016", "2017", "2018", "2019", "2020",""])
         self.productionYearBox.configure(cursor='arrow', state='readonly', takefocus=False)
-        self.productionYearBox.grid(column='1', padx='5', pady='5', row='5')
+        self.productionYearBox.grid(column='2', padx='5', pady='5', row='5')
 
-        self.powerSupplyBox = ttk.Combobox(self.wrapper1, values = ["Battery", "USB",""])
+        self.powerSupplyBox = ttk.Combobox(self, values = ["Battery", "USB",""])
         self.powerSupplyBox.configure(cursor='arrow', state='readonly', takefocus=False)
-        self.powerSupplyBox.grid(column='1', padx='5', pady='5', row='6')
+        self.powerSupplyBox.grid(column='2', padx='5', pady='5', row='6')
 
-        self.advancedSearchButton = ttk.Button(self.wrapper1, text="Filter", command=self.search)
-        self.advancedSearchButton.grid(column='2', padx='5', pady='5', row='6')
+        self.advancedSearchButton = ttk.Button(self, text="Filter", command=self.search)
+        self.advancedSearchButton.grid(column='3', padx='5', pady='5', row='6')
 
-        self.priceLabel = ttk.Label(self.wrapper1)
+        self.priceLabel = ttk.Label(self)
         self.priceLabel.configure(text='Price')
-        self.priceLabel.grid(column='0', padx='5', pady='5', row='2')
+        self.priceLabel.grid(column='1', padx='5', pady='5', row='2')
 
-        self.colorLabel = ttk.Label(self.wrapper1)
+        self.colorLabel = ttk.Label(self)
         self.colorLabel.configure(text='Color')
-        self.colorLabel.grid(column='0', padx='5', pady='5', row='3')
+        self.colorLabel.grid(column='1', padx='5', pady='5', row='3')
 
-        self.factoryLabel = ttk.Label(self.wrapper1)
+        self.factoryLabel = ttk.Label(self)
         self.factoryLabel.configure(text='Factory')
-        self.factoryLabel.grid(column='0', padx='5', pady='5', row='4')
+        self.factoryLabel.grid(column='1', padx='5', pady='5', row='4')
 
-        self.productionYearLabel = ttk.Label(self.wrapper1)
+        self.productionYearLabel = ttk.Label(self)
         self.productionYearLabel.configure(text='Production Year')
-        self.productionYearLabel.grid(column='0', padx='5', pady='5', row='5')
+        self.productionYearLabel.grid(column='1', padx='5', pady='5', row='5')
 
-        self.powerSupplyLabel = ttk.Label(self.wrapper1)
+        self.powerSupplyLabel = ttk.Label(self)
         self.powerSupplyLabel.configure(text='Power Supply')
-        self.powerSupplyLabel.grid(column='0', padx='5', pady='5', row='6')
+        self.powerSupplyLabel.grid(column='1', padx='5', pady='5', row='6')
 
-        global cols 
-        cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status", "Service Status")
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='1', columnspan='6', row='10', rowspan='1')
+
+        self.cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status", "Service Status")
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
         
-        global tree
-        tree = ttk.Treeview(self.wrapper2, columns=cols, show='headings', height="6")
-        
-        for col in cols:
-            tree.column(col, anchor="center", width=150)
-            tree.heading(col, text=col)
-        scrollbar = ttk.Scrollbar(self.wrapper2, orient="vertical", command=tree.yview)
-        tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=6, column=2, sticky="ns")
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=100)
+            self.tree.heading(col, text=col)
 
         res = mongo.adminAdvancedSearch(self.mongoSearch())
         for r in  res:
             result = self.mongoToTree(r)
-            tree.insert("", "end", values=result)
-        tree.grid(row=6, column=1, columnspan=2)
+            self.tree.insert("", "end", values=result)
     
     def search(self):
-        for r in tree.get_children():
-            tree.delete(r)
+        for r in self.tree.get_children():
+            self.tree.delete(r)
 
-        for col in cols:
-            tree.heading(col, text=col)
+        for col in self.cols:
+            self.tree.heading(col, text=col)
 
         stringsearch = self.mongoSearch()
         allrecordsList = mongo.adminAdvancedSearch(stringsearch)
@@ -104,9 +103,7 @@ class AdminAdvancedSearch(tk.Frame):
         else:
             for record in allrecordsList:
                 result = self.mongoToTree(record)
-                tree.insert("", "end", values=result)
-
-        tree.grid(row=6, column=1, columnspan=1)
+                self.tree.insert("", "end", values=result)
 
     def mongoSearch(self):
         mongoSearch = ""
