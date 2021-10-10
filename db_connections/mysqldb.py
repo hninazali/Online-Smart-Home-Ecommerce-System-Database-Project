@@ -155,6 +155,7 @@ class SQLDatabase():
             files = os.listdir("../db_scripts")
             rootdir = "../db_scripts"
 
+        #table.sql creates admin, customer, product and item table while customer and admin sqls create new users
         files = ["table.sql", "customer.sql", "admin.sql"]
 
         for file in files:
@@ -166,6 +167,17 @@ class SQLDatabase():
                     self.c.execute(sql_request + ';')
                     print("Executing:", sql_request)
         self.connection.commit()
+
+    def loadMongo(self, items, products):
+        for product in products:
+            self.c.execute(product)
+        self.connection.commit()
+
+        for item in items:
+            self.c.execute(item)
+        self.connection.commit()
+
+
 
     def getConnection(self):
         return self.connection
@@ -182,9 +194,11 @@ def dropDatabase():
 
 if __name__ == "__main__":
     # dropDatabase()
+    dropDatabase()
     db = SQLDatabase()
     # db.changePassword('aa', 'bb', "Customer")
-    print(db.getCustomerLogin('aa','aa'))
+    # print(db.getCustomerLogin('aa','aa'))
+    db.resetMySQLState()
 
     # db.resetMySQLState()
     # Testing Functions

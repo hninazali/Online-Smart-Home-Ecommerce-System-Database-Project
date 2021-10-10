@@ -221,7 +221,7 @@ class CustomerPortal(tk.Frame):
         extractID = self.itemTree.item(curItem)['values'][0]
         
         #update mysql database, need to get current customer id
-        updateStatement = "UPDATE Item SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s"
+        updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s"
         val = (date.today().isoformat(),"001", extractID)
 
         con.ping()  # reconnecting mysql

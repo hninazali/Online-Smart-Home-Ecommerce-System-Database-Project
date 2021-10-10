@@ -75,11 +75,13 @@ class MongoDB():
         return self.client
 
     
-    def convertJSONtoSQL():
+    def convertMongotoSQL(self):
         itemsSQL = []  # Array of SQL Commands to load items
         productsSQL = []  # Array of SQL commands to load products
-        items = open("../JSON_files/items.json")
-        arr = json.load(items)
+        # items = open("../JSON_files/items.json")
+        # arr = json.load(items)
+
+        arr=list(self.client['oshes']['items'].find({}))
 
         for item in arr:
             if item["ServiceStatus"] == '':
@@ -88,30 +90,32 @@ class MongoDB():
                 item["ItemID"], item["Category"], item["Color"], item["Factory"], item["PowerSupply"], item["PurchaseStatus"], item["ProductionYear"], item["Model"], item["ServiceStatus"])
             itemsSQL.append(string)
 
-        items.close()
+        # items.close()
 
-        products = open("../JSON_files/products.json")
-        arr2 = json.load(products)
+        # products = open("../JSON_files/products.json")
+        # arr2 = json.load(products)
+        arr2=list(self.client['oshes']['products'].find({}))
 
         for product in arr2:
             string = "INSERT INTO products VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
                 product["Category"], product["Cost ($)"], product["Model"], product["Price ($)"], product["ProductID"], product["Warranty (months)"],)
             productsSQL.append(string)
 
-        products.close()
+        # products.close()
 
-        with open("../db_scripts/items.sql", 'w+') as f:
-            for item in itemsSQL:
-                f.write(item+"\n")
+        # with open("../db_scripts/items.sql", 'w+') as f:
+        #     for item in itemsSQL:
+        #         f.write(item+"\n")
 
-        with open("../db_scripts/products.sql", 'w+') as f:
-            for product in productsSQL:
-                f.write(product+"\n")
+        # with open("../db_scripts/products.sql", 'w+') as f:
+        #     for product in productsSQL:
+        #         f.write(product+"\n")
 
         return itemsSQL, productsSQL
 
 if __name__ == "__main__":
     db = MongoDB()
+    obj1, obj2 = db.convertMongotoSQL()
     # db.dropCollection("products")
     # db.dropCollection("items")
     # db.resetMongoState()
