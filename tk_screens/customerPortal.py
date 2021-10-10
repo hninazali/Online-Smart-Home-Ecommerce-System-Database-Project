@@ -43,7 +43,7 @@ class CustomerPortal(tk.Frame):
         self.buyButton.grid(column='7', pady='20', row='11', sticky='e')
         self.buyButton.bind('<Button-1>', self.buyItem)
 
-        
+        self['background']='#F6F4F1'
 
         ####Comboboxes####
         vModel=[]

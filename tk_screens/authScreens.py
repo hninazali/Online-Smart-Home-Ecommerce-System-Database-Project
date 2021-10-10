@@ -3,12 +3,13 @@ from tk_screens.customerPortal import CustomerPortal
 from tk_screens.adminPortal import AdminPortal
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
+from tk_screens.tkinterCustomButton import TkinterCustomButton
 from db_connections.mysqldb import SQLDatabase
 from PIL import Image, ImageTk
 
 db = SQLDatabase()
 
-LARGEFONT = ("Verdana", 35)
+LARGEFONT = ("Filson", 35, "bold")
 # first window frame startpage
 
 class StartPage(tk.Frame):
@@ -39,6 +40,12 @@ class StartPage(tk.Frame):
         # putting the button in its place by
         # using grid
         button1.grid(row=1, column=0, padx=5, pady=5)
+        
+        # def button_function():
+        #     print("Button pressed")
+
+        # button_1 = TkinterCustomButton(text="Login", corner_radius=10, command=lambda: controller.show_frame(LoginPage, self.domain))
+        # button_1.place(x = 530,y = 650, anchor=tk.CENTER)
 
         ## button to show frame 2 with text layout2
         button2 = ttk.Button(self, text="Register",
@@ -103,6 +110,9 @@ class LoginPage(tk.Frame):
         label.grid(row=6, column=7, padx=5, pady=5, columnspan=7)
         # self.grid_rowconfigure(1, weight=1)
         # self.grid_columnconfigure(1, weight=1)
+
+        # background colour same as the welcome page image 
+        self['background']='#F6F4F1'
             
         userIDLabel = ttk.Label(self, text="User ID:")
         userIDLabel.grid(row=7, column=7, padx=5, pady=5)
@@ -175,7 +185,6 @@ class RegisterPage(tk.Frame):
     def __init__(self, parent, controller):
         self.domain = controller.getDomain()
 
-
         self.userID = tk.StringVar()
         self.name = tk.StringVar()
         self.email = tk.StringVar()
@@ -187,6 +196,8 @@ class RegisterPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = ttk.Label(self, text="Register Page", font=LARGEFONT)
         label.grid(row=2, column=3, padx=5, pady=5, columnspan=11)
+
+        self['background']='#F6F4F1'
 
         userIDlabel = ttk.Label(self, text="User ID:")
         userIDlabel.grid(row=3, column=3, padx=5, pady=5)

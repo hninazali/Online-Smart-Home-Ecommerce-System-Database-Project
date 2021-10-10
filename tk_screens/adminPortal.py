@@ -24,6 +24,7 @@ class AdminPortal(tk.Frame):
 
         createAdminButton.grid(row=3, column=7, padx=10, pady=10)
 
+        self['background']='#F6F4F1'
 
     def hello(self):
         print("hello")
@@ -69,7 +70,7 @@ class AdminPortal(tk.Frame):
         profileMenu.add_command(label="Logout", command=self.hello)      
         
         return menubar
-
+    
 
     def resetDB(self):
         db.resetMySQLState()
