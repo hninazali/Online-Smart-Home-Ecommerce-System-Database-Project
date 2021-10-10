@@ -60,6 +60,15 @@ class MongoDB():
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
             return list(cursor)
 
+    # Find the product that matches the item's attributes. Return the ID
+    def getProductID(self, itemdict):
+        # ItemDict should contain the model and category (common columns between items and products collections)
+        cursor = self.client['oshes']["products"].find(itemdict, {"ProductID": 1})
+        li = list(cursor)
+        # print("Serached for:",itemdict, "Found products:", li)
+        # print("Found Product:", li[0]["ProductID"])
+        return li[0]["ProductID"]
+
 
     # Returns instance of DeleteResult. Execute query.deleted_count for the number of deleted documents
     # TODO: test
@@ -78,38 +87,30 @@ class MongoDB():
     def convertMongotoSQL(self):
         itemsSQL = []  # Array of SQL Commands to load items
         productsSQL = []  # Array of SQL commands to load products
-        # items = open("../JSON_files/items.json")
-        # arr = json.load(items)
 
-        arr=list(self.client['oshes']['items'].find({}))
-
-        for item in arr:
-            if item["ServiceStatus"] == '':
-                item["ServiceStatus"] = 'Completed'  # Change this later
-            string = "INSERT INTO items VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
-                item["ItemID"], item["Category"], item["Color"], item["Factory"], item["PowerSupply"], item["PurchaseStatus"], item["ProductionYear"], item["Model"], item["ServiceStatus"])
-            itemsSQL.append(string)
-
-        # items.close()
-
-        # products = open("../JSON_files/products.json")
-        # arr2 = json.load(products)
         arr2=list(self.client['oshes']['products'].find({}))
 
         for product in arr2:
             string = "INSERT INTO products VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
-                product["Category"], product["Cost ($)"], product["Model"], product["Price ($)"], product["ProductID"], product["Warranty (months)"],)
+                 product["ProductID"], product["Model"], product["Category"], product["Warranty (months)"], product["Cost ($)"], product["Price ($)"])
             productsSQL.append(string)
 
-        # products.close()
 
-        # with open("../db_scripts/items.sql", 'w+') as f:
-        #     for item in itemsSQL:
-        #         f.write(item+"\n")
+        arr=list(self.client['oshes']['items'].find({}))
 
-        # with open("../db_scripts/products.sql", 'w+') as f:
-        #     for product in productsSQL:
-        #         f.write(product+"\n")
+        for item in arr:
+            customerID = "customer1" # Change this later
+            productID = self.getProductID({
+                "Category": item["Category"],
+                "Model": item["Model"]
+            }) # Change this later
+            print("Found Product:", productID)
+            
+            if item["ServiceStatus"] == '':
+                item["ServiceStatus"] = 'Completed'  # Change this later
+            string = "INSERT INTO items VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
+                item["ItemID"], item["Color"], item["Factory"], item["PowerSupply"], item["PurchaseStatus"], item["ProductionYear"], customerID, productID)
+            itemsSQL.append(string)
 
         return itemsSQL, productsSQL
 

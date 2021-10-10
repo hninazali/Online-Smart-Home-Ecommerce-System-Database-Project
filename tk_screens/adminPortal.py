@@ -2,7 +2,6 @@ import tkinter as tk
 # from tkinter import *
 from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
 from db_connections.mysqldb import SQLDatabase
-from db_connections.mysqldb import dropDatabase
 from db_connections.mongodb import MongoDB
 # from tk_screens.authScreens import StartPage -- Circular import with authScreens
 
@@ -77,11 +76,9 @@ class AdminPortal(tk.Frame):
 
     def resetDB(self):
         print("Reloading databases")
-        dropDatabase()
-        db.createDB()
         db.resetMySQLState()
-        # items, products = mongodb.convertMongotoSQL()
-        # db.loadMongo(items, products)
+        items, products = mongodb.convertMongotoSQL()
+        db.loadMongo(items, products)
 # In addition, provide a MYSQL database initialization function under the Administrator login. 
 # At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:

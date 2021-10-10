@@ -6,11 +6,11 @@ import os
 class SQLDatabase():
     def __init__(self):
         try:
-            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes", autocommit=True)
             self.c = self.connection.cursor()
         except:
             print("Oshes Database does not exist. Creating now")
-            tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+            tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", autocommit=True)
             tempcursor = tempconnection.cursor()
             tempcursor.execute("CREATE DATABASE oshes;")
             tempconnection.commit()
@@ -18,7 +18,7 @@ class SQLDatabase():
             tempcursor.close()
             tempconnection.close()
 
-            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes", autocommit=True)
             self.c = self.connection.cursor()
 
 
@@ -26,12 +26,12 @@ class SQLDatabase():
 
     # TODO: Consider initializing the connection as None and invoke this function to connect
     def connect(self, dbname = "oshes"):
-        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes", autocommit=True)
         self.c = self.connection.cursor()
 
     def createDB(self):
         print("createDB: Oshes Database does not exist. Creating now")
-        tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+        tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", autocommit=True)
         tempcursor = tempconnection.cursor()
         tempcursor.execute("CREATE DATABASE oshes;")
         tempconnection.commit()
@@ -128,9 +128,9 @@ class SQLDatabase():
         # Drop Tables
         tables = ["items","products","Customer","admin"]
         for table in tables:
-            sql = "DROP TABLE IF EXISTS `%s`"
-            self.c.execute(sql, (table))
-            self.connection.commit()
+            print("executing: Drop table "+table)
+            sql = "DROP TABLE IF EXISTS {}"
+            self.c.execute(sql.format(table))
 
         #table.sql creates admin, customer, product and item table while customer and admin sqls create new users
         files = ["table.sql", "customer.sql", "admin.sql"]
@@ -147,12 +147,14 @@ class SQLDatabase():
 
     def loadMongo(self, items, products):
         for product in products:
+            print("Executing:", product)
             self.c.execute(product)
-        self.connection.commit()
+            self.connection.commit()
 
         for item in items:
+            print("Executing:", item)
             self.c.execute(item)
-        self.connection.commit()
+            self.connection.commit()
 
 
 
