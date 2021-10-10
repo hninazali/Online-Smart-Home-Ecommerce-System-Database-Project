@@ -2,6 +2,7 @@ from pymongo import MongoClient, errors
 import os
 import json
 
+
 class MongoDB():
     def __init__(self):
         try:
@@ -100,10 +101,10 @@ class MongoDB():
 
         for item in arr:
             customerID = "customer1" # Change this later
-            productID = self.getProductID({
+            productID = int(self.getProductID({
                 "Category": item["Category"],
                 "Model": item["Model"]
-            }) # Change this later
+            })) # Change this later
             print("Found Product:", productID)
             
             if item["ServiceStatus"] == '':
@@ -115,8 +116,14 @@ class MongoDB():
         return itemsSQL, productsSQL
 
 if __name__ == "__main__":
+    from mysqldb import SQLDatabase
     db = MongoDB()
-    obj1, obj2 = db.convertMongotoSQL()
+    items, products = db.convertMongotoSQL()
+
+    db = SQLDatabase()
+    db.resetMySQLState()
+
+    db.loadMongo(items, products)
     # db.dropCollection("products")
     # db.dropCollection("items")
     # db.resetMongoState()
