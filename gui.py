@@ -1,5 +1,4 @@
 # code referenced and modified from this tutorial : https://www.geeksforgeeks.org/tkinter-application-to-switch-between-different-page-frames/
-
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from db_connections.mysqldb import SQLDatabase
@@ -32,12 +31,13 @@ class tkinterApp(tk.Tk):
 
         # Variables that persist through frames
         self.domain = None
+        self.userID = None # If none, not logged in. Else logged in
 
         # iterating through a tuple consisting
         # of the different page layouts
         # all new pages created add here
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch):
-
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch):
+    
             frame = F(container, self)
 
             # initializing frame of that object from
@@ -54,8 +54,10 @@ class tkinterApp(tk.Tk):
     def show_frame(self, cont, domain=None):
         frame = self.frames[cont]
         frame.tkraise()
+
         if domain:
             frame = self.frames[cont]
+            
             frame.setUserType(domain)
             frame.tkraise()
             self.domain = domain
@@ -63,8 +65,34 @@ class tkinterApp(tk.Tk):
             frame = self.frames[cont]
             frame.tkraise()
 
+        if (cont == CustomerPortal): 
+            menubar = frame.menuBar(self)
+            self.configure(menu=menubar)
+
+        if (cont == AdminPortal): 
+            menubar = frame.menuBar(self)
+            self.configure(menu=menubar)
+
+    def logout(self):
+        self.show_frame(StartPage)
+        self.domain = None
+        self.userID = None
+
+    # Getters
     def getDomain(self):
         return self.domain
+
+    def getUserID(self):
+        return self.userID
+
+    # Setters
+    def setUserID(self, userID):
+        self.userID = userID
+
+    def setDomain(self, domain):
+        self.domain = domain
+        print("Auth State changed:{} {}".format(self.domain, self.userID))
+
 
 
 

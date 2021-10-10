@@ -89,16 +89,18 @@ class SQLDatabase():
             else:
                 return ("Admin User doesn't exist")
 
-
-    def changePassword(self, newPass, username, isAdmin):
-        if (isAdmin):
-            changeAdminPass = ("UPDATE admin SET password = %s WHERE admin_id = %s")
-            self.c.execute(changeAdminPass, (newPass, username))
+    # DONE: Changed to send to mysql
+    def changePassword(self, newPassword, userID, domain):
+        if domain == "Administrator":
+            changeAdminPass = ("UPDATE admin SET password = %s WHERE adminID = %s")
+            self.c.execute(changeAdminPass, (newPassword, userID))
+            self.connection.commit()
+        elif domain == "Customer":
+            changeCustPass = ("UPDATE customer SET password = %s WHERE customerID = %s")
+            self.c.execute(changeCustPass, (newPassword, userID))
             self.connection.commit()
         else:
-            changeCustPass = ("UPDATE customer SET password = %s WHERE customer_id = %s")
-            self.c.execute(changeCustPass, (newPass, username))
-            self.connection.commit()
+            raise Exception("Check domain in changePassword")
 
     def changeNum(self, newNum, username, isAdmin):
         if (isAdmin):
@@ -166,37 +168,30 @@ class SQLDatabase():
                     print("Executing:", sql_request)
         self.connection.commit()
 
-    def dataInit(self):
-        try:
-            files = os.listdir("./JSON_files")
-            rootdir = "./JSON_files"
-        except:
-            files = os.listdir("../JSON_files")
-            rootdir = "../JSON_files"
+    # def dataInit(self):
+    #     try:
+    #         files = os.listdir("./JSON_files")
+    #         rootdir = "./JSON_files"
+    #     except:
+    #         files = os.listdir("../JSON_files")
+    #         rootdir = "../JSON_files"
 
-        fullpath = os.path.join(rootdir, "products.json")
-        json_obj = json.loads(open(fullpath).read())
-        for product in enumerate(json_obj):
-            products = (product[1]["ProductID"], product[1]["Category"], product[1]["Model"], product[1]["Price ($)"], product[1]["Warranty (months)"], product[1]["Cost ($)"])
-            initProduct = ("INSERT INTO PRODUCT (productID, category, model, price, warranty, cost) VALUES (%s, %s, %s, %s, %s, %s)")
-            self.c.execute(initProduct, products)
-            self.connection.commit()
+    #     fullpath = os.path.join(rootdir, "products.json")
+    #     json_obj = json.loads(open(fullpath).read())
+    #     for product in enumerate(json_obj):
+    #         products = (product[1]["ProductID"], product[1]["Category"], product[1]["Model"], product[1]["Price ($)"], product[1]["Warranty (months)"], product[1]["Cost ($)"])
+    #         initProduct = ("INSERT INTO PRODUCT (productID, category, model, price, warranty, cost) VALUES (%s, %s, %s, %s, %s, %s)")
+    #         self.c.execute(initProduct, products)
+    #         self.connection.commit()
 
-        fullpath = os.path.join(rootdir, "items.json")
-        json_obj = json.loads(open(fullpath).read())
-        for item in enumerate(json_obj):
-            productID = ("SELECT productID FROM Product WHERE model = %s AND category = %s")
-            productID = self.c.execute(productID, (item[1]["Model"], item[1]["Category"]))
-            items = (item[1]["ItemID"], item[1]["Color"], item[1]["Factory"], item[1]["PowerSupply"], item[1]["ProductionYear"], item[1]["PurchaseStatus"], productID)
-            initItem = ("INSERT INTO ITEM (itemID, color, factory, powerSupply, productionYear, purchaseStatus, productID) VALUES (%s, %s, %s, %s, %s, %s, %s)")
-            self.c.execute(initItem, items)
-    
-    # Temporary admin filter function
-    def adminProductSearch(self, category):
-         productsList = ("SELECT *, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) AS numSold, (SELECT COUNT(itemID) FROM item i WHERE purchaseStatus = %s AND p.productID = i.productID) as inventoryLevel FROM product p WHERE category LIKE %s GROUP BY productID ORDER BY productID")
-         self.c.execute(productsList, ("sold", "available", category))
-         results = self.c.fetchall()
-         return results
+    #     fullpath = os.path.join(rootdir, "items.json")
+    #     json_obj = json.loads(open(fullpath).read())
+    #     for item in enumerate(json_obj):
+    #         productID = ("SELECT productID FROM Product WHERE model = %s AND category = %s")
+    #         productID = self.c.execute(productID, (item[1]["Model"], item[1]["Category"]))
+    #         items = (item[1]["ItemID"], item[1]["Color"], item[1]["Factory"], item[1]["PowerSupply"], item[1]["ProductionYear"], item[1]["PurchaseStatus"], productID)
+    #         initItem = ("INSERT INTO ITEM (itemID, color, factory, powerSupply, productionYear, purchaseStatus, productID) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+    #         self.c.execute(initItem, items)
     
     def itemUnderService(self):
         itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Item i, Product p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
@@ -209,6 +204,8 @@ class SQLDatabase():
         self.c.execute(custList, ("Submitted and Waiting for payment"))
         results = self.c.fetchall()
         return results
+    def getConnection(self):
+        return self.connection
 
 # Exists outside of the class. Drops the oshes database if it exists
 def dropDatabase():
@@ -221,9 +218,12 @@ def dropDatabase():
 
 
 if __name__ == "__main__":
-    dropDatabase()
+    # dropDatabase()
     db = SQLDatabase()
-    db.resetMySQLState()
+    # db.changePassword('aa', 'bb', "Customer")
+    print(db.getCustomerLogin('aa','aa'))
+
+    # db.resetMySQLState()
     # Testing Functions
 
     # # Create customer
