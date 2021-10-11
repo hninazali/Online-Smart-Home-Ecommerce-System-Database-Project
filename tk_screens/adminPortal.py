@@ -1,11 +1,17 @@
 import tkinter as tk
-# from tkinter import *
-from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
+import tkinter.ttk as ttk
+from tkinter import *
 from db_connections.mysqldb import SQLDatabase
-# from tk_screens.authScreens import StartPage -- Circular import with authScreens
-
+from tk_screens.adminProductSearch import AdminProductSearch 
+from tk_screens.adminItemSearch import AdminItemSearch
+from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
+from db_connections.mongodb import MongoDB
+from PIL import Image, ImageTk
+mongo = MongoDB()
+mongo.dropCollection("items")
+mongo.dropCollection("products")
+mongo.resetMongoState()
 db = SQLDatabase()
-
 LARGEFONT = ("Verdana", 35)
 
 class AdminPortal(tk.Frame):
@@ -15,22 +21,63 @@ class AdminPortal(tk.Frame):
         self.controller = controller
 
         # Reset Button
-        resetButton = ttk.Button(self, text="Reset SQLDB", command=self.resetDB)
-        resetButton.grid(row=3, column=6, padx=10, pady=10)
-
+        self.resetButton = ttk.Button(self)
+        self.resetButton.configure(text='Reset SQLDB')
+        self.resetButton.grid(column='4', padx='5', pady='5', row='1')
+        self.resetButton.bind('<1>', self.resetDB, add='')
 
         createAdminButton = ttk.Button(self, text="Create New Admin",
                              command=lambda: controller.show_frame(CreateAdminPage, self.domain))
+        createAdminButton.grid(row=6, column=4, padx=10, pady=10)
 
-        createAdminButton.grid(row=3, column=7, padx=10, pady=10)
+        options = ("Inventory Level", "Items Under Service", "Customers with Unpaid Service Fees")
+
+        dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
+
+        dropdownlist.grid(row=1, column=1, padx=10, pady=10)
+
+        button1 = ttk.Button(self, text="Display",
+                             command=self.display)
+        button1.grid(row=1, column=2, padx=10, pady=10)
+
+        button2 = ttk.Button(self, text="Search Product",
+                             command=lambda: controller.show_frame(AdminProductSearch))
+        button2.grid(row=2, column=4, padx=10, pady=10)
+
+        button3 = ttk.Button(self, text="Search Item",
+                             command=lambda: controller.show_frame(AdminItemSearch))
+        button3.grid(row=3, column=4, padx=10, pady=10)
+
+        button4 = ttk.Button(self, text="Advanced Search",
+                             command=lambda: controller.show_frame(AdminAdvancedSearch))
+        button4.grid(row=4, column=4, padx=10, pady=10)
+
+        self['background']='#F6F4F1'
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
+
+        cols = ('Product ID', 'Sold', 'Unsold')
+        
+        self.tree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
+
+        self.tree.pack(side='left')
+        self.scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        self.scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = self.scroll_y.set)
+
+        self.renderInventoryList()
+        
 
         self['background']='#F6F4F1'
 
     def hello(self):
         print("hello")
-    
+
     def menuBar(self,root):
         menubar = tk.Menu(root)
+        # self.controller = controller
         # nestedProductMenu = tk.Menu(self)
         # nestedItemMenu = tk.Menu(self)
         # nestedRequestMenu = tk.Menu(self)
@@ -40,14 +87,15 @@ class AdminPortal(tk.Frame):
         #product
         productMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Products", menu=productMenu)
-        productMenu.add_command(label="View Products", command=self.hello)
+        productMenu.add_command(label="Simple Search", command=lambda: controller.show_frame(AdminProductSearch))
+        productMenu.add_command(label="Advanced Search", command=lambda: controller.show_frame(AdminAdvancedSearch))
         # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
 
 
         #items
         itemMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Items", menu=itemMenu)
-        itemMenu.add_command(label="View Items", command=self.hello)
+        itemMenu.add_command(label="View Items", command=lambda: controller.show_frame(AdminItemSearch))
         # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
         
         #service requests
@@ -70,17 +118,97 @@ class AdminPortal(tk.Frame):
         profileMenu.add_command(label="Logout", command=self.hello)      
         
         return menubar
+
+    def display(self):
+        if self.domain.get() == "Items Under Service":
+            self.renderItemService()
+        elif self.domain.get() == "Customers with Unpaid Service Fees":
+            self.renderCustWithFee()
+        elif self.domain.get() == "Inventory Level":
+            self.renderInventoryList()
+
+    def renderInventoryList(self):
+        self.tree.destroy()
+        self.scroll_y.destroy()
+        cols = ('Product ID', 'Sold', 'Unsold')
+        
+        self.tree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
+        self.produceTree(cols, "inventory")
+
+    def renderItemService(self):
+        self.tree.destroy()
+        self.scroll_y.destroy()
+        cols = ('Product ID', 'Category', 'Model', 'Service Status', 'Admin Assigned')
+        
+        self.tree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
+        self.produceTree(cols, "service")
+
+    def renderCustWithFee(self):
+        self.tree.destroy()
+        self.scroll_y.destroy()
+        cols = ('Customer ID', 'Name', 'Email', 'Request ID', 'Amount ($)', 'Days left for Payment')
+        self.tree = ttk.Treeview(self.treeFrame, columns = cols, show='headings')
+        self.produceTree(cols, "fee")
+
+    def produceTree(self, cols, func):
+        w = tk.IntVar(self)
+        res = []
+        if func == "inventory":
+            w = 240
+            resSold = mongo.soldLevel()
+            resUnsold = mongo.unsoldLevel()
+            self.inventoryTable(w, cols, resSold, resUnsold)
+        elif func == "service":
+            w = 144
+            res = db.itemUnderService()
+            self.normalTable(w, cols, res)
+        else:
+            w = 120
+            res = db.custWithUnpaidFees()
+            self.normalTable(w, cols, res)
+
+    def inventoryTable(self, w, cols, resSold, resUnsold):
+        for index, unsold in enumerate(resUnsold):
+            resSold[index]["unsold"] = unsold["total"]
+            print(resSold)
+        for col in cols:
+            self.tree.column(col, anchor="center", width=w)
+            self.tree.heading(col, text=col)
+        for r in resSold:
+            r = self.mongoToTree(r)
+            self.tree.insert("", "end", values=r)
+        self.tree.pack(side='left')
+        self.scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        self.scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = self.scroll_y.set)
+
+    def normalTable(self, w, cols, res):
+        print(res)
+        for col in cols:
+            self.tree.column(col, anchor="center", width=w)
+            self.tree.heading(col, text=col)
+        for r in res:
+            self.tree.insert("", "end", values=r)
+        self.tree.pack(side='left')
+        self.scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        self.scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = self.scroll_y.set)
+        
+        # self.setScrollbar()
+
+    # def setScrollbar(self):
+    #     self.tree.pack(side='left')
+    #     scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+    #     scroll_y.pack(side = RIGHT, fill = Y)
+    #     self.tree.configure(yscrollcommand = scroll_y.set)
     
+    def mongoToTree(self, r):
+        re = (r["_id"], r["total"], r["unsold"])
+        return re
 
     def resetDB(self):
         db.resetMySQLState()
-# In addition, provide a MYSQL database initialization function under the Administrator login. 
-# At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
-# When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:
-    
-    # def logout(self):
-    #     self.domain = tk.StringVar(self)
-    #     self.controller.show_frame(StartPage)
+        db.dataInit()
 
 class CreateAdminPage(tk.Frame):
     def __init__(self, parent, controller):

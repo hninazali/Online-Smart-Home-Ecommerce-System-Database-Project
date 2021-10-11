@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import pymysql
 import os
+import json
 
 class SQLDatabase():
     def __init__(self):
@@ -155,7 +156,7 @@ class SQLDatabase():
             files = os.listdir("../db_scripts")
             rootdir = "../db_scripts"
 
-        files = ["table.sql", "customer.sql", "admin.sql"]
+        files = ["customer.sql", "admin.sql", "table.sql"]
 
         for file in files:
             with open(os.path.join(rootdir, file)) as f:
@@ -167,6 +168,42 @@ class SQLDatabase():
                     print("Executing:", sql_request)
         self.connection.commit()
 
+    # def dataInit(self):
+    #     try:
+    #         files = os.listdir("./JSON_files")
+    #         rootdir = "./JSON_files"
+    #     except:
+    #         files = os.listdir("../JSON_files")
+    #         rootdir = "../JSON_files"
+
+    #     fullpath = os.path.join(rootdir, "products.json")
+    #     json_obj = json.loads(open(fullpath).read())
+    #     for product in enumerate(json_obj):
+    #         products = (product[1]["ProductID"], product[1]["Category"], product[1]["Model"], product[1]["Price ($)"], product[1]["Warranty (months)"], product[1]["Cost ($)"])
+    #         initProduct = ("INSERT INTO PRODUCT (productID, category, model, price, warranty, cost) VALUES (%s, %s, %s, %s, %s, %s)")
+    #         self.c.execute(initProduct, products)
+    #         self.connection.commit()
+
+    #     fullpath = os.path.join(rootdir, "items.json")
+    #     json_obj = json.loads(open(fullpath).read())
+    #     for item in enumerate(json_obj):
+    #         productID = ("SELECT productID FROM Product WHERE model = %s AND category = %s")
+    #         productID = self.c.execute(productID, (item[1]["Model"], item[1]["Category"]))
+    #         items = (item[1]["ItemID"], item[1]["Color"], item[1]["Factory"], item[1]["PowerSupply"], item[1]["ProductionYear"], item[1]["PurchaseStatus"], productID)
+    #         initItem = ("INSERT INTO ITEM (itemID, color, factory, powerSupply, productionYear, purchaseStatus, productID) VALUES (%s, %s, %s, %s, %s, %s, %s)")
+    #         self.c.execute(initItem, items)
+    
+    def itemUnderService(self):
+        itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Item i, Product p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
+        self.c.execute(itemsList)
+        results = self.c.fetchall()
+        return results
+    
+    def custWithUnpaidFees(self):
+        custList  =  ("SELECT customerID, name, email, requestID, serviceFee, (DATEDIFF(r.dateOfRequest, CURDATE())+ 10) as daysLeft FROM Customer c, ServiceRequest r WHERE requestStatus = %s ORDER BY customerID")
+        self.c.execute(custList, ("Submitted and Waiting for payment"))
+        results = self.c.fetchall()
+        return results
     def getConnection(self):
         return self.connection
 
@@ -190,9 +227,9 @@ if __name__ == "__main__":
     # Testing Functions
 
     # # Create customer
-    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
-    
+    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
+
     
 
     # login
@@ -200,5 +237,3 @@ if __name__ == "__main__":
     # print(db.getCustomerLogin(email,"password")) # correct
     # print(db.getCustomerLogin(email,"Aassword")) # incoreect password
     # print(db.getCustomerLogin("a"+email,"password")) # user doesnt exist
-
-    

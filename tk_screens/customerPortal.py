@@ -8,6 +8,8 @@ from db_connections.mysqldb import SQLDatabase
 from db_connections.mongodb import MongoDB
 from tk_screens.viewProfileWindow import ViewProfileWindow
 from tk_screens.changePasswordWindow import ChangePasswordWindow
+from tk_screens.adminProductSearch import AdminProductSearch 
+from tk_screens.adminItemSearch import AdminItemSearch
 #connect to mongoDB to search
 global client
 global db

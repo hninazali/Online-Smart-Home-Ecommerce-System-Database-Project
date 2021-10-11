@@ -1,12 +1,13 @@
 from pymongo import MongoClient, errors
 import os
 import json
+import certifi
 
 class MongoDB():
     def __init__(self):
         try:
             # try to instantiate a client instance
-            self.client = MongoClient("mongodb+srv://user:oshespassword@singapore.gznlc.mongodb.net/test")
+            self.client = MongoClient("mongodb://localhost:27017")
             # print the version of MongoDB server if connection successful
             print ("server version:", self.client.server_info()["version"])
 
@@ -60,6 +61,81 @@ class MongoDB():
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
             return list(cursor)
 
+    def findItemByID(self, itemID, database_name="oshes"):
+        cursor = self.client[database_name]["items"].find({"ItemID": itemID})
+        return list(cursor)
+
+    def adminProductSearch(self, category, model, database_name="oshes"):
+        if category == "" and model == "":
+            cursor = self.client[database_name]["products"].find()
+        elif category == "":
+            cursor = self.client[database_name]["products"].find({"Model": model})
+        elif model == "":
+            cursor = self.client[database_name]["products"].find({"Category": category})
+        else:
+            cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
+        return list(cursor)
+    
+    def soldLevel(self, database_name="oshes"):
+        cursor = self.client[database_name]["products"].aggregate([{ "$lookup": { "from": "items", "localField": "Model", "foreignField": "Model", "as": "relation"}},
+        { "$project": {
+                "ProductID": 1,
+                "relation": {
+                    "$filter": {
+                        "input": "$relation",
+                        "as": "r",
+                        "cond": { 
+                            "$eq": [ "$$r.PurchaseStatus", "Sold" ] 
+                            }
+                    }
+                }
+            }
+        } ,
+        { "$group": { "_id": "$ProductID", "total": { "$sum": { "$size":"$relation" } }}},
+        { "$sort": { "_id" : 1 } }])
+        return list(cursor)
+    
+    def unsoldLevel(self, database_name="oshes"):
+        cursor = self.client[database_name]["products"].aggregate([{ "$lookup": { "from": "items", "localField": "Model", "foreignField": "Model", "as": "relation"}},
+        { "$project": {
+                "ProductID": 1,
+                "relation": {
+                    "$filter": {
+                        "input": "$relation",
+                        "as": "r",
+                        "cond": { 
+                            "$eq": [ "$$r.PurchaseStatus", "Unsold" ] 
+                            }
+                    }
+                }
+            }
+        } ,
+        { "$group": { "_id": "$ProductID", "total": { "$sum": { "$size":"$relation" } }}},
+        { "$sort": { "_id" : 1 } }])
+        return list(cursor)
+
+    def adminAdvancedSearch(self, search, database_name="oshes"):
+        if search == "" or search == "{}":
+            cursor = self.client[database_name]["items"].find()
+        else:
+            cursor = self.client[database_name]["items"].find(search)
+        return list(cursor)
+
+    def findModelfromPrice(self, price, database_name="oshes"):
+        cursor = self.client[database_name]["products"].find({"Price ($)": int(price)})
+        product = list(cursor)
+        result =  {}
+        result["Category"] = product[0]['Category']
+        result["Model"] = product[0]['Model']
+        return result
+
+    def findPriceCostWarranty(self, category, model, database_name="oshes"):
+        product = self.client[database_name]["products"].find({'Category': category, 'Model': model})[0]
+        result = {}
+        result["Price"] = product['Price ($)']
+        result["Cost"] = product['Cost ($)']
+        result["Warranty"] = product['Warranty (months)']
+        return (result)
 
     # Returns instance of DeleteResult. Execute query.deleted_count for the number of deleted documents
     # TODO: test
@@ -114,7 +190,5 @@ if __name__ == "__main__":
     db = MongoDB()
     # db.dropCollection("products")
     # db.dropCollection("items")
-    # db.resetMongoState()
-    # print(db.findItems(category="Lights", model="Light1", domain="Administrator"))
+    # print(db.adminAdvancedSearch({"Color": "Blue"}))
     # print(db.findProducts(category="Lights", model="Light1", domain="Customer"))
-    
