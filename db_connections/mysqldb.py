@@ -160,7 +160,7 @@ class SQLDatabase():
             self.connection.commit()
 
     def itemUnderService(self):
-        itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Item i, Product p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
+        itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Items i, Products p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
         self.c.execute(itemsList)
         results = self.c.fetchall()
         return results
