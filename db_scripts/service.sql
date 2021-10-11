@@ -11,5 +11,5 @@ FOREIGN KEY(requestID) REFERENCES request(requestID),
 FOREIGN KEY(adminID) REFERENCES admin(adminID)
 );
 
-INSERT INTO service (serviceStatus, itemID, requestID) VALUES("waiting for approval", 1, 1);
-INSERT INTO service (serviceStatus, itemID, requestID) VALUES("waiting for approval", 1, 2);
+--INSERT INTO service (serviceStatus, itemID, requestID) VALUES("waiting for approval", 1, 1);
+--INSERT INTO service (serviceStatus, itemID, requestID) VALUES("waiting for approval", 1, 2);

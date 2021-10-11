@@ -132,16 +132,16 @@ class SQLDatabase():
         result = self.c.executemany(approveRequests, requestIDs)
         if result != len(requestIDs):
             self.connection.rollback()
-            return False
+            return result
         queryString1 = ("UPDATE service SET serviceStatus = 'in progress', adminID = ")
         queryString2 = (" WHERE serviceID = %s")
         serviceItems = queryString1 + "'" + adminID + "'" + queryString2
         result = self.c.executemany(serviceItems, serviceIDs)
         if result != len(serviceIDs):
             self.connection.rollback()
-            return False
+            return result
         self.connection.commit()
-        return True
+        return result
 
     def retrieveServicesToComplete(self, adminID):
         retrieveServicesToComplete = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.requestStatus, s.serviceStatus FROM request r, service s WHERE s.requestID = r.requestID AND s.serviceStatus = 'in progress' AND r.requestStatus = 'Approved' AND s.adminID = %s ORDER BY r.requestID")
@@ -154,14 +154,14 @@ class SQLDatabase():
         result = self.c.executemany(completeService, serviceIDs)
         if result != len(serviceIDs):
             self.connection.rollback()
-            return False
+            return result
         completeRequest = ("UPDATE request SET requestStatus = 'Completed' WHERE requestID = %s")
         result = self.c.executemany(completeRequest, requestIDs)
         if result != len(requestIDs):
             self.connection.rollback()
-            return False
+            return result
         self.connection.commit()
-        return True
+        return result
 
     def retrieveService(self):
         allReq = ("SELECT requests.request_id, items.item_id, items.category, items.model, requests.request_date, service.service_status FROM ((service INNER JOIN requests ON service.request_id = requests.request_id) INNER JOIN items ON service.item_id = items.item_id)")

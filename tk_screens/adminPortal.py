@@ -23,12 +23,12 @@ class AdminPortal(tk.Frame):
         # dropdownlist.grid(row=1, column=1, padx=10, pady=10)
 
         # Approve requests button
-        self.approveButton = tk.Button(self, text="Direct to Approve", command=lambda: controller.show_frame(AdminApproveRequestsPage, self.domain))
-        self.approveButton.grid(row=2, column=1, padx=10, pady=10)
+        self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain))
+        self.approveButton.grid(column=1, pady=5, padx=10, row=2)
 
         # Complete services button
-        self.approveButton = tk.Button(self, text="Direct to Complete", command=lambda: controller.show_frame(AdminCompleteServicesPage, self.domain))
-        self.approveButton.grid(row=3, column=1, padx=10, pady=10)
+        self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain))
+        self.completeButton.grid(column=1, pady=5, padx=10, row=3)
 
     def resetDB(self):
         db.resetMySQLState()

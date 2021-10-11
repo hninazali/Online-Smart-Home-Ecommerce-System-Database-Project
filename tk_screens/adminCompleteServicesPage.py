@@ -14,69 +14,62 @@ class AdminCompleteServicesPage(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         self.controller = controller
-        self.domain = tk.StringVar()
+        self.selectedRequests = []
+        self.selectedServices = []
+        self['background']='#F6F4F1'
 
         # set style to classic so that background can be changed, error on macbooks
         # tk.Frame.__init__(self, parent)
         # style = ttk.Style(self)
         # style.theme_use('classic')
-        wrapper1 = LabelFrame(self, text="")
-        wrapper1.pack(fill=tk.X)
-        label = ttk.Label(wrapper1, text="Complete Services", font=LARGEFONT, background='white')
-        label.grid(row=0, column=1, padx=10, pady=10)
-
-        # treeview to show requests that need approval (submitted/in progress)
-        global cols 
-        cols = ('Request ID', 'Service ID', 'Item ID', 'Request Date', 'Request Status', 'Service Status')
-
-        self.selectedRequests = []
-        self.selectedServices = []
+        label = ttk.Label(self, text="Services pending Completion", font=LARGEFONT)
+        label.grid(row=0, column=4, padx=350, pady=10)
 
     def showTree(self):
-        
-        wrapper2 = LabelFrame(self, text="Services under you")
-        wrapper2.pack(fill="both", expand="yes", padx=20, pady=10)
 
-        print("test: " + self.domain.get())
+        self.treeFrame = ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400')
+        self.treeFrame.grid(column='2', columnspan='6', row='2', rowspan='1', pady='20', padx='245')
+
+        self.cols = ('Request ID', 'Service ID', 'Item ID', 'Request Date', 'Request Status', 'Service Status')
 
         results = db.retrieveServicesToComplete(self.domain.get())
 
-        global tree
-        tree = ttk.Treeview(wrapper2, columns=cols, show='headings', height="20")
+        self.tree = ttk.Treeview(self.treeFrame, columns=self.cols, show='headings', height='10')
+        self.tree.pack(side='left')
+        scrollbar = ttk.Scrollbar(self.treeFrame, orient="vertical", command=self.tree.yview)
+        scrollbar.pack(side = 'right', fill = 'y')
+        self.tree.configure(yscrollcommand=scrollbar.set)
 
-        for col in cols:
-            tree.column(col, anchor="center", width=150)
-            tree.heading(col, text=col)
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
 
         for r in results:
-            tree.insert("", "end", values=r)
+            self.tree.insert("", "end", values=r)
 
-        tree.grid(row=2, column=1, columnspan=1)
-
-        # Attach scrollbar to treeview
-        scrollbar = ttk.Scrollbar(wrapper2, orient="vertical", command=tree.yview)
-        tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=6, column=2, sticky="ns")
-
-        self.approveButton = tk.Button(self, text="Completed", command=self.completeServices)
-        self.approveButton.pack()
+        # approve button removes requests from the list and change the request & service statuses to approved and in progress
+        self.cButton = ttk.Button(self, text="Completed", command= lambda: self.completeServices(), width=15)
+        self.cButton.grid(row='5', column='4', padx='35', pady='5')
 
     def completeServices(self):
 
-        values = tree.selection()
+        values = self.tree.selection()
 
         for v in values:
-            self.selectedRequests.append(tree.item(v)['values'][0])
-            self.selectedServices.append(tree.item(v)['values'][1])
+            self.selectedRequests.append(self.tree.item(v)['values'][0])
+            self.selectedServices.append(self.tree.item(v)['values'][1])
 
         res = db.completeService(self.selectedRequests, self.selectedServices)
 
-        if res:
+        if res is None:
+            messagebox.showwarning(title="Services Completion", message="Please select record(s) to proceed.")
+        elif res == len(self.selectedRequests):
             messagebox.showinfo(title="Services Completion", message="Selected record(s) have been updated successfully!")
             for v in values:
-                tree.delete(v)
+                self.tree.delete(v)
         else:
-            messagebox.showinfo(title="Services Completion", message="An error has occurred while records(s) were processed.")
+            messagebox.showerror(title="Services Completion", message="An error has occurred while records(s) were processed.")
         
         self.selectedRequests.clear()
         self.selectedServices.clear()

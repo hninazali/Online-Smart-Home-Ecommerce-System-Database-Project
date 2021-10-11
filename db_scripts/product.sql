@@ -9,4 +9,4 @@ price INT NOT NULL,
 PRIMARY KEY (productID) 
 );
 
-INSERT INTO product VALUES(003, "SmartHome1", "Lights", 8, 30.0, 70.0);
+--INSERT INTO product VALUES(003, "SmartHome1", "Lights", 8, 30.0, 70.0);
