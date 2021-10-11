@@ -1,4 +1,4 @@
-# Online-Smart-Home-Ecommerce-System-Database-Project
+# Group 9 [BT2102 Assignment 1] - Online Smart Home Ecommerce System Database Project
 
 ## Python Environment Setup
 1. cd to directory of your choice and use the following commands to install through `requirements.txt` file. 
@@ -14,5 +14,9 @@ pip install -r requirements.txt
 
 After you pull the codes
 1. Run the sql scripts to create databases and tables
+``` 
+cd db_connections
+python3 mysqldb.py
+```
 2. Create customer and admin in SQL
 3. Run gui.py file 
