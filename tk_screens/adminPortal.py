@@ -75,6 +75,9 @@ class AdminPortal(tk.Frame):
     def hello(self):
         print("hello")
 
+    def handleLogout(self):
+        self.controller.logout()
+    
     def menuBar(self,root):
         menubar = tk.Menu(root)
         # self.controller = controller
@@ -113,9 +116,9 @@ class AdminPortal(tk.Frame):
         #profile
         profileMenu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="My Profile", menu=profileMenu)
-        profileMenu.add_command(label="View Profile", command=self.hello)
+        profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
         profileMenu.add_separator()
-        profileMenu.add_command(label="Logout", command=self.hello)      
+        profileMenu.add_command(label="Logout", command=self.handleLogout)      
         
         return menubar
 
@@ -138,7 +141,7 @@ class AdminPortal(tk.Frame):
     def renderItemService(self):
         self.tree.destroy()
         self.scroll_y.destroy()
-        cols = ('Product ID', 'Category', 'Model', 'Service Status', 'Admin Assigned')
+        cols = ('Item ID', 'Category', 'Model', 'Service Status', 'Admin Assigned')
         
         self.tree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
         self.produceTree(cols, "service")
@@ -207,8 +210,20 @@ class AdminPortal(tk.Frame):
         return re
 
     def resetDB(self):
+        print("Reloading databases")
         db.resetMySQLState()
-        db.dataInit()
+        items, products = mongodb.convertMongotoSQL()
+        db.loadMongo(items, products)
+        messagebox.showinfo(title="Reset Database Success", message= "Success! The database is reset!")
+       
+
+# In addition, provide a MYSQL database initialization function under the Administrator login. 
+# At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
+# When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:
+    
+    # def logout(self):
+    #     self.domain = tk.StringVar(self)
+    #     self.controller.show_frame(StartPage)
 
 class CreateAdminPage(tk.Frame):
     def __init__(self, parent, controller):

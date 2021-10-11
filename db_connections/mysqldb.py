@@ -7,18 +7,19 @@ import json
 class SQLDatabase():
     def __init__(self):
         try:
-            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes", autocommit=True)
             self.c = self.connection.cursor()
         except:
             print("Oshes Database does not exist. Creating now")
-            tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+            tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", autocommit=True)
             tempcursor = tempconnection.cursor()
             tempcursor.execute("CREATE DATABASE oshes;")
+            tempconnection.commit()
 
             tempcursor.close()
             tempconnection.close()
 
-            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+            self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes", autocommit=True)
             self.c = self.connection.cursor()
 
 
@@ -26,8 +27,17 @@ class SQLDatabase():
 
     # TODO: Consider initializing the connection as None and invoke this function to connect
     def connect(self, dbname = "oshes"):
-        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+        self.connection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes", autocommit=True)
         self.c = self.connection.cursor()
+
+    def createDB(self):
+        print("createDB: Oshes Database does not exist. Creating now")
+        tempconnection = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", autocommit=True)
+        tempcursor = tempconnection.cursor()
+        tempcursor.execute("CREATE DATABASE oshes;")
+        tempconnection.commit()
+        tempcursor.close()
+        tempconnection.close()
 
     # Create Customer - DONE
     def createCustomer(self, custInfo):
@@ -102,51 +112,11 @@ class SQLDatabase():
         else:
             raise Exception("Check domain in changePassword")
 
-    def changeNum(self, newNum, username, isAdmin):
-        if (isAdmin):
-            changeAdminNum = ("UPDATE admin SET phone_number = %s WHERE admin_id = %s")
-            self.c.execute(changeAdminNum, (newNum, username))
-            self.connection.commit()
-        else:
-            changeCustNum = ("UPDATE customer SET password = %s WHERE customer_id = %s")
-            self.c.execute(changeCustNum, (newNum, username))
-            self.connection.commit()
-    
-    def changeEmail(self, newEmail, username):
-        changeCustEmail = ("UPDATE customer SET email_address = %s WHERE customer_id = %s")
-        self.c.execute(changeCustEmail, (newEmail, username))
-        self.connection.commit()
-
-    def changeAddress(self, newAddress, username):
-        changeCustAddress = ("UPDATE customer SET address = %s WHERE customer_id = %s")
-        self.c.execute(changeCustAddress, (newAddress, username))
-        self.connection.commit()
-
-    def beginService(self, serviceReq):
-        beginService = ("UPDATE service SET service_status = %s WHERE request_id = %s")
-        beginRequest = ("UPDATE requests SET request_status = %s WHERE request_id = %s")
-        self.c.execute(beginService, ("In progress", serviceReq[0]))
-        self.c.execute(beginRequest, ("Approved", serviceReq[0]))
-        self.connection.commit()
-
-    def completeService(self, serviceReq):
-        completeService = ("UPDATE service SET service_status = %s WHERE request_id = %s")
-        completeRequest = ("UPDATE requests set request_status = %s WHERE request_id = %s")
-        self.c.execute(completeService, ("Completed", serviceReq[0]))
-        self.c.execute(completeRequest, ("Completed", serviceReq[0]))
-        self.connection.commit()
-
-    def retrieveService(self):
-        allReq = ("SELECT requests.request_id, items.item_id, items.category, items.model, requests.request_date, service.service_status FROM ((service INNER JOIN requests ON service.request_id = requests.request_id) INNER JOIN items ON service.item_id = items.item_id)")
-        self.c.execute(allReq, ())
-        results = self.c.fetchall()
-        print(results)
-        return results
-
- 
 
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
+        # dropDatabase()
+        # self.createDB()
         rootdir = "./db_scripts"
         # Just in case someone cd into this dir and run the script
         # TODO: Specify the order of scripts to be executed
@@ -155,8 +125,16 @@ class SQLDatabase():
         except:
             files = os.listdir("../db_scripts")
             rootdir = "../db_scripts"
+        
+        # Drop Tables
+        tables = ["items","products","Customer","admin"]
+        for table in tables:
+            print("executing: Drop table "+table)
+            sql = "DROP TABLE IF EXISTS {}"
+            self.c.execute(sql.format(table))
 
-        files = ["customer.sql", "admin.sql", "table.sql"]
+        #table.sql creates admin, customer, product and item table while customer and admin sqls create new users
+        files = ["table.sql", "customer.sql", "admin.sql"]
 
         for file in files:
             with open(os.path.join(rootdir, file)) as f:
@@ -168,31 +146,19 @@ class SQLDatabase():
                     print("Executing:", sql_request)
         self.connection.commit()
 
-    # def dataInit(self):
-    #     try:
-    #         files = os.listdir("./JSON_files")
-    #         rootdir = "./JSON_files"
-    #     except:
-    #         files = os.listdir("../JSON_files")
-    #         rootdir = "../JSON_files"
+    def loadMongo(self, items, products):
+        productStr  = 'INSERT INTO products VALUES (%s, %s,%s, %s,%s, %s);'
+        itemStr = 'INSERT INTO items VALUES (%s, %s,%s, %s,%s, %s,%s, %s, %s);'
+        for product in products:
+            print("Executing:", product)
+            self.c.execute(productStr, product)
+            self.connection.commit()
 
-    #     fullpath = os.path.join(rootdir, "products.json")
-    #     json_obj = json.loads(open(fullpath).read())
-    #     for product in enumerate(json_obj):
-    #         products = (product[1]["ProductID"], product[1]["Category"], product[1]["Model"], product[1]["Price ($)"], product[1]["Warranty (months)"], product[1]["Cost ($)"])
-    #         initProduct = ("INSERT INTO PRODUCT (productID, category, model, price, warranty, cost) VALUES (%s, %s, %s, %s, %s, %s)")
-    #         self.c.execute(initProduct, products)
-    #         self.connection.commit()
+        for item in items:
+            print("Executing:", item)
+            self.c.execute(itemStr, item)
+            self.connection.commit()
 
-    #     fullpath = os.path.join(rootdir, "items.json")
-    #     json_obj = json.loads(open(fullpath).read())
-    #     for item in enumerate(json_obj):
-    #         productID = ("SELECT productID FROM Product WHERE model = %s AND category = %s")
-    #         productID = self.c.execute(productID, (item[1]["Model"], item[1]["Category"]))
-    #         items = (item[1]["ItemID"], item[1]["Color"], item[1]["Factory"], item[1]["PowerSupply"], item[1]["ProductionYear"], item[1]["PurchaseStatus"], productID)
-    #         initItem = ("INSERT INTO ITEM (itemID, color, factory, powerSupply, productionYear, purchaseStatus, productID) VALUES (%s, %s, %s, %s, %s, %s, %s)")
-    #         self.c.execute(initItem, items)
-    
     def itemUnderService(self):
         itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Item i, Product p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
         self.c.execute(itemsList)
@@ -204,24 +170,52 @@ class SQLDatabase():
         self.c.execute(custList, ("Submitted and Waiting for payment"))
         results = self.c.fetchall()
         return results
+
     def getConnection(self):
         return self.connection
 
-# Exists outside of the class. Drops the oshes database if it exists
-def dropDatabase():
-    try:
-        tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
-        cur = tempc.cursor()
-        cur.execute("DROP DATABASE oshes;")
-    except:
-        print("DB oshes does not exist")
+# # this methods will be callable without any requirements for the database
+# class DBOps():
+#     def dropDatabase(self):
+#         print("Dropping Databases")
+#         try:
+#             tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password")
+#             cur = tempc.cursor()
+#             print("check1")
+#             cur.execute("CREATE DATABASE oshes;")
+#             tempc.commit()
+
+#             tempc.select_db("oshes")
+
+#             cur.execute("DROP DATABASE oshes;")
+#             tempc.commit()
+#             print("check2")
+            
+#         except:
+#             raise Exception("DB oshes does not exist")
+
+
+# # Exists outside of the class. Drops the oshes database if it exists
+# def dropDatabase():
+#     print("Dropping Databases")
+#     try:
+#         tempc = pymysql.connect(host="localhost", port=3306, user="root", passwd="password", database="oshes")
+#         cur = tempc.cursor()
+#         # print("check1")
+#         cur.execute("DROP DATABASE oshes;")
+#         tempc.commit()
+#         # print("check2")
+        
+#     except:
+#         print("DB oshes does not exist")
 
 
 if __name__ == "__main__":
-    # dropDatabase()
     db = SQLDatabase()
     # db.changePassword('aa', 'bb', "Customer")
-    print(db.getCustomerLogin('aa','aa'))
+    # print(db.getCustomerLogin('aa','aa'))
+    db.resetMySQLState()
+
 
     # db.resetMySQLState()
     # Testing Functions
