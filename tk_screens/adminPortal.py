@@ -30,6 +30,9 @@ class AdminPortal(tk.Frame):
 
     def hello(self):
         print("hello")
+
+    def handleLogout(self):
+        self.controller.logout()
     
     def menuBar(self,root):
         menubar = tk.Menu(root)
@@ -69,7 +72,7 @@ class AdminPortal(tk.Frame):
         menubar.add_cascade(label="My Profile", menu=profileMenu)
         profileMenu.add_command(label="View Profile", command=self.hello)
         profileMenu.add_separator()
-        profileMenu.add_command(label="Logout", command=self.hello)      
+        profileMenu.add_command(label="Logout", command=self.handleLogout)      
         
         return menubar
     
