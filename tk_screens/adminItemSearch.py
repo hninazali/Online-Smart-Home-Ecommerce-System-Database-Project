@@ -3,6 +3,7 @@ from tkinter import *
 import tkinter.ttk as ttk
 from db_connections.mongodb import MongoDB
 from PIL import Image, ImageTk
+# from tk_screens.adminPortal import AdminPortal
 mongo = MongoDB()
 mongo.dropCollection("items")
 mongo.dropCollection("products")
@@ -17,6 +18,10 @@ class AdminItemSearch(tk.Frame):
 
         self.itemID = tk.StringVar()
         self['background']='#F6F4F1'
+
+        # button1 = ttk.Button(self, text="Back to Admin Home",
+        #                      command=lambda: controller.show_frame(AdminPortal))
+        # button1.grid(row=1, column=3, padx=5, pady=5)
 
         label = ttk.Label(self, text="Items List", font=LARGEFONT)
         label.grid(row=0, column=2, padx=10, pady=10)

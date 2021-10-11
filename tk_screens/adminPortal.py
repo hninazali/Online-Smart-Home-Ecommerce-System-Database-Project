@@ -1,12 +1,16 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import *
+from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
 from db_connections.mysqldb import SQLDatabase
 from tk_screens.adminProductSearch import AdminProductSearch 
 from tk_screens.adminItemSearch import AdminItemSearch
 from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
+from tk_screens.viewProfileWindow import ViewProfileWindow
 from db_connections.mongodb import MongoDB
+from tk_screens.changePasswordWindow import ChangePasswordWindow
 from PIL import Image, ImageTk
+
 mongo = MongoDB()
 mongo.dropCollection("items")
 mongo.dropCollection("products")
@@ -22,13 +26,13 @@ class AdminPortal(tk.Frame):
 
         # Reset Button
         self.resetButton = ttk.Button(self)
-        self.resetButton.configure(text='Reset SQLDB')
+        self.resetButton.configure(text='Reset database')
         self.resetButton.grid(column='4', padx='5', pady='5', row='1')
         self.resetButton.bind('<1>', self.resetDB, add='')
 
         createAdminButton = ttk.Button(self, text="Create New Admin",
                              command=lambda: controller.show_frame(CreateAdminPage, self.domain))
-        createAdminButton.grid(row=6, column=4, padx=10, pady=10)
+        createAdminButton.grid(row=2, column=4, padx=10, pady=10)
 
         options = ("Inventory Level", "Items Under Service", "Customers with Unpaid Service Fees")
 
@@ -42,15 +46,15 @@ class AdminPortal(tk.Frame):
 
         button2 = ttk.Button(self, text="Search Product",
                              command=lambda: controller.show_frame(AdminProductSearch))
-        button2.grid(row=2, column=4, padx=10, pady=10)
+        button2.grid(row=3, column=4, padx=10, pady=10)
 
         button3 = ttk.Button(self, text="Search Item",
                              command=lambda: controller.show_frame(AdminItemSearch))
-        button3.grid(row=3, column=4, padx=10, pady=10)
+        button3.grid(row=4, column=4, padx=10, pady=10)
 
         button4 = ttk.Button(self, text="Advanced Search",
                              command=lambda: controller.show_frame(AdminAdvancedSearch))
-        button4.grid(row=4, column=4, padx=10, pady=10)
+        button4.grid(row=5, column=4, padx=10, pady=10)
 
         self['background']='#F6F4F1'
 
@@ -90,15 +94,15 @@ class AdminPortal(tk.Frame):
         #product
         productMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Products", menu=productMenu)
-        productMenu.add_command(label="Simple Search", command=lambda: controller.show_frame(AdminProductSearch))
-        productMenu.add_command(label="Advanced Search", command=lambda: controller.show_frame(AdminAdvancedSearch))
+        productMenu.add_command(label="Simple Search", command=lambda: self.controller.show_frame(AdminProductSearch))
+        productMenu.add_command(label="Advanced Search", command=lambda: self.controller.show_frame(AdminAdvancedSearch))
         # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
 
 
         #items
         itemMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Items", menu=itemMenu)
-        itemMenu.add_command(label="View Items", command=lambda: controller.show_frame(AdminItemSearch))
+        itemMenu.add_command(label="View Items", command=lambda: self.controller.show_frame(AdminItemSearch))
         # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
         
         #service requests
@@ -117,6 +121,7 @@ class AdminPortal(tk.Frame):
         profileMenu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="My Profile", menu=profileMenu)
         profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
         profileMenu.add_separator()
         profileMenu.add_command(label="Logout", command=self.handleLogout)      
         
@@ -212,7 +217,7 @@ class AdminPortal(tk.Frame):
     def resetDB(self):
         print("Reloading databases")
         db.resetMySQLState()
-        items, products = mongodb.convertMongotoSQL()
+        items, products = mongo.convertMongotoSQL()
         db.loadMongo(items, products)
         messagebox.showinfo(title="Reset Database Success", message= "Success! The database is reset!")
        

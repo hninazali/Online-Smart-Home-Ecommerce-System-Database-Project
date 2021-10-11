@@ -9,7 +9,7 @@ class ViewProfileWindow(Toplevel):
         # Pass in the controller from the other frames as master
         super().__init__(master = master)
         self.title("View Profile")
-        self.geometry('1050x600')
+        self.geometry('400x300')
         
         self.userID = self.master.getUserID()
         self.domain = self.master.getDomain()
