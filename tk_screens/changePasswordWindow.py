@@ -1,5 +1,5 @@
 from tkinter import Toplevel
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import tkinter as tk
 from db_connections.mysqldb import SQLDatabase
 
@@ -11,8 +11,8 @@ class ChangePasswordWindow(Toplevel):
         super().__init__(master = master)
         self.db = SQLDatabase()
 
-        self.title("Search Products")
-        self.geometry('400x300')
+        self.title("Change Password")
+        self.geometry('550x300')
         self.master = master # Controller in frames
 
         self.oldPassword = tk.StringVar()
@@ -20,13 +20,13 @@ class ChangePasswordWindow(Toplevel):
 
         pass1Label = ttk.Label(self, text="Old Password:")
         pass1Label.grid(row=0, column=1, padx=5, pady=5)
-        pass1Input = ttk.Entry(self, textvariable=self.oldPassword)
-        pass1Input.grid(row=0, column=3,  padx=5, pady=5)
+        pass1Input = ttk.Entry(self, show="*", textvariable=self.oldPassword)
+        pass1Input.grid(row=0, column=3,  padx=10, pady=5)
 
         pass2Label = ttk.Label(self, text="New Password:")
         pass2Label.grid(row=1, column=1, padx=5, pady=5)
-        pass2Input = ttk.Entry(self, textvariable=self.newPassword)
-        pass2Input.grid(row=1, column=3,  padx=5, pady=5)
+        pass2Input = ttk.Entry(self, show="*", textvariable=self.newPassword)
+        pass2Input.grid(row=1, column=3,  padx=10, pady=5)
 
 
         button1 = ttk.Button(self, text="Change Password",
@@ -51,5 +51,7 @@ class ChangePasswordWindow(Toplevel):
         else:
             print("Password Change Approved:", self.checkAuthState())
             self.db.changePassword(self.newPassword.get(), self.master.getUserID(), self.master.getDomain())
+            messagebox.showinfo(title="Password Change Success", message= "Succesfully changed password for user " + self.master.getUserID())
+
 
 

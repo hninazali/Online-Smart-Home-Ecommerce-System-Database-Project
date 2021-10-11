@@ -128,7 +128,7 @@ class SQLDatabase():
             rootdir = "../db_scripts"
         
         # Drop Tables
-        tables = ["items","products","Customer","admin"]
+        tables = ["Service", "ServiceRequest", "items","products","Customer","admin"]
         for table in tables:
             print("executing: Drop table "+table)
             sql = "DROP TABLE IF EXISTS {}"
@@ -161,18 +161,18 @@ class SQLDatabase():
             self.connection.commit()
 
     def retrieveRequestsForApproval(self):
-        retrieveRequestsForApproval = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.serviceFee, r.requestStatus, s.serviceStatus FROM request r, service s WHERE s.requestID = r.requestID AND (r.requestStatus='Submitted' OR r.requestStatus='In progress') AND s.serviceStatus = 'waiting for approval' ORDER BY requestID")
+        retrieveRequestsForApproval = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.serviceFee, r.requestStatus, s.serviceStatus FROM ServiceRequest r, Service s WHERE s.requestID = r.requestID AND (r.requestStatus='Submitted' OR r.requestStatus='In progress') AND s.serviceStatus = 'Waiting for Approval' ORDER BY requestID")
         self.c.execute(retrieveRequestsForApproval, ())
         results = self.c.fetchall()
         return results
 
     def approveRequests(self, requestIDs, serviceIDs, adminID):
-        approveRequests = ("UPDATE request SET requestStatus = 'Approved' WHERE requestID = %s")
+        approveRequests = ("UPDATE ServiceRequest SET requestStatus = 'Approved' WHERE requestID = %s")
         result = self.c.executemany(approveRequests, requestIDs)
         if result != len(requestIDs):
             self.connection.rollback()
             return result
-        queryString1 = ("UPDATE service SET serviceStatus = 'in progress', adminID = ")
+        queryString1 = ("UPDATE Service SET serviceStatus = 'In Progress', adminID = ")
         queryString2 = (" WHERE serviceID = %s")
         serviceItems = queryString1 + "'" + adminID + "'" + queryString2
         result = self.c.executemany(serviceItems, serviceIDs)
@@ -183,18 +183,18 @@ class SQLDatabase():
         return result
 
     def retrieveServicesToComplete(self, adminID):
-        retrieveServicesToComplete = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.requestStatus, s.serviceStatus FROM request r, service s WHERE s.requestID = r.requestID AND s.serviceStatus = 'in progress' AND r.requestStatus = 'Approved' AND s.adminID = %s ORDER BY r.requestID")
+        retrieveServicesToComplete = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.requestStatus, s.serviceStatus FROM ServiceRequest r, Service s WHERE s.requestID = r.requestID AND s.serviceStatus = 'In Progress' AND r.requestStatus = 'Approved' AND s.adminID = %s ORDER BY r.requestID")
         self.c.execute(retrieveServicesToComplete, (adminID))
         results = self.c.fetchall()
         return results
 
     def completeService(self, requestIDs, serviceIDs):
-        completeService = ("UPDATE service SET serviceStatus = 'completed' WHERE serviceID = %s")
+        completeService = ("UPDATE Service SET serviceStatus = 'Completed' WHERE serviceID = %s")
         result = self.c.executemany(completeService, serviceIDs)
         if result != len(serviceIDs):
             self.connection.rollback()
             return result
-        completeRequest = ("UPDATE request SET requestStatus = 'Completed' WHERE requestID = %s")
+        completeRequest = ("UPDATE ServiceRequest SET requestStatus = 'Completed' WHERE requestID = %s")
         result = self.c.executemany(completeRequest, requestIDs)
         if result != len(requestIDs):
             self.connection.rollback()

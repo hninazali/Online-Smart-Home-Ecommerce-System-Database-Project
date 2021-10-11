@@ -1,7 +1,6 @@
 from pymongo import MongoClient, errors
 import os
 import json
-import certifi
 
 
 class MongoDB():
