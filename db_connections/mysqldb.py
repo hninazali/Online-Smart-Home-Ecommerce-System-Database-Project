@@ -146,14 +146,16 @@ class SQLDatabase():
         self.connection.commit()
 
     def loadMongo(self, items, products):
+        productStr  = 'INSERT INTO products VALUES (%s, %s,%s, %s,%s, %s);'
+        itemStr = 'INSERT INTO items VALUES (%s, %s,%s, %s,%s, %s,%s, %s, %s);'
         for product in products:
             print("Executing:", product)
-            self.c.execute(product)
+            self.c.execute(productStr, product)
             self.connection.commit()
 
         for item in items:
             print("Executing:", item)
-            self.c.execute(item)
+            self.c.execute(itemStr, item)
             self.connection.commit()
 
 

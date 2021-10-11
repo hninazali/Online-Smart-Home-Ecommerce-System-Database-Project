@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
 from db_connections.mysqldb import SQLDatabase
 from db_connections.mongodb import MongoDB
+from tk_screens.viewProfileWindow import ViewProfileWindow
 # from tk_screens.authScreens import StartPage -- Circular import with authScreens
 
 db = SQLDatabase()
@@ -17,7 +18,7 @@ class AdminPortal(tk.Frame):
         self.controller = controller
 
         # Reset Button
-        resetButton = ttk.Button(self, text="Reset SQLDB", command=self.resetDB)
+        resetButton = ttk.Button(self, text="Reset database", command=self.resetDB)
         resetButton.grid(row=3, column=6, padx=10, pady=10)
 
 
@@ -70,7 +71,7 @@ class AdminPortal(tk.Frame):
         #profile
         profileMenu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="My Profile", menu=profileMenu)
-        profileMenu.add_command(label="View Profile", command=self.hello)
+        profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
         profileMenu.add_separator()
         profileMenu.add_command(label="Logout", command=self.handleLogout)      
         
@@ -82,6 +83,9 @@ class AdminPortal(tk.Frame):
         db.resetMySQLState()
         items, products = mongodb.convertMongotoSQL()
         db.loadMongo(items, products)
+        messagebox.showinfo(title="Reset Database Success", message= "Success! The database is reset!")
+       
+
 # In addition, provide a MYSQL database initialization function under the Administrator login. 
 # At the beginning of your  presentation, you are required to apply this function to reinitialize the MYSQL database. 
 # When the MYSQL database is initialized,  provide a function to allow the Administrator to display the following information (Purchase status= “SOLD” and  Purchase status=“UNSOLD”) on the items in the MySQL tables:

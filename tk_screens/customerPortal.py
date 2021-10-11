@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import *
-from tk_screens.searchWindow import searchWindow
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
 from datetime import date
@@ -29,9 +28,9 @@ class CustomerPortal(tk.Frame):
     
 
         ####Buttons####
-        self.homeButton = ttk.Button(self)
-        self.homeButton.configure(text='Home')
-        self.homeButton.grid(column='1', padx='3', pady='3', row='1')
+        # self.homeButton = ttk.Button(self)
+        # self.homeButton.configure(text='Home')
+        # self.homeButton.grid(column='1', padx='3', pady='3', row='1')
 
         self.searchButton = ttk.Button(self)
         self.searchButton.configure(text='Search')
@@ -130,7 +129,7 @@ class CustomerPortal(tk.Frame):
         ####Item display####
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
-        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1')
+        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10')
 
         cols = ("itemID","Category","Model", "Price", "Color","Factory", "Production Year", "Power Supply")
         
@@ -222,7 +221,7 @@ class CustomerPortal(tk.Frame):
         
         #update mysql database, need to get current customer id
         updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s"
-        val = (date.today().isoformat(),"001", extractID)
+        val = (date.today().isoformat(),self.controller.getUserID(), extractID)
 
         con.ping()  # reconnecting mysql
         with con.cursor() as cursor:         
@@ -260,31 +259,30 @@ class CustomerPortal(tk.Frame):
         # nestedServiceMenu = tk.Menu(self)
         # nestedProfileMenu = tk.Menu(self)
 
-        #product
-        productMenu = tk.Menu(menubar, tearoff=0)   
-        menubar.add_cascade(label="Products", menu=productMenu)
-        productMenu.add_command(label="View Products", command=self.hello)
-        # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
+        # #product
+        # productMenu = tk.Menu(menubar, tearoff=0)   
+        # menubar.add_cascade(label="Products", menu=productMenu)
+        # productMenu.add_command(label="View Products", command=self.hello)
+        # # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
 
 
-        #items
-        itemMenu = tk.Menu(menubar, tearoff=0)   
-        menubar.add_cascade(label="Items", menu=itemMenu)
-        itemMenu.add_command(label="View Items", command=self.hello)
-        itemMenu.add_command(label="Search", command = lambda: searchWindow(master=self.controller))
+        #purchases
+        purchasesMenu = tk.Menu(menubar, tearoff=0) 
+        menubar.add_cascade(label = "My Purchases", menu=purchasesMenu)  
+        purchasesMenu.add_command(label="View My Purchases", command=self.hello)
         # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
         
         #service requests
         requestMenu = tk.Menu(menubar, tearoff=0)   
-        menubar.add_cascade(label="Service Requests", menu=requestMenu)
+        menubar.add_cascade(label="My Service Requests", menu=requestMenu)
         requestMenu.add_command(label="View Service Requests", command=self.hello)
     #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
-        #service 
-        serviceMenu = tk.Menu(menubar, tearoff=0)   
-        menubar.add_cascade(label="Services", menu=requestMenu)
-        serviceMenu.add_command(label="View Services", command=self.hello)
-        # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
+        # #service 
+        # serviceMenu = tk.Menu(menubar, tearoff=0)   
+        # menubar.add_cascade(label="Services", menu=requestMenu)
+        # serviceMenu.add_command(label="View Services", command=self.hello)
+        # # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
 
         #profile
         profileMenu = tk.Menu(menubar, tearoff=0)

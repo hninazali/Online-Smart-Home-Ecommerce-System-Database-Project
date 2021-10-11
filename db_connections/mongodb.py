@@ -86,21 +86,40 @@ class MongoDB():
 
     
     def convertMongotoSQL(self):
-        itemsSQL = []  # Array of SQL Commands to load items
-        productsSQL = []  # Array of SQL commands to load products
+        itemsSQL = []  # Array of SQL Values as a tuple to load items
+        productsSQL = []  # Array of SQL Values as a tuple to load products
 
         arr2=list(self.client['oshes']['products'].find({}))
 
+        # for product in arr2:
+        #     string = "INSERT INTO products VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
+        #          product["ProductID"], product["Model"], product["Category"], product["Warranty (months)"], product["Cost ($)"], product["Price ($)"])
+        #     productsSQL.append(string)
+
         for product in arr2:
-            string = "INSERT INTO products VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
-                 product["ProductID"], product["Model"], product["Category"], product["Warranty (months)"], product["Cost ($)"], product["Price ($)"])
+            string = (product["ProductID"], product["Model"], product["Category"], product["Warranty (months)"], product["Cost ($)"], product["Price ($)"])
             productsSQL.append(string)
 
+
+        # arr=list(self.client['oshes']['items'].find({}))
+
+        # for item in arr:
+        #     customerID = "customer1" # Change this later
+        #     productID = int(self.getProductID({
+        #         "Category": item["Category"],
+        #         "Model": item["Model"]
+        #     })) # Change this later
+        #     print("Found Product:", productID)
+            
+        #     if item["ServiceStatus"] == '':
+        #         item["ServiceStatus"] = 'Completed'  # Change this later
+        #     string = "INSERT INTO items VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
+        #         item["ItemID"], item["Color"], item["Factory"], item["PowerSupply"], item["PurchaseStatus"], item["ProductionYear"], customerID, productID, None)
+        #     itemsSQL.append(string)
 
         arr=list(self.client['oshes']['items'].find({}))
 
         for item in arr:
-            customerID = "customer1" # Change this later
             productID = int(self.getProductID({
                 "Category": item["Category"],
                 "Model": item["Model"]
@@ -109,8 +128,7 @@ class MongoDB():
             
             if item["ServiceStatus"] == '':
                 item["ServiceStatus"] = 'Completed'  # Change this later
-            string = "INSERT INTO items VALUES (\"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\", \"{}\");".format(
-                item["ItemID"], item["Color"], item["Factory"], item["PowerSupply"], item["PurchaseStatus"], item["ProductionYear"], customerID, productID)
+            string = (item["ItemID"], item["Color"], item["Factory"], item["PowerSupply"], item["PurchaseStatus"], item["ProductionYear"], None, productID, None)
             itemsSQL.append(string)
 
         return itemsSQL, productsSQL
