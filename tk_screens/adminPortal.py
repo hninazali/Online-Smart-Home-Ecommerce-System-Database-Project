@@ -21,7 +21,7 @@ LARGEFONT = ("Verdana", 35)
 class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.domain = tk.StringVar(self)
+        self.adminFunc = tk.StringVar(self)
         self.controller = controller
 
         # Reset Button
@@ -36,7 +36,7 @@ class AdminPortal(tk.Frame):
 
         options = ("Inventory Level", "Items Under Service", "Customers with Unpaid Service Fees")
 
-        dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
+        dropdownlist = ttk.OptionMenu(self, self.adminFunc, options[0], *options)
 
         dropdownlist.grid(row=1, column=1, padx=10, pady=10)
 
@@ -128,11 +128,11 @@ class AdminPortal(tk.Frame):
         return menubar
 
     def display(self):
-        if self.domain.get() == "Items Under Service":
+        if self.adminFunc.get() == "Items Under Service":
             self.renderItemService()
-        elif self.domain.get() == "Customers with Unpaid Service Fees":
+        elif self.adminFunc.get() == "Customers with Unpaid Service Fees":
             self.renderCustWithFee()
-        elif self.domain.get() == "Inventory Level":
+        elif self.adminFunc.get() == "Inventory Level":
             self.renderInventoryList()
 
     def renderInventoryList(self):
