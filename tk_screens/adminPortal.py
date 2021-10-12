@@ -197,7 +197,6 @@ class AdminPortal(tk.Frame):
     def inventoryTable(self, w, cols, resSold, resUnsold):
         for index, unsold in enumerate(resUnsold):
             resSold[index]["unsold"] = unsold["total"]
-            print("inventoryTable:",resSold)
         for col in cols:
             self.tree.column(col, anchor="center", width=w)
             self.tree.heading(col, text=col)
@@ -210,7 +209,6 @@ class AdminPortal(tk.Frame):
         self.tree.configure(yscrollcommand = self.scroll_y.set)
 
     def normalTable(self, w, cols, res):
-        print("normalTable:",res)
         for col in cols:
             self.tree.column(col, anchor="center", width=w)
             self.tree.heading(col, text=col)

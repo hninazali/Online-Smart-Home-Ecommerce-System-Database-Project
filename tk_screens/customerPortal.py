@@ -51,9 +51,6 @@ class CustomerPortal(tk.Frame):
 
         self['background']='#F6F4F1'
 
-        print("user id to req page")
-        print("======================")
-        print(self.controller.getUserID())
         reqButton = ttk.Button(self, text="Requests List",
                              command=lambda: controller.show_frame(RequestsPage, domain = "Customer", userID = self.controller.getUserID()))
         reqButton.grid(row=2, column=8, padx=10, pady=10)
