@@ -27,6 +27,8 @@ class CustomerPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        self.userID = None
+        self.domain = None
     
         self.label = ttk.Label(self, text="Customer Home", font=LARGEFONT)
         self.label.grid(row=0, column=4, padx=10, pady=10)
@@ -48,6 +50,13 @@ class CustomerPortal(tk.Frame):
         self.buyButton.bind('<Button-1>', self.buyItem)
 
         self['background']='#F6F4F1'
+
+        print("user id to req page")
+        print("======================")
+        print(self.controller.getUserID())
+        reqButton = ttk.Button(self, text="Requests List",
+                             command=lambda: controller.show_frame(RequestsPage, domain = "Customer", userID = self.controller.getUserID()))
+        reqButton.grid(row=2, column=8, padx=10, pady=10)
 
         ####Comboboxes####
         vModel=[]
@@ -300,6 +309,126 @@ class CustomerPortal(tk.Frame):
         
         return menubar
     
+class RequestsPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.userID = None
+        self.domain = None
+    
+        self.label = ttk.Label(self, text="Requests List", font=LARGEFONT)
+        self.label.grid(row=0, column=4, padx=10, pady=10)
+
+        self.payButton = ttk.Button(self)
+        self.payButton.configure(text='Pay')
+        self.payButton.grid(column='6', pady='20', row='11', sticky='e')
+        self.payButton.bind('<Button-1>', self.payRequest)
+
+        self.cancelButton = ttk.Button(self)
+        self.cancelButton.configure(text='Cancel')
+        self.cancelButton.grid(column='7', pady='20', row='11', sticky='e')
+        self.cancelButton.bind('<Button-1>', self.cancelRequest)
+
+        button1 = ttk.Button(self, text="Back to Admin Home",
+                             command=lambda: controller.show_frame(CustomerPortal))
+        button1.grid(row=0, column=1, padx=5, pady=5)
+
+        self['background']='#F6F4F1'
+        
+    def showTree(self):
+        ####Item display####
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400')
+        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10')
+
+        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee")
+        
+        self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
+        self.itemTree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.itemTree.configure(yscrollcommand = scroll_y.set)
+
+        for col in cols:
+            if col ==  "Request Status":
+                self.itemTree.column(col, anchor="center", width=230)
+                self.itemTree.heading(col, text=col)
+            else:
+                self.itemTree.column(col, anchor="center", width=150)
+                self.itemTree.heading(col, text=col)
+
+        allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID())
+        for r in allRequestsList:
+            self.itemTree.insert("", "end", values=r)
+ 
+    def payRequest(self, a):
+        curItem = self.itemTree.focus()
+        extractID = self.itemTree.item(curItem)['values'][0]
+        requestStatus = self.itemTree.item(curItem)['values'][2]
+        if requestStatus == "Submitted and Waiting for payment":
+
+            payReq = mysqlinit.payRequest(extractID)
+
+            # reload table
+            messagebox.showinfo(title="Payment Successful", message= "Thank you for your payment!")
+            for r in self.itemTree.get_children():
+                self.itemTree.delete(r)
+
+            allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID())
+
+            for r in allRequestsList:
+                self.itemTree.insert("", "end", values=r)
+        else:
+            messagebox.showinfo(title="Payment Unsuccessful", message= "Payment is not required for this request!")
+    
+    def cancelRequest(self, a):
+        curItem = self.itemTree.focus()
+        extractID = self.itemTree.item(curItem)['values'][0]
+        requestStatus = self.itemTree.item(curItem)['values'][2]
+        if requestStatus != "Canceled" and requestStatus != "Completed":
+
+            payReq = mysqlinit.cancelRequest(extractID)
+
+            # reload table
+            messagebox.showinfo(title="Cancellation Successful", message= "Request {} has been successfully cancelled!".format(extractID))
+            for r in self.itemTree.get_children():
+                self.itemTree.delete(r)
+
+            allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID())
+
+            for r in allRequestsList:
+                self.itemTree.insert("", "end", values=r)
+        else:
+            messagebox.showinfo(title="Cancellation Unsuccessful", message= "This request cannot be cancelled!")
+
+    def menuBar(self,root):
+        menubar = tk.Menu(root)
+        #purchases
+        purchasesMenu = tk.Menu(menubar, tearoff=0) 
+        menubar.add_cascade(label = "My Purchases", menu=purchasesMenu)  
+        purchasesMenu.add_command(label="View My Purchases", command=self.hello)
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #service requests
+        requestMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="My Service Requests", menu=requestMenu)
+        requestMenu.add_command(label="View Service Requests", command=self.hello)
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+        #profile
+        profileMenu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        profileMenu.add_command(label="View Profile", command= lambda: ViewProfileWindow(master=self.controller))
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
+        profileMenu.add_separator()
+        profileMenu.add_command(label="Logout", command=self.handleLogout)
+        self.showTree()
+        return menubar
+    
+    def hello(self):
+        print("hello")
+    
+    def handleLogout(self):
+        self.controller.logout()
 
 
     # def menuBar(self,root):

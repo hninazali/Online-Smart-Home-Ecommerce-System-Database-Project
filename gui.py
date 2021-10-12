@@ -49,7 +49,7 @@ class tkinterApp(tk.Tk):
         # of the different page layouts
         # all new pages created add here
 
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage, RequestsPage):
     
             frame = F(container, self)
 
@@ -64,27 +64,40 @@ class tkinterApp(tk.Tk):
 
     # to display the current frame passed as
     # parameter
-    def show_frame(self, cont, domain=None):
+    def show_frame(self, cont, domain=None, userID=None):
         frame = self.frames[cont]
         frame.tkraise()
 
-        if domain:
-            frame = self.frames[cont]
-            
-            frame.setUserType(domain)
-            frame.tkraise()
-            self.domain = domain
-        else:
-            frame = self.frames[cont]
-            frame.tkraise()
+        if (cont == LoginPage or cont == RegisterPage or cont == StartPage):
+             if domain:
+                 frame = self.frames[cont]
+                 frame.setUserType(domain)
+                 frame.tkraise()
+                 self.domain = domain
+             else:
+                 frame = self.frames[cont]
+                 frame.tkraise()
 
-        if (cont == CustomerPortal): 
-            menubar = frame.menuBar(self)
-            self.configure(menu=menubar)
+        elif cont == CustomerPortal or cont == AdminPortal or cont == RequestsPage:
+             menubar = frame.menuBar(self)
+             self.configure(menu=menubar)
 
-        if (cont == AdminPortal): 
-            menubar = frame.menuBar(self)
-            self.configure(menu=menubar)
+             # if not domain or not userID:
+             #     frame = self.frames[cont]
+             #     frame.tkraise()
+             # else:
+             frame = self.frames[cont]
+             frame.domain = domain
+             frame.userID = userID
+             frame.tkraise()
+
+         # elif (cont == MyPurchases):
+         #     if not domain or not userID:
+         #         menubar = frame.menuBar(self)
+         #         self.configure(menu=menubar)
+         #     else:
+         #         menubar = frame.menuBar(self, domain = self.domain, userID = self.userID)
+         #         self.configure(menu=menubar)
 
     def logout(self):
         self.show_frame(StartPage)

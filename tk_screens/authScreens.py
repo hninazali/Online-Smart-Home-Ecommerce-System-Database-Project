@@ -1,5 +1,5 @@
 from tk_screens.adminPortal import *
-from tk_screens.customerPortal import CustomerPortal
+from tk_screens.customerPortal import *
 from tk_screens.adminPortal import AdminPortal
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
@@ -159,7 +159,7 @@ class LoginPage(tk.Frame):
                 messagebox.showinfo(title="Login Success", message="Successfully logged in")
                 self.controller.setUserID(self.userID.get()) # Change the auth state
                 self.controller.setDomain(self.domain.get())
-                self.controller.show_frame(CustomerPortal)
+                self.controller.show_frame(CustomerPortal, domain = "Customer", userID = self.userID.get())
             elif isinstance(res, str):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)
@@ -181,6 +181,9 @@ class LoginPage(tk.Frame):
         self.domain = usertype
         # Log
         print("gui.py>LoginPage> Domain Set:",self.domain.get())
+    
+    def setUserID(self, userid):
+         self.userID = userid
 
 # third window frame page2
 class RegisterPage(tk.Frame):
