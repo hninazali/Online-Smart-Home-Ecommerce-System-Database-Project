@@ -60,7 +60,7 @@ CREATE TABLE ServiceRequest (
 
 CREATE TABLE Service(
 	serviceID MEDIUMINT NOT NULL AUTO_INCREMENT,
-	serviceStatus 	ENUM("Waiting for Approval", "In Progress", "Completed"),
+	serviceStatus 	ENUM("Waiting for Approval", "In Progress", "Completed") DEFAULT 'Waiting for Approval',
     itemID 			MEDIUMINT 	NOT NULL,
     requestID 		MEDIUMINT 			NOT NULL,
 	adminID 		VARCHAR(16),
