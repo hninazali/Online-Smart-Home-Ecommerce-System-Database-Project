@@ -4,7 +4,7 @@ import tkinter.ttk as ttk
 from db_connections.mysqldb import SQLDatabase
 db = SQLDatabase()
 
-LARGEFONT = ("Verdana", 35)
+LARGEFONT = ("Calibri", 35, "bold")
 
 
 class AdminApproveRequestsPage(tk.Frame):

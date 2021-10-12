@@ -19,26 +19,31 @@ mongo.dropCollection("items")
 mongo.dropCollection("products")
 mongo.resetMongoState()
 db = SQLDatabase()
-LARGEFONT = ("Verdana", 35)
+
+LARGEFONT = ("Calibri", 35, "bold")
 
 class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         
         tk.Frame.__init__(self, parent)
 
+
         self.domain = tk.StringVar(self)
         self.adminFunc = tk.StringVar(self)
         self.controller = controller
 
+        self.label = ttk.Label(self, text="Admin Home", font=LARGEFONT)
+        self.label.grid(row=0, column=3, padx=10, pady=10)
+
         # Reset Button
         self.resetButton = ttk.Button(self)
         self.resetButton.configure(text='Reset database')
-        self.resetButton.grid(column='4', padx='5', pady='5', row='1')
+        self.resetButton.grid(column='6', padx='5', pady='5', row='1')
         self.resetButton.bind('<1>', self.resetDB, add='')
 
         createAdminButton = ttk.Button(self, text="Create New Admin",
                              command=lambda: controller.show_frame(CreateAdminPage, self.domain))
-        createAdminButton.grid(row=2, column=4, padx=10, pady=10)
+        createAdminButton.grid(row=2, column=6, padx=10, pady=10)
 
         options = ("Inventory Level", "Items Under Service", "Customers with Unpaid Service Fees")
 
@@ -52,15 +57,15 @@ class AdminPortal(tk.Frame):
 
         button2 = ttk.Button(self, text="Search Product",
                              command=lambda: controller.show_frame(AdminProductSearch))
-        button2.grid(row=3, column=4, padx=10, pady=10)
+        button2.grid(row=3, column=6, padx=10, pady=10)
 
         button3 = ttk.Button(self, text="Search Item",
                              command=lambda: controller.show_frame(AdminItemSearch))
-        button3.grid(row=4, column=4, padx=10, pady=10)
+        button3.grid(row=4, column=6, padx=10, pady=10)
 
         button4 = ttk.Button(self, text="Advanced Search",
                              command=lambda: controller.show_frame(AdminAdvancedSearch))
-        button4.grid(row=5, column=4, padx=10, pady=10)
+        button4.grid(row=5, column=6, padx=10, pady=10)
 
         self['background']='#F6F4F1'
 
@@ -81,11 +86,11 @@ class AdminPortal(tk.Frame):
 
         # Approve requests button
         self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain))
-        self.approveButton.grid(column=1, pady=5, padx=10, row=2)
+        self.approveButton.grid(column=2, pady=5, padx=10, row=2)
 
         # Complete services button
         self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain))
-        self.completeButton.grid(column=1, pady=5, padx=10, row=3)
+        self.completeButton.grid(column=2, pady=5, padx=10, row=3)
         
 
         self['background']='#F6F4F1'
@@ -105,6 +110,8 @@ class AdminPortal(tk.Frame):
         # nestedServiceMenu = tk.Menu(self)
         # nestedProfileMenu = tk.Menu(self)
 
+        #back to admin main portal
+        
         #product
         productMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Products", menu=productMenu)

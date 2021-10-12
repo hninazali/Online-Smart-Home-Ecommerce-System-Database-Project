@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 
 db = SQLDatabase()
 
-LARGEFONT = ("Filson", 35, "bold")
+LARGEFONT = ("Calibri", 35, "bold")
 # first window frame startpage
 
 class StartPage(tk.Frame):

@@ -4,7 +4,7 @@ from db_connections.mysqldb import SQLDatabase
 from PIL import Image, ImageTk
 db = SQLDatabase()
 
-LARGEFONT = ("Verdana", 35)
+LARGEFONT = ("Calibri", 35, "bold")
 
 
 class AdminCompleteServicesPage(tk.Frame):

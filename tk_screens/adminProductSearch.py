@@ -10,7 +10,7 @@ mongo.dropCollection("items")
 mongo.dropCollection("products")
 mongo.resetMongoState()
 
-LARGEFONT = ("Verdana", 35)
+LARGEFONT = ("Calibri", 35, "bold")
 
 class AdminProductSearch(tk.Frame):
     def __init__(self, parent, controller):
@@ -62,7 +62,7 @@ class AdminProductSearch(tk.Frame):
 
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
-        self.treeFrame.grid(column='1', columnspan='6', row='10', rowspan='1')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
 
         self.cols = ('Product ID', 'Category', 'Model', 'Price', 'Cost', 'Warranty (months)', 'Inventory Level', 'Number sold')
 
