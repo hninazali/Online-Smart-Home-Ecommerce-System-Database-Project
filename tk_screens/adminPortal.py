@@ -6,9 +6,9 @@ from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
 from db_connections.mysqldb import SQLDatabase
 from tk_screens.adminApproveRequestsPage import AdminApproveRequestsPage
 from tk_screens.adminCompleteServicesPage import AdminCompleteServicesPage
-from tk_screens.adminProductSearch import AdminProductSearch 
-from tk_screens.adminItemSearch import AdminItemSearch
-from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
+# from tk_screens.adminProductSearch import AdminProductSearch 
+# from tk_screens.adminItemSearch import AdminItemSearch
+# from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
 from tk_screens.viewProfileWindow import ViewProfileWindow
 from db_connections.mongodb import MongoDB
 from tk_screens.changePasswordWindow import ChangePasswordWindow
@@ -345,9 +345,308 @@ class CreateAdminPage(tk.Frame):
                 print("Register success")
                 messagebox.showinfo(title="Registration Success", message= "Succesfully created an admin account!")
 
+class AdminItemSearch(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
 
+        self.itemID = tk.StringVar()
+        self['background']='#F6F4F1'
 
+        button1 = ttk.Button(self, text="Back to Admin Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+        button1.grid(row=0, column=1, padx=5, pady=5)
 
+        label = ttk.Label(self, text="Items List", font=LARGEFONT)
+        label.grid(row=0, column=3, padx=10, pady=10)
+
+        itemIDLabel = ttk.Label(self, text="Item ID:")
+        itemIDLabel.grid(row=1, column=1, padx=10, pady=10)
+
+        itemIDInput = ttk.Entry(self, textvariable=self.itemID)
+        itemIDInput.grid(row=1, column=2, padx=10, pady=10)
+
+        button1 = ttk.Button(self, text="Filter",
+                             command=self.renderItemsList)
+        button1.grid(row=1, column=3, padx=10, pady=10)
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
+
+        self.cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status', 'Service Status')
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
+        
+        res = mongo.findItemByID(self.itemID.get())
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
+        for r in  res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+    def renderItemsList(self):
+        for r in self.tree.get_children():
+            self.tree.delete(r)
+
+        res = mongo.findItemByID(self.itemID.get())
+
+        for col in self.cols:
+            self.tree.heading(col, text=col)
+        for r in res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+    def mongoToTree(self, r):
+        serviceStatus = ""
+        if r["PurchaseStatus"] == "Sold" and r["ServiceStatus"] == "":
+            serviceStatus = "N/A"
+        else:
+            serviceStatus =  r["ServiceStatus"]
+        re = (r["ItemID"], r["Model"], r["Category"], r["Color"], r["Factory"], r["PowerSupply"], r["ProductionYear"], r["PurchaseStatus"], serviceStatus)
+        return re
+    
+class AdminProductSearch(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        self.category = tk.StringVar(self)
+        self.model = tk.StringVar(self)
+        
+        self['background']='#F6F4F1'
+
+        button1 = ttk.Button(self, text="Back to Admin Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+        button1.grid(row=0, column=1, padx=5, pady=5)
+
+        self.label = ttk.Label(self, text="Products List", font=LARGEFONT)
+        self.label.grid(row=0, column=3, padx=10, pady=10)
+
+        # Dropdown menu options
+        optionsCategory = ("All", "Lights", "Locks")
+        optionsModel = ("All", "Light1", "Light2", "SmartHome1", "Safe1", "Safe2", "Safe3")
+
+        vModel=[]
+        self.modelLabel = ttk.Label(self, text="Model:")
+        self.modelLabel.grid(row=2, column=1, padx=5, pady=5)
+        self.modelBox = ttk.Combobox(self, values = vModel)
+        self.modelBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.modelBox.grid(row=2, column=2, sticky=tk.E, padx=10, pady=10)
+
+        def categoryAndModel(event):
+            if self.categoryBox.get()=="Lights":
+                vModel = ["Light1", "Light2", "SmartHome1",""]
+            elif self.categoryBox.get()=="Locks":
+                vModel = ["Safe1", "Safe2", "Safe3", "SmartHome1",""]
+            else:
+
+                vModel = []
+            self.modelBox.configure(values = vModel)
+
+        self.catLabel = ttk.Label(self, text="Model:")
+        self.catLabel.grid(row=1, column=1, padx=5, pady=5)
+        self.categoryBox = ttk.Combobox(self, values = ["Lights", "Locks",""])
+        self.categoryBox.bind('<<ComboboxSelected>>', categoryAndModel)
+        self.categoryBox.configure(state='readonly')
+        self.categoryBox.grid(row=1, column=2, sticky=tk.E, padx=10, pady=10)
+
+        button2 = ttk.Button(self, text="Filter",
+                             command=self.renderProductsList)
+        button2.grid(row=2, column=3, padx=10, pady=10)
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
+
+        self.cols = ('Product ID', 'Category', 'Model', 'Price', 'Cost', 'Warranty (months)', 'Inventory Level', 'Number sold')
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
+
+        res = mongo.adminProductSearch(self.category.get(), self.model.get())
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
+        for r in  res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+    def renderProductsList(self):
+        for r in self.tree.get_children():
+            self.tree.delete(r)
+
+        res = mongo.adminProductSearch(self.categoryBox.get(), self.modelBox.get())
+
+        for col in self.cols:
+            self.tree.heading(col, text=col)
+        for r in res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+        # self.tree.grid(row=6, column=1, columnspan=1)
+
+    def mongoToTree(self, r):
+        resSold = mongo.soldLevel()
+        resUnsold = mongo.unsoldLevel()
+
+        re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], resSold[r["ProductID"]-1]["total"], resUnsold[r["ProductID"]-1]["total"])
+        return re
+
+class AdminAdvancedSearch(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        label = ttk.Label(self, text="Products List", font=LARGEFONT)
+        label.grid(row=0, column=3, padx=10, pady=10)
+
+        self['background']='#F6F4F1'
+
+        button1 = ttk.Button(self, text="Back to Admin Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+        button1.grid(row=0, column=1, padx=5, pady=5)
+
+        self.priceBox = ttk.Combobox(self ,values = ["50", "60",
+        "70","100","120","125","200",""])
+        self.priceBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.priceBox.grid(column='2', padx='5', pady='5', row='2')
+        
+        self.colorBox = ttk.Combobox(self, values = ["White", "Blue",
+        "Yellow", "Green", "Black",""])
+        self.colorBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.colorBox.grid(column='2', padx='5', pady='5', row='3')
+
+        self.factoryBox = ttk.Combobox(self, values = ["Malaysia", "China", "Philippines",""])
+        self.factoryBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.factoryBox.grid(column='2', padx='5', pady='5', row='4')
+
+        self.productionYearBox = ttk.Combobox(self, values = ["2014", "2015",
+        "2016", "2017", "2018", "2019", "2020",""])
+        self.productionYearBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.productionYearBox.grid(column='2', padx='5', pady='5', row='5')
+
+        self.powerSupplyBox = ttk.Combobox(self, values = ["Battery", "USB",""])
+        self.powerSupplyBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.powerSupplyBox.grid(column='2', padx='5', pady='5', row='6')
+
+        self.advancedSearchButton = ttk.Button(self, text="Filter", command=self.search)
+        self.advancedSearchButton.grid(column='3', padx='5', pady='5', row='6')
+
+        self.priceLabel = ttk.Label(self)
+        self.priceLabel.configure(text='Price')
+        self.priceLabel.grid(column='1', padx='5', pady='5', row='2')
+
+        self.colorLabel = ttk.Label(self)
+        self.colorLabel.configure(text='Color')
+        self.colorLabel.grid(column='1', padx='5', pady='5', row='3')
+
+        self.factoryLabel = ttk.Label(self)
+        self.factoryLabel.configure(text='Factory')
+        self.factoryLabel.grid(column='1', padx='5', pady='5', row='4')
+
+        self.productionYearLabel = ttk.Label(self)
+        self.productionYearLabel.configure(text='Production Year')
+        self.productionYearLabel.grid(column='1', padx='5', pady='5', row='5')
+
+        self.powerSupplyLabel = ttk.Label(self)
+        self.powerSupplyLabel.configure(text='Power Supply')
+        self.powerSupplyLabel.grid(column='1', padx='5', pady='5', row='6')
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='6', row='7', rowspan='1')
+
+        self.cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status", "Service Status")
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
+        
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=100)
+            self.tree.heading(col, text=col)
+
+        res = mongo.adminAdvancedSearch(self.mongoSearch())
+        for r in  res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+    
+    def search(self):
+        for r in self.tree.get_children():
+            self.tree.delete(r)
+
+        for col in self.cols:
+            self.tree.heading(col, text=col)
+
+        stringsearch = self.mongoSearch()
+        allrecordsList = mongo.adminAdvancedSearch(stringsearch)
+        messagebox.showinfo(title="Search Results", message= "{} items available based on your search!".format(len(allrecordsList)))
+
+        if len(allrecordsList) == 0:
+            pass
+        else:
+            for record in allrecordsList:
+                result = self.mongoToTree(record)
+                self.tree.insert("", "end", values=result)
+
+    def mongoSearch(self):
+        mongoSearch = ""
+
+        price =  self.priceBox.get()
+        color = self.colorBox.get()
+        factory = self.factoryBox.get()
+        productionYear = self.productionYearBox.get()
+        powerSupply = self.powerSupplyBox.get()
+        category = ""
+        model = ""
+
+        if price:
+            catandmod = self.findModelfromPrice(price)
+            if category and category != catandmod[0]:
+                category = "no output"
+            if model and model != catandmod[1]:
+                model = "no output"
+            else:
+                category = catandmod[0]
+                model = catandmod[1]   
+        dictSearch = {}   
+
+        if category:
+             dictSearch["Category"] = category
+        if model:
+            dictSearch["Model"] = model
+        if color:
+             dictSearch["Color"] = color
+        if factory:
+            dictSearch["Factory"] = factory
+        if productionYear:
+            dictSearch["ProductionYear"] = productionYear
+        if powerSupply:
+            dictSearch["PowerSupply"] = powerSupply
+        return dictSearch
+
+    def findModelfromPrice(self, price):
+        product = mongo.findModelfromPrice(price)
+        Category = product["Category"]
+        Model = product["Model"]
+        return (Category, Model)
+
+    def mongoToTree(self, r):
+        # To get price, cost, warranty from product (not avail in item)
+        pcw = mongo.findPriceCostWarranty(r["Category"], r["Model"])
+        re = (r["ItemID"], r["Category"], r["Model"], pcw["Price"], pcw["Cost"], r["Color"], r["Factory"], pcw["Warranty"], r["ProductionYear"], r["PowerSupply"], r["PurchaseStatus"], r["ServiceStatus"])
+        return re
 
 # Winy can try with her table code too
 
