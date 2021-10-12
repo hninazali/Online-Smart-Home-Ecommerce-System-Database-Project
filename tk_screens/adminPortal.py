@@ -29,6 +29,8 @@ class AdminPortal(tk.Frame):
         self.domain = controller.getDomain()
         self.adminFunc = tk.StringVar(self)
         self.controller = controller
+        self.userID = None
+        self.domain = None
 
         self.label = ttk.Label(self, text="Admin Home", font=LARGEFONT)
         self.label.grid(row=0, column=3, padx=10, pady=10)
@@ -95,6 +97,9 @@ class AdminPortal(tk.Frame):
 
     def hello(self):
         print("hello")
+        print(self.userID)
+        print(self.domain)
+        
 
     def handleLogout(self):
         self.controller.logout()

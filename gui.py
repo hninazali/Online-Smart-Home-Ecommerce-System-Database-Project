@@ -66,27 +66,40 @@ class tkinterApp(tk.Tk):
 
     # to display the current frame passed as
     # parameter
-    def show_frame(self, cont, domain=None):
+    def show_frame(self, cont, domain=None, userID=None):
         frame = self.frames[cont]
         frame.tkraise()
 
-        if domain:
-            frame = self.frames[cont]
-            
-            frame.setUserType(domain)
-            frame.tkraise()
-            self.domain = domain
-        else:
-            frame = self.frames[cont]
-            frame.tkraise()
+        if (cont == LoginPage or cont == RegisterPage or cont == StartPage):
+            if domain:
+                frame = self.frames[cont]
+                frame.setUserType(domain)
+                frame.tkraise()
+                self.domain = domain
+            else:
+                frame = self.frames[cont]
+                frame.tkraise()
 
-        if (cont == CustomerPortal): 
+        elif cont == CustomerPortal or cont == AdminPortal: # Or cont == Mypurchases 
             menubar = frame.menuBar(self)
             self.configure(menu=menubar)
+    
+            # if not domain or not userID:
+            #     frame = self.frames[cont]
+            #     frame.tkraise()
+            # else:
+            frame = self.frames[cont]
+            frame.domain = domain
+            frame.userID = userID
+            frame.tkraise()
 
-        if (cont == AdminPortal): 
-            menubar = frame.menuBar(self)
-            self.configure(menu=menubar)
+        # elif (cont == MyPurchases):
+        #     if not domain or not userID:
+        #         menubar = frame.menuBar(self)
+        #         self.configure(menu=menubar)
+        #     else:
+        #         menubar = frame.menuBar(self, domain = self.domain, userID = self.userID)
+        #         self.configure(menu=menubar)
 
     def logout(self):
         self.show_frame(StartPage)

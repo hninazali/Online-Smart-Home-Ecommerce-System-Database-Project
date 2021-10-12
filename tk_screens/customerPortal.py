@@ -29,6 +29,8 @@ class CustomerPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        self.userID = None
+        self.domain = None
     
         self.label = ttk.Label(self, text="Customer Home", font=LARGEFONT)
         self.label.grid(row=0, column=4, padx=10, pady=10)
@@ -253,7 +255,9 @@ class CustomerPortal(tk.Frame):
     #     file_new_frame.pack(fill="both", expand=1)
 
     def hello(self):
-        print("hello")
+        print("hello Test")
+        print(self.userID)
+        print(self.domain)
     
     def handleLogout(self):
         self.controller.logout()
@@ -293,7 +297,7 @@ class CustomerPortal(tk.Frame):
 
         #profile
         profileMenu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        menubar.add_cascade(label="My Profile", menu=profileMenu) 
         profileMenu.add_command(label="View Profile", command= lambda: ViewProfileWindow(master=self.controller))
         profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
         profileMenu.add_separator()
