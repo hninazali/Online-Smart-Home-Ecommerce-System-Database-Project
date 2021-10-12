@@ -1,4 +1,4 @@
-from tk_screens.adminPortal import AdminPortal
+from tk_screens.adminPortal import *
 from tk_screens.customerPortal import CustomerPortal
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
