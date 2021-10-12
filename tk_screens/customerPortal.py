@@ -341,7 +341,7 @@ class RequestsPage(tk.Frame):
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400')
         self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10')
 
-        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee")
+        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
         
         self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
         self.itemTree.pack(side='left')

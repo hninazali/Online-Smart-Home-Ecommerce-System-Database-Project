@@ -162,29 +162,29 @@ class SQLDatabase():
             self.c.execute(itemStr, item)
             self.connection.commit()
 
-        reqcreate = ("INSERT INTO ServiceRequest (serviceFee, requestStatus, dateOfRequest, itemID, dateOfPayment) VALUES (%s,%s,%s,%s,%s)")
-        self.c.execute(reqcreate, ("30", "Submitted and Waiting for Payment", "2021-01-01", "1001", "2021-01-09"))
-        self.connection.commit()
+        # reqcreate = ("INSERT INTO ServiceRequest (serviceFee, requestStatus, dateOfRequest, itemID, dateOfPayment) VALUES (%s,%s,%s,%s,%s)")
+        # self.c.execute(reqcreate, ("30", "Submitted and Waiting for Payment", "2021-01-01", "1001", "2021-01-09"))
+        # self.connection.commit()
 
-        reqcreate1 = ("INSERT INTO ServiceRequest (serviceFee, requestStatus, dateOfRequest, itemID, dateOfPayment) VALUES (%s,%s,%s,%s,%s)")
-        self.c.execute(reqcreate1, ("40", "Submitted", "2021-01-01", "1002", "2021-01-09"))
-        self.connection.commit()
+        # reqcreate1 = ("INSERT INTO ServiceRequest (serviceFee, requestStatus, dateOfRequest, itemID, dateOfPayment) VALUES (%s,%s,%s,%s,%s)")
+        # self.c.execute(reqcreate1, ("40", "Submitted", "2021-01-01", "1002", "2021-01-09"))
+        # self.connection.commit()
 
-        servicecreate = ("INSERT INTO Service (serviceStatus, itemID, requestID, adminID) VALUES (%s,%s,%s,%s)")
-        self.c.execute(servicecreate, ("Waiting for Approval", "1001", "1", "admin1"))
-        self.connection.commit()
+        # servicecreate = ("INSERT INTO Service (serviceStatus, itemID, requestID, adminID) VALUES (%s,%s,%s,%s)")
+        # self.c.execute(servicecreate, ("Waiting for Approval", "1001", "1", "admin1"))
+        # self.connection.commit()
 
-        servicecreate1 = ("INSERT INTO Service (serviceStatus, itemID, requestID, adminID) VALUES (%s,%s,%s,%s)")
-        self.c.execute(servicecreate1, ("In Progress", "1002", "2", "admin1"))
-        self.connection.commit()
+        # servicecreate1 = ("INSERT INTO Service (serviceStatus, itemID, requestID, adminID) VALUES (%s,%s,%s,%s)")
+        # self.c.execute(servicecreate1, ("In Progress", "1002", "2", "admin1"))
+        # self.connection.commit()
 
-        upd = ("UPDATE Items SET customerID = 'customer1' WHERE itemID = %s")
-        self.c.execute(upd, ("1001"))
-        self.connection.commit()
+        # upd = ("UPDATE Items SET customerID = 'customer1' WHERE itemID = %s")
+        # self.c.execute(upd, ("1001"))
+        # self.connection.commit()
 
-        upd = ("UPDATE Items SET customerID = 'customer1' WHERE itemID = %s")
-        self.c.execute(upd, ("1002"))
-        self.connection.commit()
+        # upd = ("UPDATE Items SET customerID = 'customer1' WHERE itemID = %s")
+        # self.c.execute(upd, ("1002"))
+        # self.connection.commit()
 
     def retrieveRequestsForApproval(self):
         retrieveRequestsForApproval = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.serviceFee, r.requestStatus, s.serviceStatus FROM ServiceRequest r, Service s WHERE s.requestID = r.requestID AND (r.requestStatus='Submitted' OR r.requestStatus='In progress') AND s.serviceStatus = 'Waiting for Approval' ORDER BY requestID")
@@ -241,7 +241,7 @@ class SQLDatabase():
         return results
 
     def retrieveRequests(self, customerID):
-        requestsList = ("SELECT r.requestID, i.itemID, r.requestStatus, r.dateOfRequest, ADDDATE(r.dateOfRequest, 10) as dueDate, r.serviceFee FROM Items i, ServiceRequest r WHERE i.itemID = r.itemID AND i.customerID = %s ORDER BY r.requestID")
+        requestsList = ("SELECT r.requestID, i.itemID, r.requestStatus, r.dateOfRequest, ADDDATE(r.dateOfRequest, 10) as dueDate, r.serviceFee, s.serviceStatus FROM Items i, ServiceRequest r, Service s WHERE i.itemID = r.itemID AND i.customerID = %s AND s.requestID = r.requestID ORDER BY r.requestID")
         self.c.execute(requestsList, customerID)
         results = self.c.fetchall()
         return results
