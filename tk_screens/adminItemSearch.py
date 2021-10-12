@@ -9,7 +9,7 @@ mongo = MongoDB()
 # mongo.dropCollection("products")
 # mongo.resetMongoState()
 
-LARGEFONT = ("Verdana", 35)
+LARGEFONT = ("Calibri", 35, "bold")
 
 class AdminItemSearch(tk.Frame):
     def __init__(self, parent, controller):
@@ -24,7 +24,7 @@ class AdminItemSearch(tk.Frame):
         # button1.grid(row=1, column=3, padx=5, pady=5)
 
         label = ttk.Label(self, text="Items List", font=LARGEFONT)
-        label.grid(row=0, column=2, padx=10, pady=10)
+        label.grid(row=0, column=3, padx=10, pady=10)
 
         itemIDLabel = ttk.Label(self, text="Item ID:")
         itemIDLabel.grid(row=1, column=1, padx=10, pady=10)
@@ -38,7 +38,7 @@ class AdminItemSearch(tk.Frame):
 
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
-        self.treeFrame.grid(column='1', columnspan='6', row='10', rowspan='1')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
 
         self.cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status', 'Service Status')
 

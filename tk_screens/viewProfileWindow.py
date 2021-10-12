@@ -10,6 +10,8 @@ class ViewProfileWindow(Toplevel):
         super().__init__(master = master)
         self.title("View Profile")
         self.geometry('400x300')
+
+        self['background']='#F6F4F1'
         
         self.userID = self.master.getUserID()
         self.domain = self.master.getDomain()

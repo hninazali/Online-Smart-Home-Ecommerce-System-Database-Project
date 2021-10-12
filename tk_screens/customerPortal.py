@@ -18,6 +18,8 @@ client = mymongodb.getClient()
 db = client["oshes"]
 products = db["products"]
 
+LARGEFONT = ("Calibri", 35, "bold")
+
 #connect to mysql database to register purchases
 global con
 mysqlinit = SQLDatabase()
@@ -28,7 +30,9 @@ class CustomerPortal(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
     
-
+        self.label = ttk.Label(self, text="Customer Home", font=LARGEFONT)
+        self.label.grid(row=0, column=4, padx=10, pady=10)
+        
         ####Buttons####
         # self.homeButton = ttk.Button(self)
         # self.homeButton.configure(text='Home')
@@ -37,6 +41,7 @@ class CustomerPortal(tk.Frame):
         self.searchButton = ttk.Button(self)
         self.searchButton.configure(text='Search')
         self.searchButton.grid(column='7', padx='5', pady='5', row='9')
+
         self.searchButton.bind('<1>', self.search, add='')
 
         self.buyButton = ttk.Button(self)

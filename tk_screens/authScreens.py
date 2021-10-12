@@ -9,13 +9,14 @@ from PIL import Image, ImageTk
 
 db = SQLDatabase()
 
-LARGEFONT = ("Filson", 35, "bold")
+LARGEFONT = ("Calibri", 35, "bold")
 # first window frame startpage
 
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.domain = tk.StringVar(self)
+        self.userID = tk.StringVar(self)
         self.controller = controller
         
         # label of frame Layout 2
@@ -152,6 +153,7 @@ class LoginPage(tk.Frame):
         if self.domain.get() == "Customer":
             print("logged in:", self.userID.get(), self.password.get())
             res = db.getCustomerLogin(self.userID.get(), self.password.get())
+
             # if res.startswith('(') and res.endswith(')'):
             if isinstance(res, tuple):
                 messagebox.showinfo(title="Login Success", message="Successfully logged in")

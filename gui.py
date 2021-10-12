@@ -9,6 +9,8 @@ LARGEFONT = ("Verdana", 35)
 from tk_screens.authScreens import *
 from tk_screens.customerPortal import *
 from tk_screens.adminPortal import *
+from tk_screens.adminApproveRequestsPage import *
+from tk_screens.adminCompleteServicesPage import *
 from tk_screens.adminProductSearch import *
 from tk_screens.adminItemSearch import *
 
@@ -34,6 +36,9 @@ class tkinterApp(tk.Tk):
 
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
+        self.geometry('1500x800')
+        self.grid_propagate(0)
+        self.title("OSHES Group 9")
 
         # initializing frames to an empty array
         self.frames = {}
@@ -45,7 +50,8 @@ class tkinterApp(tk.Tk):
         # iterating through a tuple consisting
         # of the different page layouts
         # all new pages created add here
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch):
+
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage):
     
             frame = F(container, self)
 

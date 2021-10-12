@@ -4,6 +4,8 @@ import pymysql
 import os
 import json
 
+from pymysql.connections import MySQLResult
+
 class SQLDatabase():
     def __init__(self):
         try:
@@ -112,7 +114,6 @@ class SQLDatabase():
         else:
             raise Exception("Check domain in changePassword")
 
-
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
         # import inspect
@@ -160,6 +161,48 @@ class SQLDatabase():
             print("Executing:", item)
             self.c.execute(itemStr, item)
             self.connection.commit()
+
+    def retrieveRequestsForApproval(self):
+        retrieveRequestsForApproval = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.serviceFee, r.requestStatus, s.serviceStatus FROM ServiceRequest r, Service s WHERE s.requestID = r.requestID AND (r.requestStatus='Submitted' OR r.requestStatus='In progress') AND s.serviceStatus = 'Waiting for Approval' ORDER BY requestID")
+        self.c.execute(retrieveRequestsForApproval, ())
+        results = self.c.fetchall()
+        return results
+
+    def approveRequests(self, requestIDs, serviceIDs, adminID):
+        approveRequests = ("UPDATE ServiceRequest SET requestStatus = 'Approved' WHERE requestID = %s")
+        result = self.c.executemany(approveRequests, requestIDs)
+        if result != len(requestIDs):
+            self.connection.rollback()
+            return result
+        queryString1 = ("UPDATE Service SET serviceStatus = 'In Progress', adminID = ")
+        queryString2 = (" WHERE serviceID = %s")
+        serviceItems = queryString1 + "'" + adminID + "'" + queryString2
+        result = self.c.executemany(serviceItems, serviceIDs)
+        if result != len(serviceIDs):
+            self.connection.rollback()
+            return result
+        self.connection.commit()
+        return result
+
+    def retrieveServicesToComplete(self, adminID):
+        retrieveServicesToComplete = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.requestStatus, s.serviceStatus FROM ServiceRequest r, Service s WHERE s.requestID = r.requestID AND s.serviceStatus = 'In Progress' AND r.requestStatus = 'Approved' AND s.adminID = %s ORDER BY r.requestID")
+        self.c.execute(retrieveServicesToComplete, (adminID))
+        results = self.c.fetchall()
+        return results
+
+    def completeService(self, requestIDs, serviceIDs):
+        completeService = ("UPDATE Service SET serviceStatus = 'Completed' WHERE serviceID = %s")
+        result = self.c.executemany(completeService, serviceIDs)
+        if result != len(serviceIDs):
+            self.connection.rollback()
+            return result
+        completeRequest = ("UPDATE ServiceRequest SET requestStatus = 'Completed' WHERE requestID = %s")
+        result = self.c.executemany(completeRequest, requestIDs)
+        if result != len(requestIDs):
+            self.connection.rollback()
+            return result
+        self.connection.commit()
+        return result
 
     def itemUnderService(self):
         itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Items i, Products p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
@@ -226,7 +269,6 @@ if __name__ == "__main__":
     db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
     db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
 
-    
 
     # login
     # email = 'brenda2@gmail.com'
