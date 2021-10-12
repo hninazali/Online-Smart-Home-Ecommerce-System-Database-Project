@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label, LabelFrame
 from db_connections.mysqldb import SQLDatabase
-from PIL import Image, ImageTk
+from tk_screens.viewProfileWindow import ViewProfileWindow
+from tk_screens.changePasswordWindow import ChangePasswordWindow
+#from tk_screens.adminApproveRequestsPage import AdminApproveRequestsPage
 db = SQLDatabase()
 
 LARGEFONT = ("Calibri", 35, "bold")
@@ -14,6 +16,8 @@ class AdminCompleteServicesPage(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         self.controller = controller
+        self.userID = None
+        self.domain = None
         self.selectedRequests = []
         self.selectedServices = []
         self['background']='#F6F4F1'
@@ -33,7 +37,7 @@ class AdminCompleteServicesPage(tk.Frame):
 
         self.cols = ('Request ID', 'Service ID', 'Item ID', 'Request Date', 'Request Status', 'Service Status')
 
-        results = db.retrieveServicesToComplete(self.domain.get())
+        results = db.retrieveServicesToComplete(self.controller.getUserID())
 
         self.tree = ttk.Treeview(self.treeFrame, columns=self.cols, show='headings', height='10')
         self.tree.pack(side='left')
@@ -73,6 +77,63 @@ class AdminCompleteServicesPage(tk.Frame):
         
         self.selectedRequests.clear()
         self.selectedServices.clear()
+
+    def hello(self):
+        print("hello")
+        print(self.userID)
+        print(self.domain)
+
+    def handleLogout(self):
+        self.controller.logout()
+
+    def menuBar(self,root):
+        menubar = tk.Menu(root)
+        # self.controller = controller
+        # nestedProductMenu = tk.Menu(self)
+        # nestedItemMenu = tk.Menu(self)
+        # nestedRequestMenu = tk.Menu(self)
+        # nestedServiceMenu = tk.Menu(self)
+        # nestedProfileMenu = tk.Menu(self)
+
+        #back to admin main portal
+        
+        #product
+        productMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Products", menu=productMenu)
+        productMenu.add_command(label="Simple Search", command=lambda: self.controller.show_frame(AdminProductSearch))
+        productMenu.add_command(label="Advanced Search", command=lambda: self.controller.show_frame(AdminAdvancedSearch))
+        # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
+
+
+        #items
+        itemMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Items", menu=itemMenu)
+        itemMenu.add_command(label="View Items", command=lambda: self.controller.show_frame(AdminItemSearch))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #service requests
+        requestMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Service Requests", menu=requestMenu)
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(AdminApproveRequestsPage))
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+
+        #service 
+        serviceMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Services", menu=serviceMenu)
+        serviceMenu.add_command(label="View Services", command=lambda: self.controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
+        # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
+
+        #profile
+        profileMenu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
+        profileMenu.add_separator()
+        profileMenu.add_command(label="Logout", command=self.handleLogout)
+
+        self.showTree()      
+        
+        return menubar
     
     def setUserType(self, userID):
         self.domain = userID

@@ -50,7 +50,7 @@ FOREIGN KEY (productID) REFERENCES products(productID)
 
 CREATE TABLE ServiceRequest (
 	requestID 		MEDIUMINT 	NOT NULL AUTO_INCREMENT, 
-	serviceFee 		INT,
+	serviceFee 		INT DEFAULT 0,
 	requestStatus 	ENUM('Submitted', 'Submitted and Waiting for payment', 'In progress', 'Approved', 'Canceled', 'Completed') NOT NULL,
 	dateOfRequest 	DATE NOT NULL,
 	itemID 			MEDIUMINT NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE ServiceRequest (
 
 CREATE TABLE Service(
 	serviceID MEDIUMINT NOT NULL AUTO_INCREMENT,
-	serviceStatus 	ENUM("Waiting for Approval", "In Progress", "Completed") DEFAULT 'Waiting for Approval',
+	serviceStatus 	ENUM("Waiting for Approval", "In Progress", "Completed"),
     itemID 			MEDIUMINT 	NOT NULL,
     requestID 		MEDIUMINT 			NOT NULL,
 	adminID 		VARCHAR(16),

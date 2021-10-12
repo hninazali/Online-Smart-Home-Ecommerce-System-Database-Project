@@ -85,11 +85,11 @@ class AdminPortal(tk.Frame):
         self.renderInventoryList()
 
         # Approve requests button
-        self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain))
+        self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
         self.approveButton.grid(column=2, pady=5, padx=10, row=2)
 
         # Complete services button
-        self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain))
+        self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
         self.completeButton.grid(column=2, pady=5, padx=10, row=3)
         
 
@@ -132,13 +132,13 @@ class AdminPortal(tk.Frame):
         #service requests
         requestMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Service Requests", menu=requestMenu)
-        requestMenu.add_command(label="View Service Requests", command=self.hello)
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
     #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
         #service 
         serviceMenu = tk.Menu(menubar, tearoff=0)   
-        menubar.add_cascade(label="Services", menu=requestMenu)
-        serviceMenu.add_command(label="View Services", command=self.hello)
+        menubar.add_cascade(label="Services", menu=serviceMenu)
+        serviceMenu.add_command(label="View Services", command=lambda: self.controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
         # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
 
         #profile
