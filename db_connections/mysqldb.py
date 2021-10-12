@@ -115,6 +115,8 @@ class SQLDatabase():
 
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
+        # import inspect
+        # print("Printed:",inspect.stack()[1].function)
         # dropDatabase()
         # self.createDB()
         rootdir = "./db_scripts"
@@ -127,7 +129,7 @@ class SQLDatabase():
             rootdir = "../db_scripts"
         
         # Drop Tables
-        tables = ["items","products","Customer","admin"]
+        tables = ["Service","ServiceRequest","items","products","Customer","admin"]
         for table in tables:
             print("executing: Drop table "+table)
             sql = "DROP TABLE IF EXISTS {}"

@@ -7,9 +7,9 @@ from PIL import Image, ImageTk
 # from tk_screens.adminPortal import AdminPortal
 
 mongo = MongoDB()
-mongo.dropCollection("items")
-mongo.dropCollection("products")
-mongo.resetMongoState()
+# mongo.dropCollection("items")
+# mongo.dropCollection("products")
+# mongo.resetMongoState()
 
 LARGEFONT = ("Verdana", 35)
 

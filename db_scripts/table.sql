@@ -53,16 +53,16 @@ CREATE TABLE ServiceRequest (
 	serviceFee 		INT,
 	requestStatus 	VARCHAR(40),
 	dateOfRequest 	DATE,
-	itemID 			VARCHAR(4)  	NOT NULL,
+	itemID 			MEDIUMINT  	NOT NULL,
 	dateOfPayment 	DATE,
 	PRIMARY KEY (requestID),
-	FOREIGN KEY (itemID) REFERENCES Item(itemID));
+	FOREIGN KEY (itemID) REFERENCES items(itemID));
 
 CREATE TABLE Service(
 	serviceStatus 	ENUM("waiting for approval", "in progress", "completed"),
-    itemID 			VARCHAR(4)  	NOT NULL,
+    itemID 			MEDIUMINT 	NOT NULL,
     requestID 		INT 			NOT NULL,
 	adminID 		VARCHAR(40),
-    FOREIGN KEY (itemID) REFERENCES Item(itemID),
-    FOREIGN KEY (requestID) REFERENCES ServiceRequest(requestID)
-	FOREIGN KEY (adminID) REFERENCES Admin(adminID));
+    FOREIGN KEY (itemID) REFERENCES items(itemID),
+    FOREIGN KEY (requestID) REFERENCES ServiceRequest(requestID),
+	FOREIGN KEY (adminID) REFERENCES admin(adminID));

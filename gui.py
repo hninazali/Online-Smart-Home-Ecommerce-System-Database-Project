@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from db_connections.mysqldb import SQLDatabase
+from db_connections.mongodb import MongoDB
 
 LARGEFONT = ("Verdana", 35)
 
@@ -11,6 +12,7 @@ from tk_screens.adminPortal import *
 from tk_screens.adminProductSearch import *
 from tk_screens.adminItemSearch import *
 
+
 class tkinterApp(tk.Tk):
 
     # __init__ function for class tkinterApp
@@ -18,6 +20,13 @@ class tkinterApp(tk.Tk):
 
         # __init__ function for class Tk
         tk.Tk.__init__(self, *args, **kwargs)
+
+        #reset database on load
+        db = MongoDB()
+        items, products = db.convertMongotoSQL()
+        db = SQLDatabase()
+        db.resetMySQLState()
+        db.loadMongo(items, products)
 
         # creating a container
         container = tk.Frame(self)

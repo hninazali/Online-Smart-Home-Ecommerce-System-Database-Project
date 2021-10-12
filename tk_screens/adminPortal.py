@@ -12,23 +12,24 @@ from tk_screens.changePasswordWindow import ChangePasswordWindow
 from PIL import Image, ImageTk
 
 mongo = MongoDB()
-mongo.dropCollection("items")
-mongo.dropCollection("products")
-mongo.resetMongoState()
+# mongo.dropCollection("items")
+# mongo.dropCollection("products")
+# mongo.resetMongoState()
 db = SQLDatabase()
 LARGEFONT = ("Verdana", 35)
 
 class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.domain = controller.getDomain()
         self.adminFunc = tk.StringVar(self)
         self.controller = controller
 
         # Reset Button
-        self.resetButton = ttk.Button(self)
-        self.resetButton.configure(text='Reset database')
+        self.resetButton = ttk.Button(self, text="Reset Database",
+                             command=self.resetDB)
         self.resetButton.grid(column='4', padx='5', pady='5', row='1')
-        self.resetButton.bind('<1>', self.resetDB, add='')
+        # self.resetButton.bind('<1>', self.resetDB, add='')
 
         createAdminButton = ttk.Button(self, text="Create New Admin",
                              command=lambda: controller.show_frame(CreateAdminPage, self.domain))
@@ -178,7 +179,7 @@ class AdminPortal(tk.Frame):
     def inventoryTable(self, w, cols, resSold, resUnsold):
         for index, unsold in enumerate(resUnsold):
             resSold[index]["unsold"] = unsold["total"]
-            print(resSold)
+            print("inventoryTable:",resSold)
         for col in cols:
             self.tree.column(col, anchor="center", width=w)
             self.tree.heading(col, text=col)
@@ -191,7 +192,7 @@ class AdminPortal(tk.Frame):
         self.tree.configure(yscrollcommand = self.scroll_y.set)
 
     def normalTable(self, w, cols, res):
-        print(res)
+        print("normalTable:",res)
         for col in cols:
             self.tree.column(col, anchor="center", width=w)
             self.tree.heading(col, text=col)
@@ -320,6 +321,8 @@ class CreateAdminPage(tk.Frame):
             else : 
                 print("Register success")
                 messagebox.showinfo(title="Registration Success", message= "Succesfully created an admin account!")
+
+
 
 
 
