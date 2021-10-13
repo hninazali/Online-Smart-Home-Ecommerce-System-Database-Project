@@ -1,5 +1,5 @@
 from tk_screens.adminPortal import *
-from tk_screens.customerPortal import CustomerPortal
+from tk_screens.customerPortal import *
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from tk_screens.tkinterCustomButton import TkinterCustomButton

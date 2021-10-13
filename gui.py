@@ -9,8 +9,8 @@ LARGEFONT = ("Verdana", 35)
 from tk_screens.authScreens import *
 from tk_screens.customerPortal import *
 from tk_screens.adminPortal import *
-from tk_screens.adminApproveRequestsPage import *
-from tk_screens.adminCompleteServicesPage import *
+# from tk_screens.adminApproveRequestsPage import *
+# from tk_screens.adminCompleteServicesPage import *
 
 
 class tkinterApp(tk.Tk):
