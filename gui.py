@@ -35,7 +35,7 @@ class tkinterApp(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
         self.geometry('1500x800')
-        self.grid_propagate(0)
+        # self.grid_propagate(0)
         self.title("OSHES Group 9")
 
         # initializing frames to an empty array

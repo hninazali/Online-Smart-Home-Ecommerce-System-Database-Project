@@ -38,7 +38,8 @@ class AdminPortal(tk.Frame):
         # Reset Button
         self.resetButton = ttk.Button(self, text="Reset Database",
                              command=self.resetDB)
-        self.resetButton.grid(column='4', padx='5', pady='5', row='1')
+        self.resetButton.grid(row=1, column=6,padx=10, pady=10)
+        # self.resetButton.grid(column='6', padx='5', pady='5', row='1')
         # self.resetButton.bind('<1>', self.resetDB, add='')
 
         createAdminButton = ttk.Button(self, text="Create New Admin",
@@ -358,7 +359,7 @@ class AdminItemSearch(tk.Frame):
         self.itemID = tk.StringVar()
         self['background']='#F6F4F1'
 
-        button1 = ttk.Button(self, text="Back to Admin Home",
+        button1 = ttk.Button(self, text="Back to Home",
                              command=lambda: controller.show_frame(AdminPortal))
         button1.grid(row=0, column=1, padx=5, pady=5)
 
@@ -389,7 +390,7 @@ class AdminItemSearch(tk.Frame):
         
         res = mongo.findItemByID(self.itemID.get())
         for col in self.cols:
-            self.tree.column(col, anchor="center", width=150)
+            self.tree.column(col, anchor="center", width=80)
             self.tree.heading(col, text=col)
         for r in  res:
             result = self.mongoToTree(r)
@@ -426,7 +427,7 @@ class AdminProductSearch(tk.Frame):
         
         self['background']='#F6F4F1'
 
-        button1 = ttk.Button(self, text="Back to Admin Home",
+        button1 = ttk.Button(self, text="Back to Home",
                              command=lambda: controller.show_frame(AdminPortal))
         button1.grid(row=0, column=1, padx=5, pady=5)
 
@@ -516,7 +517,7 @@ class AdminAdvancedSearch(tk.Frame):
 
         self['background']='#F6F4F1'
 
-        button1 = ttk.Button(self, text="Back to Admin Home",
+        button1 = ttk.Button(self, text="Back to Home",
                              command=lambda: controller.show_frame(AdminPortal))
         button1.grid(row=0, column=1, padx=5, pady=5)
 

@@ -27,7 +27,7 @@ class StartPage(tk.Frame):
         self.img = ImageTk.PhotoImage(Image.open("images/main_final.png").convert("RGB"))
         # self.img = tk.PhotoImage(file = "images/main_1.jpeg")
         self.label = ttk.Label(self, image=self.img)
-        self.label.grid(row=0, column=0, padx=100, pady=20)
+        self.label.grid(row=0, column=2, padx=250, pady=20)
         
         # putting the grid in its place by using
         # grid
@@ -39,7 +39,7 @@ class StartPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button1.grid(row=1, column=0, padx=5, pady=5)
+        button1.grid(row=1, column=2, padx=5, pady=5)
         
         # def button_function():
         #     print("Button pressed")
@@ -53,7 +53,7 @@ class StartPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=2, column=0, padx=5, pady=5)
+        button2.grid(row=2, column=2, padx=5, pady=5)
 
 
         # Dropdown menu options
@@ -61,7 +61,7 @@ class StartPage(tk.Frame):
 
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
         
-        dropdownlist.grid(row=3, column=0, padx=5, pady=5)
+        dropdownlist.grid(row=3, column=2, padx=5, pady=5)
 
         # table = Table(parent= parent,columns=("FName", "LName", "Roll No"))
         # table.insertRow(('Amit', 'Kumar', '17701'))
@@ -257,7 +257,7 @@ class RegisterPage(tk.Frame):
 
         # button to show frame 3 with text
         # layout3
-        button2 = ttk.Button(self, text="Back to Home",
+        button2 = ttk.Button(self, text="Back to Welcome Page",
                              command=lambda: controller.show_frame(StartPage))
 
         # putting the button in its place by

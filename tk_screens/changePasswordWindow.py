@@ -41,14 +41,17 @@ class ChangePasswordWindow(Toplevel):
         domain = self.master.getDomain()
         if domain == "Customer":
             return self.db.getCustomerLogin(userID, self.oldPassword.get())
-        elif domain == "Admin":
+        elif domain == "Administrator":
             return self.db.getAdminLogin(userID, self.oldPassword.get())
         else:
+            print("userID" + userID)
+            print("domain" + domain)
             raise Exception("Check User type in changePasswordwindow.py")
 
     def handleChangePassword(self):
         if self.checkAuthState() == "User doesn't exist" or self.checkAuthState() =="Incorrect Password":
-            print("Auth Error! Please check password"+self.checkAuthState()) # TODO: Change to popup or warning
+            messagebox.showinfo(title="Password Change Failed", message= "Auth Error! Please check password " + self.checkAuthState())
+            # print("Auth Error! Please check password"+self.checkAuthState()) # TODO: Change to popup or warning
         else:
             print("Password Change Approved:", self.checkAuthState())
             self.db.changePassword(self.newPassword.get(), self.master.getUserID(), self.master.getDomain())
