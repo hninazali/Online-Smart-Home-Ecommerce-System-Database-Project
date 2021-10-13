@@ -269,6 +269,12 @@ class SQLDatabase():
         self.c.execute(cancelService, ("Completed", requestID))
         self.connection.commit()
 
+    def retrieveInventoryLevel(self):
+        retrieveInventoryLevel = "SELECT productID, sum(case when purchaseStatus='sold' then 1 else 0 end) AS 'Sold', sum(case when purchaseStatus='unsold' then 1 else 0 end) AS 'Unsold' FROM items GROUP BY productID;"
+        self.c.execute(retrieveInventoryLevel, ())
+        results = self.c.fetchall()
+        return results
+
 
     def getConnection(self):
         return self.connection

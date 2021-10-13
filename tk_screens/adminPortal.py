@@ -70,6 +70,18 @@ class AdminPortal(tk.Frame):
 
         self['background']='#F6F4F1'
 
+        # Approve requests button
+        self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
+        self.approveButton.grid(column=2, pady=5, padx=10, row=2)
+
+        # Complete services button
+        self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
+        self.completeButton.grid(column=2, pady=5, padx=10, row=3)
+        
+
+        self['background']='#F6F4F1'
+
+    def showTree(self):
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
@@ -84,17 +96,6 @@ class AdminPortal(tk.Frame):
         self.tree.configure(yscrollcommand = self.scroll_y.set)
 
         self.renderInventoryList()
-
-        # Approve requests button
-        self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
-        self.approveButton.grid(column=2, pady=5, padx=10, row=2)
-
-        # Complete services button
-        self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
-        self.completeButton.grid(column=2, pady=5, padx=10, row=3)
-        
-
-        self['background']='#F6F4F1'
 
     def hello(self):
         print("hello")
@@ -148,7 +149,9 @@ class AdminPortal(tk.Frame):
         profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
         profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
         profileMenu.add_separator()
-        profileMenu.add_command(label="Logout", command=self.handleLogout)      
+        profileMenu.add_command(label="Logout", command=self.handleLogout)
+
+        self.showTree()      
         
         return menubar
 
@@ -188,9 +191,10 @@ class AdminPortal(tk.Frame):
         res = []
         if func == "inventory":
             w = 240
-            resSold = mongo.soldLevel()
-            resUnsold = mongo.unsoldLevel()
-            self.inventoryTable(w, cols, resSold, resUnsold)
+            res = db.retrieveInventoryLevel()
+            # resSold = mongo.soldLevel()
+            # resUnsold = mongo.unsoldLevel()
+            self.normalTable(w, cols, res)
         elif func == "service":
             w = 144
             res = db.itemUnderService()
@@ -801,7 +805,7 @@ class AdminApproveRequestsPage(tk.Frame):
         requestMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Service Requests", menu=requestMenu)
         requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
-    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+        # requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
         #service 
         serviceMenu = tk.Menu(menubar, tearoff=0)   
