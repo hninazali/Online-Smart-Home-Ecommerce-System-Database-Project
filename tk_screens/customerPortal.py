@@ -237,18 +237,24 @@ class CustomerPortal(tk.Frame):
             extractID = self.itemTree.item(curItem)['values'][0]
             
             #update mysql database, need to get current customer id
-            updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s"
+            updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s AND PurchaseStatus = 'Unsold' "
             val = (date.today().isoformat(),self.controller.getUserID(), extractID)
 
             con.ping()  # reconnecting mysql
             with con.cursor() as cursor:         
                 cursor.execute(updateStatement, val)
+                if cursor.rowcount == 0:
+                    messagebox.showinfo(title="Purchase Unsuccessful", message= "Item has been sold!")
+                else:
+                    messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
+
+                
             con.commit()
             con.close()
 
             #delete item and show purchase success
             self.itemTree.delete(self.itemTree.focus())
-            messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
+            
         else: 
             # print("Current item does not exists")
             messagebox.showwarning(title="Error", message="Please select an item to buy.")
