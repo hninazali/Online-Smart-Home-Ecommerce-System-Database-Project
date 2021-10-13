@@ -49,7 +49,7 @@ class tkinterApp(tk.Tk):
         # of the different page layouts
         # all new pages created add here
 
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage, RequestsPage):
     
             frame = F(container, self)
 
@@ -78,7 +78,7 @@ class tkinterApp(tk.Tk):
                 frame = self.frames[cont]
                 frame.tkraise()
 
-        elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage: # Or cont == Mypurchases 
+        elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage or cont == RequestsPage: # Or cont == Mypurchases 
             menubar = frame.menuBar(self)
             self.configure(menu=menubar)
     
