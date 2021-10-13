@@ -390,7 +390,7 @@ class AdminItemSearch(tk.Frame):
         
         res = mongo.findItemByID(self.itemID.get())
         for col in self.cols:
-            self.tree.column(col, anchor="center", width=80)
+            self.tree.column(col, anchor="center", width=130)
             self.tree.heading(col, text=col)
         for r in  res:
             result = self.mongoToTree(r)
