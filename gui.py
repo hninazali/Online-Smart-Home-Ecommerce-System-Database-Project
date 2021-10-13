@@ -78,7 +78,7 @@ class tkinterApp(tk.Tk):
                 frame = self.frames[cont]
                 frame.tkraise()
 
-        elif cont == CustomerPortal or cont == AdminPortal: # Or cont == Mypurchases 
+        elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage: # Or cont == Mypurchases 
             menubar = frame.menuBar(self)
             self.configure(menu=menubar)
     
