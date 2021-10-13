@@ -12,6 +12,7 @@ from tk_screens.adminApproveRequestsPage import *
 from tk_screens.adminCompleteServicesPage import *
 from tk_screens.adminProductSearch import *
 from tk_screens.adminItemSearch import *
+from tk_screens.myPurchases import *
 
 class tkinterApp(tk.Tk):
 
@@ -42,7 +43,7 @@ class tkinterApp(tk.Tk):
         # of the different page layouts
         # all new pages created add here
 
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage, MyPurchases):
     
             frame = F(container, self)
 

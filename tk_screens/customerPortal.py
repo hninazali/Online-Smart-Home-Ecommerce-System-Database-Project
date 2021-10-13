@@ -5,10 +5,12 @@ import tkinter.messagebox as messagebox
 from datetime import date
 from db_connections.mysqldb import SQLDatabase
 from db_connections.mongodb import MongoDB
+from tk_screens.myPurchases import MyPurchases
 from tk_screens.viewProfileWindow import ViewProfileWindow
 from tk_screens.changePasswordWindow import ChangePasswordWindow
 from tk_screens.adminProductSearch import AdminProductSearch 
 from tk_screens.adminItemSearch import AdminItemSearch
+from tk_screens.myPurchases import MyPurchases
 #connect to mongoDB to search
 global client
 global db
@@ -276,7 +278,7 @@ class CustomerPortal(tk.Frame):
         #purchases
         purchasesMenu = tk.Menu(menubar, tearoff=0) 
         menubar.add_cascade(label = "My Purchases", menu=purchasesMenu)  
-        purchasesMenu.add_command(label="View My Purchases", command=self.hello)
+        purchasesMenu.add_command(label="View My Purchases", command=lambda: self.controller.show_frame(MyPurchases))
         # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
         
         #service requests
