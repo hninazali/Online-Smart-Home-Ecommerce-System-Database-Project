@@ -42,6 +42,7 @@ class SQLDatabase():
         tempcursor.close()
         tempconnection.close()
 
+
     # Create Customer - DONE
     def createCustomer(self, custInfo):
         addCust = ("INSERT INTO customer "
@@ -143,6 +144,9 @@ class SQLDatabase():
             print("executing: Drop table "+table)
             sql = "DROP TABLE IF EXISTS {}"
             self.c.execute(sql.format(table))
+
+        dropEvent = "DROP EVENT IF EXISTS paymentOverdue"
+        self.c.execute(dropEvent)
 
         #table.sql creates admin, customer, product and item table while customer and admin sqls create new users
         files = ["table.sql", "customer.sql", "admin.sql"]
@@ -361,7 +365,7 @@ if __name__ == "__main__":
     db = SQLDatabase()
     # db.changePassword('aa', 'bb', "Customer")
     # print(db.getCustomerLogin('aa','aa'))
-    # db.resetMySQLState()
+    db.resetMySQLState()
 
 
     # db.resetMySQLState()
@@ -377,4 +381,3 @@ if __name__ == "__main__":
     # print(db.getCustomerLogin(email,"password")) # correct
     # print(db.getCustomerLogin(email,"Aassword")) # incoreect password
     # print(db.getCustomerLogin("a"+email,"password")) # user doesnt exist
-    db.createServiceRequest([0.0, "2021-10-15", 1100])

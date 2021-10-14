@@ -36,6 +36,7 @@ class tkinterApp(tk.Tk):
                     cur.execute(sql_request + ';')
                     print("Executing:", sql_request)
                 con.commit()
+                
         except Exception as e:
             print(e)
         db.createAdmin(["admin1","Admin1","password", "F", "5555" ])
