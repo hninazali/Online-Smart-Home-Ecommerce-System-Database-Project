@@ -275,6 +275,36 @@ class SQLDatabase():
         results = self.c.fetchall()
         return results
 
+    def loadPurchases(self, userID):
+        # purchasesList = ("SELECT i.itemID, category, model, price, dateOfPurchase, warranty, serviceStatus FROM (items i JOIN products p ON i.productID = p.productID) LEFT JOIN service s ON i.itemID = s.serviceID WHERE customerID = %s")
+
+        purchasesList = ("SELECT itemID, category, model, cost, price, dateOfPurchase, warranty FROM items i, products p WHERE i.productID = p.productID AND customerID = %s")
+        self.c.execute(purchasesList, (userID,))
+        results = self.c.fetchall()
+        return results
+
+    def createServiceRequest(self, reqInfo):
+        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s)")
+        try:   
+            self.c.execute(createReq, reqInfo)
+            self.connection.commit()
+        except Exception as e:
+            return e
+
+    def retrieveRequestID(self, reqInfo):
+        reqID  =  ("SELECT requestID FROM servicerequest WHERE dateOfRequest = %s AND itemID = %s")
+        self.c.execute(reqID, reqInfo)
+        results = self.c.fetchone()
+        return results
+
+    def createService(self, serviceInfo):
+        createService = ("INSERT INTO service (serviceStatus, itemID, requestID) VALUES ('Waiting for Approval', %s, %s)")
+        try:   
+            self.c.execute(createService, serviceInfo)
+            self.connection.commit()
+        except Exception as e:
+            return e
+
 
     def getConnection(self):
         return self.connection

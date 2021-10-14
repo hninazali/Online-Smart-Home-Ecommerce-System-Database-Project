@@ -50,7 +50,7 @@ FOREIGN KEY (productID) REFERENCES products(productID)
 
 CREATE TABLE ServiceRequest (
 	requestID 		MEDIUMINT 	NOT NULL AUTO_INCREMENT, 
-	serviceFee 		INT DEFAULT 0,
+	serviceFee 		DOUBLE DEFAULT 0.0,
 	requestStatus 	ENUM('Submitted', 'Submitted and Waiting for payment', 'In progress', 'Approved', 'Canceled', 'Completed') NOT NULL,
 	dateOfRequest 	DATE NOT NULL,
 	itemID 			MEDIUMINT NOT NULL,

@@ -2,7 +2,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from db_connections.mysqldb import SQLDatabase
-from db_connections.mongodb import MongoDB
 
 LARGEFONT = ("Verdana", 35)
 
@@ -19,8 +18,7 @@ class tkinterApp(tk.Tk):
     def __init__(self, *args, **kwargs):
 
         # __init__ function for class Tk
-        tk.Tk.__init__(self, *args, **kwargs)
-
+        tk.Tk.__init__(self, *args, **kwargs)    
         #reset database on load
         db = MongoDB()
         items, products = db.convertMongotoSQL()
@@ -28,7 +26,7 @@ class tkinterApp(tk.Tk):
         db.resetMySQLState()
         db.loadMongo(items, products)
 
-        # creating a container
+         # creating a container
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
 
@@ -49,7 +47,7 @@ class tkinterApp(tk.Tk):
         # of the different page layouts
         # all new pages created add here
 
-        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage, RequestsPage):
+        for F in (StartPage, LoginPage, RegisterPage, CustomerPortal, AdminPortal, CreateAdminPage, AdminProductSearch, AdminItemSearch, AdminAdvancedSearch, AdminApproveRequestsPage, AdminCompleteServicesPage, RequestsPage, MyPurchases):
     
             frame = F(container, self)
 
