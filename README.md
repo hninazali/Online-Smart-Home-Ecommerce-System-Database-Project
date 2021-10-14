@@ -27,7 +27,7 @@ After you pull the codes
 cd db_connections
 python3 mysqldb.py
 ```
-2. Create customer and admin in SQL
+2. Create customer and admin in mySQL workbench
 3. Run gui.py file 
 ```
 python3 gui.py
