@@ -19,6 +19,8 @@ pip install -r requirements.txt
 home = ./env/bin..
 ```
 
+## 🚀 Building and Running for Production
+
 After you pull the codes
 1. Run the sql scripts to create databases and tables
 ``` 
