@@ -1,3 +1,4 @@
+from datetime import date
 import tkinter as tk
 import tkinter.ttk as ttk
 import pymysql
@@ -291,24 +292,28 @@ class SQLDatabase():
         return results
 
     def createServiceRequest(self, reqInfo):
-        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s)")
+        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s);")
         try:   
             self.c.execute(createReq, reqInfo)
             self.connection.commit()
+            requestID = self.c.lastrowid
+            print(requestID)
+            self.createService([reqInfo[2], requestID])
         except Exception as e:
             return e
 
-    def retrieveRequestID(self, reqInfo):
-        reqID  =  ("SELECT requestID FROM servicerequest WHERE dateOfRequest = %s AND itemID = %s")
-        self.c.execute(reqID, reqInfo)
-        results = self.c.fetchone()
-        return results
+    # def retrieveRequestID(self, reqInfo):
+    #     reqID  =  ("SELECT requestID FROM servicerequest WHERE dateOfRequest = %s AND itemID = %s")
+    #     self.c.execute(reqID, reqInfo)
+    #     results = self.c.fetchone()
+    #     return results
 
     def createService(self, serviceInfo):
         createService = ("INSERT INTO service (serviceStatus, itemID, requestID) VALUES ('Waiting for Approval', %s, %s)")
         try:   
             self.c.execute(createService, serviceInfo)
             self.connection.commit()
+            print("created Service")
         except Exception as e:
             return e
 
@@ -356,15 +361,15 @@ if __name__ == "__main__":
     db = SQLDatabase()
     # db.changePassword('aa', 'bb', "Customer")
     # print(db.getCustomerLogin('aa','aa'))
-    db.resetMySQLState()
+    # db.resetMySQLState()
 
 
     # db.resetMySQLState()
     # Testing Functions
 
     # # Create customer
-    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
+    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
 
 
     # login
@@ -372,3 +377,4 @@ if __name__ == "__main__":
     # print(db.getCustomerLogin(email,"password")) # correct
     # print(db.getCustomerLogin(email,"Aassword")) # incoreect password
     # print(db.getCustomerLogin("a"+email,"password")) # user doesnt exist
+    db.createServiceRequest([0.0, "2021-10-15", 1100])

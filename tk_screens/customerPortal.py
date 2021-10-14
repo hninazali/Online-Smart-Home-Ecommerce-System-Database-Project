@@ -232,30 +232,54 @@ class CustomerPortal(tk.Frame):
         price = product['Price ($)']
         return (price)
 
-    def buyItem(self, a):
-        curItem = self.itemTree.focus()
-        if not curItem is "":
-            extractID = self.itemTree.item(curItem)['values'][0]
+    # def buyItem(self, a):
+    #     curItem = self.itemTree.focus()
+    #     if not curItem is "":
+    #         extractID = self.itemTree.item(curItem)['values'][0]
             
-            #update mysql database, need to get current customer id
-            updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s AND PurchaseStatus = 'Unsold' "
-            val = (date.today().isoformat(),self.controller.getUserID(), extractID)
+    #         #update mysql database, need to get current customer id
+    #         updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s AND PurchaseStatus = 'Unsold' "
+    #         val = (date.today().isoformat(),self.controller.getUserID(), extractID)
 
-            con.ping()  # reconnecting mysql
-            with con.cursor() as cursor:         
-                cursor.execute(updateStatement, val)
-                if cursor.rowcount == 0:
-                    messagebox.showinfo(title="Purchase Unsuccessful", message= "Item has been sold!")
-                else:
-                    messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
+    #         con.ping()  # reconnecting mysql
+    #         with con.cursor() as cursor:         
+    #             cursor.execute(updateStatement, val)
+    #             if cursor.rowcount == 0:
+    #                 messagebox.showinfo(title="Purchase Unsuccessful", message= "Item has been sold!")
+    #             else:
+    #                 messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
 
                 
+    #         con.commit()
+    #         # con.close()
+
+    #         #delete item and show purchase success
+    #         self.itemTree.delete(self.itemTree.focus())
+            
+    #     else: 
+    #         # print("Current item does not exists")
+    #         messagebox.showwarning(title="Error", message="Please select an item to buy.")
+
+    def buyItem(self, a):
+        selection = self.itemTree.selection()
+        if not selection is "":
+            for curItem in selection:
+                extractID = self.itemTree.item(curItem)['values'][0]
+                
+                #update mysql database, need to get current customer id
+                updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s AND PurchaseStatus = 'Unsold' "
+                val = (date.today().isoformat(),self.controller.getUserID(), extractID)
+
+                con.ping()  # reconnecting mysql
+                with con.cursor() as cursor:         
+                    cursor.execute(updateStatement, val)
+                    if cursor.rowcount == 0:
+                        messagebox.showinfo(title="Purchase Unsuccessful", message= "Item has been sold!")
+                    else:
+                        messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
+                self.itemTree.delete(curItem)
             con.commit()
             # con.close()
-
-            #delete item and show purchase success
-            self.itemTree.delete(self.itemTree.focus())
-            
         else: 
             # print("Current item does not exists")
             messagebox.showwarning(title="Error", message="Please select an item to buy.")
@@ -462,8 +486,19 @@ class RequestsPage(tk.Frame):
  
         print("Retrieving requests")
         allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
+        
         for r in allRequestsList: 
-            self.itemTree.insert("", "end", values=r) 
+            self.itemTree.insert("", "end", values=self.polishData(r)) 
+
+    def polishData(self, r):
+        dueDate = r[4]
+        serviceFee = r[5]
+        
+        if serviceFee == 0:
+            dueDate = "N/A"
+
+        result = (r[0], r[1], r[2], r[3], dueDate, r[5], r[6])
+        return result
 
          
     # def showTree(self): 
@@ -514,7 +549,7 @@ class RequestsPage(tk.Frame):
                 allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
     
                 for r in allRequestsList: 
-                    self.itemTree.insert("", "end", values=r) 
+                    self.itemTree.insert("", "end", values=self.polishData(r)) 
             else: 
                 messagebox.showinfo(title="Payment Unsuccessful", message= "Payment is not required for this request!") 
         else: 
@@ -562,7 +597,7 @@ class RequestsPage(tk.Frame):
                 allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
  
                 for r in allRequestsList: 
-                    self.itemTree.insert("", "end", values=r) 
+                    self.itemTree.insert("", "end", values=self.polishData(r)) 
             else: 
                 messagebox.showinfo(title="Cancellation Unsuccessful", message= "This request cannot be cancelled!")        
 
@@ -731,15 +766,15 @@ class MyPurchases(tk.Frame):
         else : 
             messagebox.showinfo(title="Request Service Success", message= "Succesfully requested for service!")
 
-        requestID = self.db.retrieveRequestID([dateOfRequest, itemID])
-        print("Request ID")
-        print(requestID[0])
+        # requestID = self.db.retrieveRequestID([dateOfRequest, itemID])
+        # print("Request ID")
+        # print(requestID[0])
 
-        service = self.db.createService([itemID, requestID])
-        if service: 
-            messagebox.showerror(title="Service Creation Failed", message=res)
-        else : 
-            messagebox.showinfo(title="Service Creation Success", message= "Succesfully created service!")
+        # service = self.db.createService([itemID, requestID])
+        # if res: 
+        #     messagebox.showerror(title="Service Creation Failed", message=res)
+        # else : 
+        #     messagebox.showinfo(title="Service Creation Success", message= "Succesfully created service!")
 
 
         # refresh table
