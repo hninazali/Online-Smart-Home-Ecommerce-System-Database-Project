@@ -5,6 +5,10 @@ With the advent and popularity of ecommerce, more and more consumers are purchas
 
 _This project is part of the module BT2102: Data Management and Visualisation, where students are tasked to create an OSHES (Online Smart Home Ecommerce System) using only Python, MySQL and MongoDB._
 
+<p align="center">
+  <img src="https://i.imgur.com/ZfmBDbd.png" width=600 />
+</div>
+
 ## 🛠️ Python Environment Setup
 1. cd to directory of your choice and use the following commands to install through `requirements.txt` file. 
 ```
