@@ -9,43 +9,62 @@ _This project is part of the module BT2102: Data Management and Visualisation, w
   <img src="https://i.imgur.com/ZfmBDbd.png" width=600 />
 </div>
 
-## 🛠️ Python Environment Setup
+## 🛠️ Environment Setup
 1. cd to directory of your choice and use the following commands to install through `requirements.txt` file. 
 ```
 python3 -m venv ./env
 ```
-2. Activate through `env/Scripts/activate.ps1` (for Windows) or `source env/bin/activate` (for Mac). This will install necessary sql and mongo libraries (pymysql, pymongo, sqlalchemy). Install dependencies
+2. Activate through `env/Scripts/activate.ps1` (for Windows) or `source env/bin/activate` (for Mac).
+
+3. To install dependencies : 
 ```
 pip install -r requirements.txt
 ```
-3. Change python environment in VSCode in pyvenv.cfg file to
+4. Change python environment in VSCode or IDE to the one you have created : 
 ```
 home = ./env/bin..
 ```
 
-## 🚀 Building and Running for Production
+Ensure that MySQL is set up locally with the following credentials:
+```
+user: 'root'
+password: 'password'
+port: 3306
+mysql_db: 'oshes'
+host: localhost
+```
+Ensure that MongoDB is set up locally with the following credentials:
+```
+mongo_uri: 'mongodb://localhost:27017'
+database_name: 'oshes'
+```
 
-After you pull the codes
-1. Run the sql scripts to create databases and tables
-``` 
-cd db_connections
-python3 mysqldb.py
+## 🚀 Running the app in production
+
+1. Ensure that you have an empty schema "oshes" on your SQL Workbench. 
+2. Run gui.py
 ```
-2. Create customer and admin in mySQL workbench
-3. Run gui.py file 
+python gui.py
 ```
-python3 gui.py
+3. Log in as Administrator with the following credentials : 
 ```
+User ID : admin1 
+Password : password
+```
+You will need to first login as an admin to initialise the database by pressing the "Initialise Data" button on the Admin Portal Home Page. 
+
+
 
 ## 💻 Tech Stack
-| Libraries and Frameworks Used  | Frontend & Databases |
+| Libraries and Frameworks  | Usage |
 | ------------- | ------------- |
 | Tkinter  | 	Frontend GUI |
+| Python | Frontend, Backend |
 | MySQL  | Database |
 | MongoDB  | Database |
 
 ## 👨‍💻👩‍💻 Contributors
-1. HNIN AZALI
+1. HNIN AZALI BRENDA YANG
 2. LEE ZHI XUAN
 3. NG SEOW TENG
 4. RYAN GOH SHI JUN

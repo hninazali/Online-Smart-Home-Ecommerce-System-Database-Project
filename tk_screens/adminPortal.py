@@ -36,7 +36,7 @@ class AdminPortal(tk.Frame):
         self.label.grid(row=0, column=3, padx=10, pady=10)
 
         # Reset Button
-        self.resetButton = ttk.Button(self, text="Reset Database",
+        self.resetButton = ttk.Button(self, text="Initialise Data",
                              command=self.resetDB)
         self.resetButton.grid(row=1, column=6,padx=10, pady=10)
         # self.resetButton.grid(column='6', padx='5', pady='5', row='1')
