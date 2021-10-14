@@ -251,7 +251,7 @@ class CustomerPortal(tk.Frame):
 
                 
             con.commit()
-            con.close()
+            # con.close()
 
             #delete item and show purchase success
             self.itemTree.delete(self.itemTree.focus())
@@ -387,11 +387,32 @@ class RequestsPage(tk.Frame):
     def __init__(self, parent, controller): 
         tk.Frame.__init__(self, parent) 
         self.controller = controller 
+        # self.db = SQLDatabase()
         self.userID = None 
         self.domain = None 
      
         self.label = ttk.Label(self, text="Requests List", font=LARGEFONT) 
         self.label.grid(row=0, column=4, padx=10, pady=10) 
+
+        self.treeFrame= ttk.Frame(self) 
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400') 
+        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10') 
+ 
+        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
+         
+        self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings') 
+        self.itemTree.pack(side='left') 
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview) 
+        scroll_y.pack(side = RIGHT, fill = Y) 
+        self.itemTree.configure(yscrollcommand = scroll_y.set) 
+
+        for col in cols: 
+            if col ==  "Request Status": 
+                self.itemTree.column(col, anchor="center", width=230) 
+                self.itemTree.heading(col, text=col) 
+            else: 
+                self.itemTree.column(col, anchor="center", width=150) 
+                self.itemTree.heading(col, text=col) 
  
         self.payButton = ttk.Button(self) 
         self.payButton.configure(text='Pay') 
@@ -409,22 +430,28 @@ class RequestsPage(tk.Frame):
  
         self['background']='#F6F4F1' 
 
-         
+    
     def showTree(self): 
         # print("Running showtree")
         ####Item display#### 
-        self.treeFrame= ttk.Frame(self) 
-        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400') 
-        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10') 
+        
+        # self.treeFrame= ttk.Frame(self) 
+        # self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400') 
+        # self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10') 
  
-        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
+        # cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
          
-        self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings') 
-        self.itemTree.pack(side='left') 
-        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview) 
-        scroll_y.pack(side = RIGHT, fill = Y) 
-        self.itemTree.configure(yscrollcommand = scroll_y.set) 
+        # self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings') 
+        # self.itemTree.pack(side='left') 
+        # scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview) 
+        # scroll_y.pack(side = RIGHT, fill = Y) 
+        # self.itemTree.configure(yscrollcommand = scroll_y.set) 
+
+        print("Deleting itemTree")
+        self.itemTree.delete(*self.itemTree.get_children())
  
+        print(" Regenerating headings")
+        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
         for col in cols: 
             if col ==  "Request Status": 
                 self.itemTree.column(col, anchor="center", width=230) 
@@ -433,9 +460,41 @@ class RequestsPage(tk.Frame):
                 self.itemTree.column(col, anchor="center", width=150) 
                 self.itemTree.heading(col, text=col) 
  
+        print("Retrieving requests")
         allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
         for r in allRequestsList: 
             self.itemTree.insert("", "end", values=r) 
+
+         
+    # def showTree(self): 
+    #     # print("Running showtree")
+    #     ###Item display#### 
+    #     self.treeFrame= ttk.Frame(self) 
+    #     self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400') 
+    #     self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10') 
+ 
+    #     cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
+         
+    #     self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings') 
+    #     self.itemTree.pack(side='left') 
+    #     scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview) 
+    #     scroll_y.pack(side = RIGHT, fill = Y) 
+    #     self.itemTree.configure(yscrollcommand = scroll_y.set) 
+        
+    #     # self.itemTree.delete(*self.itemTree.get_children())
+
+    #     for col in self.cols: 
+    #         if col ==  "Request Status": 
+    #             self.itemTree.column(col, anchor="center", width=230) 
+    #             self.itemTree.heading(col, text=col) 
+    #         else: 
+    #             self.itemTree.column(col, anchor="center", width=150) 
+    #             self.itemTree.heading(col, text=col) 
+        
+    #     allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
+
+    #     for r in allRequestsList: 
+    #         self.itemTree.insert("", "end", values=r) 
   
     def payRequest(self, a): 
         curItem = self.itemTree.focus() 
@@ -574,22 +633,25 @@ class MyPurchases(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
         self.db = SQLDatabase()
-        self.domain = controller.getDomain()
-        self.userID = controller.getUserID()
+        self.userID = None
+        self.domain = None
+        # self.domain = controller.getDomain()
+        # self.userID = controller.getUserID()
         print("User ID:")
         print(self.userID)
 
         self['background']='#F6F4F1'
 
-        # button1 = ttk.Button(self, text="Back to Customer Home",
-        #                      command=lambda: controller.show_frame(CustomerPortal))
-        # button1.grid(row=1, column=3, padx=5, pady=5)
+        button1 = ttk.Button(self, text="Back to Home", 
+                             command=lambda: controller.show_frame(CustomerPortal)) 
+        button1.grid(row=0, column=1, padx=5, pady=5) 
+
 
         self.label = ttk.Label(self, text="My Purchases", font=LARGEFONT)
         self.label.grid(row=0, column=3, padx=10, pady=10)  
 
-        self.loadButton = ttk.Button(self, text="Load Purchases", command=self.showTree)
-        self.loadButton.grid(column='1', padx='10', pady='10', row='9')
+        # self.loadButton = ttk.Button(self, text="Load Purchases", command=self.showTree)
+        # self.loadButton.grid(column='1', padx='10', pady='10', row='9')
 
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
@@ -679,5 +741,45 @@ class MyPurchases(tk.Frame):
         else : 
             messagebox.showinfo(title="Service Creation Success", message= "Succesfully created service!")
 
+
         # refresh table
-        self.showTree()
+        # self.showTree()
+    
+    def menuBar(self,root): 
+        print(self.controller.getUserID())
+        menubar = tk.Menu(root) 
+
+        #home 
+        homeMenu = tk.Menu(menubar, tearoff=0)  
+        menubar.add_cascade(label = "Home", menu=homeMenu)   
+        homeMenu.add_command(label="Buy Items", command=lambda: self.controller.show_frame(CustomerPortal))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #purchases 
+        purchasesMenu = tk.Menu(menubar, tearoff=0)  
+        menubar.add_cascade(label = "My Purchases", menu=purchasesMenu)   
+        purchasesMenu.add_command(label="View My Purchases", command=lambda: self.controller.show_frame(MyPurchases, domain = "Customer", userID = self.controller.getUserID()))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu) 
+         
+        #service requests 
+        requestMenu = tk.Menu(menubar, tearoff=0)    
+        menubar.add_cascade(label="My Service Requests", menu=requestMenu) 
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(RequestsPage, domain = "Customer", userID = self.controller.getUserID()))
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu) 
+        #profile 
+        profileMenu = tk.Menu(menubar, tearoff=0) 
+        menubar.add_cascade(label="My Profile", menu=profileMenu) 
+        profileMenu.add_command(label="View Profile", command= lambda: ViewProfileWindow(master=self.controller)) 
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller)) 
+        profileMenu.add_separator() 
+        profileMenu.add_command(label="Logout", command=self.handleLogout) 
+
+        self.showTree() 
+
+        return menubar 
+     
+    def hello(self): 
+        print("hello") 
+     
+    def handleLogout(self): 
+        self.controller.logout() 

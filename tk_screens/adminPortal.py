@@ -81,6 +81,8 @@ class AdminPortal(tk.Frame):
 
         self['background']='#F6F4F1'
 
+        # self.showTree()
+
     def showTree(self):
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')

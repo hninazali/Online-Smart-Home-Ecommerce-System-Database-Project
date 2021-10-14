@@ -7,5 +7,6 @@
 -- PRIMARY KEY(adminID));
 
 INSERT INTO admin VALUES ("admin1", "Admin1", "password", "M", "12345");
+-- INSERT INTO admin VALUES ("group9","Group9","password", "F", "12345" )
 INSERT INTO admin VALUES (" ", " ", " ", "M", " ");
 INSERT INTO admin VALUES ("aa", "aa", "aa", "M", "aa");

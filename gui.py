@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from db_connections.mysqldb import SQLDatabase
-
+import os
 LARGEFONT = ("Verdana", 35)
 
 from tk_screens.authScreens import *
@@ -20,11 +20,27 @@ class tkinterApp(tk.Tk):
         # __init__ function for class Tk
         tk.Tk.__init__(self, *args, **kwargs)    
         #reset database on load
-        db = MongoDB()
-        items, products = db.convertMongotoSQL()
+        # db = MongoDB()
+        # items, products = db.convertMongotoSQL()
         db = SQLDatabase()
-        db.resetMySQLState()
-        db.loadMongo(items, products)
+        con = db.connection
+        cur = db.c
+        db.dropTables()
+
+        try:
+            with open(os.path.join("./db_scripts/table.sql")) as f:
+                allCmd = f.read().split(';')
+                allCmd.pop()
+
+                for idx, sql_request in enumerate(allCmd):
+                    cur.execute(sql_request + ';')
+                    print("Executing:", sql_request)
+                con.commit()
+        except Exception as e:
+            print(e)
+        db.createAdmin(["admin1","Admin1","password", "F", "5555" ])
+        # db.resetMySQLState()
+        # db.loadMongo(items, products)
 
          # creating a container
         container = tk.Frame(self)
@@ -76,7 +92,21 @@ class tkinterApp(tk.Tk):
                 frame = self.frames[cont]
                 frame.tkraise()
 
-        elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage or cont == RequestsPage: # Or cont == Mypurchases 
+        elif cont == AdminApproveRequestsPage or cont == RequestsPage:
+            menubar = frame.menuBar(self)
+            self.configure(menu=menubar)
+    
+            # if not domain or not userID:
+            #     frame = self.frames[cont]
+            #     frame.tkraise()
+            # else:
+            frame = self.frames[cont]
+            frame.domain = domain
+            frame.userID = userID
+            frame.showTree()
+            frame.tkraise()
+
+        elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage or cont == RequestsPage  or cont == MyPurchases : 
             menubar = frame.menuBar(self)
             self.configure(menu=menubar)
     
@@ -88,6 +118,7 @@ class tkinterApp(tk.Tk):
             frame.domain = domain
             frame.userID = userID
             frame.tkraise()
+
 
         # elif (cont == MyPurchases):
         #     if not domain or not userID:

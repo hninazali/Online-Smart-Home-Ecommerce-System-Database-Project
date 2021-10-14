@@ -114,6 +114,13 @@ class SQLDatabase():
         else:
             raise Exception("Check domain in changePassword")
 
+    def dropTables(self):
+        tables = ["Service","ServiceRequest","items","products","Customer","admin"]
+        for table in tables:
+            print("executing: Drop table "+table)
+            sql = "DROP TABLE IF EXISTS {}"
+            self.c.execute(sql.format(table))
+
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
         # import inspect
