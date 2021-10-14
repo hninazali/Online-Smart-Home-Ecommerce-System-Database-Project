@@ -25,7 +25,7 @@ class tkinterApp(tk.Tk):
         db = SQLDatabase()
         con = db.connection
         cur = db.c
-        db.dropTables()
+        # db.dropTables()
 
         try:
             with open(os.path.join("./db_scripts/table.sql")) as f:
@@ -92,19 +92,19 @@ class tkinterApp(tk.Tk):
                 frame = self.frames[cont]
                 frame.tkraise()
 
-        elif cont == AdminApproveRequestsPage or cont == RequestsPage:
-            menubar = frame.menuBar(self)
-            self.configure(menu=menubar)
+        # elif cont == AdminApproveRequestsPage or cont == RequestsPage:
+        #     menubar = frame.menuBar(self)
+        #     self.configure(menu=menubar)
     
-            # if not domain or not userID:
-            #     frame = self.frames[cont]
-            #     frame.tkraise()
-            # else:
-            frame = self.frames[cont]
-            frame.domain = domain
-            frame.userID = userID
-            frame.showTree()
-            frame.tkraise()
+        #     # if not domain or not userID:
+        #     #     frame = self.frames[cont]
+        #     #     frame.tkraise()
+        #     # else:
+        #     frame = self.frames[cont]
+        #     frame.domain = domain
+        #     frame.userID = userID
+        #     frame.showTree()
+        #     frame.tkraise()
 
         elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage or cont == RequestsPage  or cont == MyPurchases : 
             menubar = frame.menuBar(self)
