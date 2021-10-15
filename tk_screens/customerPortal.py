@@ -146,7 +146,7 @@ class CustomerPortal(tk.Frame):
         ####Item display####
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
-        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10')
+        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10', padx='20')
 
         cols = ("itemID","Category","Model", "Price", "Color","Factory", "Production Year", "Power Supply")
         
@@ -701,7 +701,7 @@ class MyPurchases(tk.Frame):
         self.tree.configure(yscrollcommand = scroll_y.set)
 
         self.requestButton = ttk.Button(self, text="Request to Service", command=self.createRequest)
-        self.requestButton.grid(column='6', pady='20', row='11', sticky='e')
+        self.requestButton.grid(column='6', pady='20', row='7')
 
     def showTree(self):
         self.tree.delete(*self.tree.get_children())
@@ -713,7 +713,7 @@ class MyPurchases(tk.Frame):
         #     print(r)
 
         for col in self.cols:
-            self.tree.column(col, anchor="center", width=150)
+            self.tree.column(col, anchor="center", width=130)
             self.tree.heading(col, text=col)
 
         for r in results:
