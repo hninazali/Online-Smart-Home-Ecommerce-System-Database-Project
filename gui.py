@@ -107,7 +107,7 @@ class tkinterApp(tk.Tk):
         #     frame.showTree()
         #     frame.tkraise()
 
-        elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage or cont == RequestsPage  or cont == MyPurchases : 
+        elif cont == CustomerPortal or cont == AdminPortal or cont == AdminApproveRequestsPage or cont == AdminCompleteServicesPage or cont == RequestsPage  or cont == MyPurchases or cont == AdminProductSearch: 
             menubar = frame.menuBar(self)
             self.configure(menu=menubar)
     
