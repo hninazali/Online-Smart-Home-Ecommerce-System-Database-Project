@@ -437,7 +437,7 @@ class AdminProductSearch(tk.Frame):
         button1.grid(row=0, column=1, padx=5, pady=5)
 
         self.label = ttk.Label(self, text="Products List", font=LARGEFONT)
-        self.label.grid(row=0, column=3, padx=10, pady=10)
+        self.label.grid(row=0, column=3, padx=5, pady=20)
 
         # Dropdown menu options
         optionsCategory = ("All", "Lights", "Locks")
@@ -474,7 +474,7 @@ class AdminProductSearch(tk.Frame):
     def showTree(self):
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
-        self.treeFrame.grid(column='1', columnspan='6', row='6', rowspan='1', padx=20, pady=20)
+        self.treeFrame.grid(column='1', columnspan='6', row='6', rowspan='1', padx=100, pady=20)
 
         self.cols = ('Product ID', 'Category', 'Model', 'Price', 'Cost', 'Warranty (months)', 'Inventory Level', 'Number sold')
 
@@ -486,7 +486,7 @@ class AdminProductSearch(tk.Frame):
 
         res = mongo.adminProductSearch(self.category.get(), self.model.get())
         for col in self.cols:
-            self.tree.column(col, anchor="center", width=100)
+            self.tree.column(col, anchor="center", width=150)
             self.tree.heading(col, text=col)
         for r in  res:
             result = self.mongoToTree(r)

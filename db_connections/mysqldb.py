@@ -269,8 +269,8 @@ class SQLDatabase():
         return results
 
     def payRequest(self, requestID):
-        cancelReq = ("UPDATE ServiceRequest SET requestStatus = %s, serviceFee = %s, dateOfPayment = CURDATE() WHERE requestID = %s")
-        self.c.execute(cancelReq, ("In Progress", 0, requestID))
+        cancelReq = ("UPDATE ServiceRequest SET requestStatus = %s, dateOfPayment = CURDATE() WHERE requestID = %s")
+        self.c.execute(cancelReq, ("In Progress", requestID))
         self.connection.commit()
 
     def cancelRequest(self, requestID):
