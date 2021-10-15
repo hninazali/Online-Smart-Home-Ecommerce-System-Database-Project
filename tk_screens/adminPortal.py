@@ -509,8 +509,8 @@ class AdminProductSearch(tk.Frame):
     def mongoToTree(self, r):
         res = db.retrieveInventoryLevel()
         productID = r["ProductID"]
-        unsold = res[productID-1][1]
-        sold = res[productID-1][2]
+        unsold = res[productID-1][3]
+        sold = res[productID-1][4]
         re = (productID, r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], unsold, sold)
         return re
 
