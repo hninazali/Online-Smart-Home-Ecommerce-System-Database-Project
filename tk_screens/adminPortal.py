@@ -13,6 +13,7 @@ from tk_screens.viewProfileWindow import ViewProfileWindow
 from db_connections.mongodb import MongoDB
 from tk_screens.changePasswordWindow import ChangePasswordWindow
 from PIL import Image, ImageTk
+from tk_screens.tkinterCustomButton import TkinterCustomButton
 
 mongo = MongoDB()
 # mongo.dropCollection("items")
@@ -54,19 +55,26 @@ class AdminPortal(tk.Frame):
 
         button1 = ttk.Button(self, text="Display",
                              command=self.display)
-        button1.grid(row=4, column=4, padx=10, pady=10)
+        button1.grid(row=4, column=3, padx=10, pady=10)
+
+        # displayButton = TkinterCustomButton(self, text="Display", corner_radius=10, command=self.display)
+        # displayButton.grid(row=4, column=3, padx=10, pady=10)
+        # displayButton.place(relx=0.5, rely=0.5)
+
+#         button_1 = TkinterCustomButton(text="My Button", corner_radius=10, command=button_function)
+# button_1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
         button2 = ttk.Button(self, text="Search Product",
                              command=lambda: controller.show_frame(AdminProductSearch))
-        button2.grid(row=1, column=3, padx=10, pady=10)
+        button2.grid(row=1, column=4, padx=10, pady=10)
 
         button3 = ttk.Button(self, text="Search Item",
                              command=lambda: controller.show_frame(AdminItemSearch))
-        button3.grid(row=2, column=3, padx=10, pady=10)
+        button3.grid(row=2, column=4, padx=10, pady=10)
 
         button4 = ttk.Button(self, text="Advanced Search",
                              command=lambda: controller.show_frame(AdminAdvancedSearch))
-        button4.grid(row=3, column=3, padx=10, pady=10)
+        button4.grid(row=3, column=4, padx=10, pady=10)
 
         self['background']='#F6F4F1'
 

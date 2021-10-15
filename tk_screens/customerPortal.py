@@ -679,11 +679,11 @@ class MyPurchases(tk.Frame):
 
         button1 = ttk.Button(self, text="Back to Home", 
                              command=lambda: controller.show_frame(CustomerPortal)) 
-        button1.grid(row=0, column=1, padx=5, pady=5) 
+        button1.grid(row=0, column=2, padx=5, pady=5) 
 
 
         self.label = ttk.Label(self, text="My Purchases", font=LARGEFONT)
-        self.label.grid(row=0, column=3, padx=10, pady=10)  
+        self.label.grid(row=0, column=5, padx=10, pady=10)  
 
         # self.loadButton = ttk.Button(self, text="Load Purchases", command=self.showTree)
         # self.loadButton.grid(column='1', padx='10', pady='10', row='9')
@@ -764,8 +764,8 @@ class MyPurchases(tk.Frame):
         existingServices = self.db.findExistingServices(itemID) 
         # print(existingServices) 
         # print(type(existingServices)) 
-        print(existingServices) 
-        print(type(existingServices)) 
+        # print(existingServices) 
+        # print(type(existingServices)) 
         if not existingServices: 
             # no existing services that are waiting for approval/in progress, proceed to create request 
             if serviceFee == "0.0": 
