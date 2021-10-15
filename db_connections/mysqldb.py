@@ -296,13 +296,17 @@ class SQLDatabase():
         return results
 
     def createServiceRequest(self, reqInfo):
-        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s);")
+        print(reqInfo[0])
+        print(reqInfo[1])
+        print(reqInfo[2])
+        print(reqInfo[3])
+        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, %s, %s, %s);")
         try:   
             self.c.execute(createReq, reqInfo)
             self.connection.commit()
             requestID = self.c.lastrowid
             print(requestID)
-            self.createService([reqInfo[2], requestID])
+            self.createService([reqInfo[3], requestID])
         except Exception as e:
             return e
 
@@ -321,39 +325,14 @@ class SQLDatabase():
         except Exception as e:
             return e
 
-
-    def getConnection(self):
-        return self.connection
-
-    def loadPurchases(self, userID):
-        # purchasesList = ("SELECT i.itemID, category, model, price, dateOfPurchase, warranty, serviceStatus FROM (items i JOIN products p ON i.productID = p.productID) LEFT JOIN service s ON i.itemID = s.serviceID WHERE customerID = %s")
-
-        purchasesList = ("SELECT itemID, category, model, cost, price, dateOfPurchase, warranty FROM items i, products p WHERE i.productID = p.productID AND customerID = %s")
-        self.c.execute(purchasesList, (userID,))
+    def findExistingServices(self, itemID):
+        findServices = ("SELECT * FROM service WHERE itemID = %s AND (serviceStatus = 'Waiting for Approval' OR serviceStatus = 'In Progress')")
+        self.c.execute(findServices, (itemID))
         results = self.c.fetchall()
         return results
 
-    def createServiceRequest(self, reqInfo):
-        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s)")
-        try:   
-            self.c.execute(createReq, reqInfo)
-            self.connection.commit()
-        except Exception as e:
-            return e
-
-    def retrieveRequestID(self, reqInfo):
-        reqID  =  ("SELECT requestID FROM servicerequest WHERE dateOfRequest = %s AND itemID = %s")
-        self.c.execute(reqID, reqInfo)
-        results = self.c.fetchone()
-        return results
-
-    def createService(self, serviceInfo):
-        createService = ("INSERT INTO service (serviceStatus, itemID, requestID) VALUES ('Waiting for Approval', %s, %s)")
-        try:   
-            self.c.execute(createService, serviceInfo)
-            self.connection.commit()
-        except Exception as e:
-            return e
+    def getConnection(self):
+        return self.connection
 
 # # this methods will be callable without any requirements for the database
 # class DBOps():
