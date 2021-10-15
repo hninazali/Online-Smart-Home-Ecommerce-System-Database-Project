@@ -107,15 +107,15 @@ class LoginPage(tk.Frame):
 
         tk.Frame.__init__(self, parent)
         label = ttk.Label(self, text="Login Page", font=LARGEFONT, anchor='center')
-        label.grid(row=6, column=7, padx=5, pady=5, columnspan=7)
-        # self.grid_rowconfigure(1, weight=1)
-        # self.grid_columnconfigure(1, weight=1)
+        label.grid(row=6, column=7, padx=(400,0), pady=(100,50), columnspan=7)
+        # label.grid_rowconfigure(1, weight=1)
+        # label.grid_columnconfigure(1, weight=1)
 
         # background colour same as the welcome page image 
         self['background']='#F6F4F1'
             
         userIDLabel = ttk.Label(self, text="User ID:")
-        userIDLabel.grid(row=7, column=7, padx=5, pady=5)
+        userIDLabel.grid(row=7, column=7, padx=(400,0), pady=5)
         
 
         userIDInput = ttk.Entry(self, textvariable=self.userID)
@@ -123,7 +123,7 @@ class LoginPage(tk.Frame):
         
 
         passwordLabel = ttk.Label(self, text="Password:")
-        passwordLabel.grid(row=8, column=7, padx=5, pady=5)
+        passwordLabel.grid(row=8, column=7, padx=(400,0), pady=5)
 
         passwordInput = ttk.Entry(self,show="*", textvariable=self.password)
         passwordInput.grid(row=8, column=8, padx=5, pady=5)
@@ -136,7 +136,7 @@ class LoginPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=9, column=7, padx=5, pady=5)
+        button2.grid(row=9, column=8, padx=0, pady=5)
 
         # button to show frame 2 with text
         # layout2
@@ -145,7 +145,7 @@ class LoginPage(tk.Frame):
 
         # putting the button in its place
         # by using grid
-        button1.grid(row=9, column=8, padx=5, pady=5)
+        button1.grid(row=1, column=1, padx=(10,0), pady=10)
 
 
     def handleLogin(self):
