@@ -506,10 +506,11 @@ class AdminProductSearch(tk.Frame):
         # self.tree.grid(row=6, column=1, columnspan=1)
 
     def mongoToTree(self, r):
-        resSold = mongo.soldLevel()
-        resUnsold = mongo.unsoldLevel()
-
-        re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], resSold[r["ProductID"]-1]["total"], resUnsold[r["ProductID"]-1]["total"])
+        res = db.retrieveInventoryLevel()
+        productID = r["ProductID"]
+        unsold = res[productID-1][1]
+        sold = res[productID-1][2]
+        re = (productID, r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], unsold, sold)
         return re
 
 class AdminAdvancedSearch(tk.Frame):
