@@ -13,7 +13,6 @@ from tk_screens.viewProfileWindow import ViewProfileWindow
 from db_connections.mongodb import MongoDB
 from tk_screens.changePasswordWindow import ChangePasswordWindow
 from PIL import Image, ImageTk
-from tk_screens.tkinterCustomButton import TkinterCustomButton
 
 mongo = MongoDB()
 # mongo.dropCollection("items")
@@ -55,26 +54,19 @@ class AdminPortal(tk.Frame):
 
         button1 = ttk.Button(self, text="Display",
                              command=self.display)
-        button1.grid(row=4, column=3, padx=10, pady=10)
-
-        # displayButton = TkinterCustomButton(self, text="Display", corner_radius=10, command=self.display)
-        # displayButton.grid(row=4, column=3, padx=10, pady=10)
-        # displayButton.place(relx=0.5, rely=0.5)
-
-#         button_1 = TkinterCustomButton(text="My Button", corner_radius=10, command=button_function)
-# button_1.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+        button1.grid(row=4, column=6, padx=10, pady=10)
 
         button2 = ttk.Button(self, text="Search Product",
                              command=lambda: controller.show_frame(AdminProductSearch))
-        button2.grid(row=1, column=4, padx=10, pady=10)
+        button2.grid(row=1, column=3, padx=10, pady=10)
 
         button3 = ttk.Button(self, text="Search Item",
                              command=lambda: controller.show_frame(AdminItemSearch))
-        button3.grid(row=2, column=4, padx=10, pady=10)
+        button3.grid(row=2, column=3, padx=10, pady=10)
 
         button4 = ttk.Button(self, text="Advanced Search",
                              command=lambda: controller.show_frame(AdminAdvancedSearch))
-        button4.grid(row=3, column=4, padx=10, pady=10)
+        button4.grid(row=3, column=3, padx=10, pady=10)
 
         self['background']='#F6F4F1'
 
@@ -96,7 +88,7 @@ class AdminPortal(tk.Frame):
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='200')
         self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
 
-        cols = ('Product ID', 'Sold', 'Unsold')
+        cols = ('Product ID', 'Category', 'Model', 'Sold', 'Unsold')
         
         self.tree = ttk.Treeview(self.treeFrame, columns = cols,show='headings')
 
@@ -200,7 +192,7 @@ class AdminPortal(tk.Frame):
         w = tk.IntVar(self)
         res = []
         if func == "inventory":
-            w = 150
+            w = 240
             res = db.retrieveInventoryLevel()
             # resSold = mongo.soldLevel()
             # resUnsold = mongo.unsoldLevel()
@@ -395,7 +387,7 @@ class AdminItemSearch(tk.Frame):
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
 
-        self.cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status', 'Service Status')
+        self.cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status')
 
         self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
         self.tree.pack(side='left')
@@ -427,12 +419,7 @@ class AdminItemSearch(tk.Frame):
             messagebox.showinfo(title="Search Results", message= "Item ID {} does not exist!".format(self.itemID.get()))
 
     def mongoToTree(self, r):
-        serviceStatus = ""
-        if r["PurchaseStatus"] == "Sold" and r["ServiceStatus"] == "":
-            serviceStatus = "N/A"
-        else:
-            serviceStatus =  r["ServiceStatus"]
-        re = (r["ItemID"], r["Model"], r["Category"], r["Color"], r["Factory"], r["PowerSupply"], r["ProductionYear"], r["PurchaseStatus"], serviceStatus)
+        re = (r["ItemID"], r["Model"], r["Category"], r["Color"], r["Factory"], r["PowerSupply"], r["ProductionYear"], r["PurchaseStatus"])
         return re
     
 class AdminProductSearch(tk.Frame):
@@ -520,10 +507,11 @@ class AdminProductSearch(tk.Frame):
         # self.tree.grid(row=6, column=1, columnspan=1)
 
     def mongoToTree(self, r):
-        resSold = mongo.soldLevel()
-        resUnsold = mongo.unsoldLevel()
-
-        re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], resSold[r["ProductID"]-1]["total"], resUnsold[r["ProductID"]-1]["total"])
+        res = db.retrieveInventoryLevel()
+        productID = r["ProductID"]
+        unsold = res[productID-1][1]
+        sold = res[productID-1][2]
+        re = (productID, r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], unsold, sold)
         return re
 
     def menuBar(self,root):
@@ -647,7 +635,7 @@ class AdminAdvancedSearch(tk.Frame):
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='7', rowspan='1')
 
-        self.cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status", "Service Status")
+        self.cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status")
 
         self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
         self.tree.pack(side='left')
@@ -778,7 +766,7 @@ class AdminApproveRequestsPage(tk.Frame):
         # using grid
         backToAdminPortalButton.grid(row=10, column=4,  padx=5, pady=5)
 
-        label = ttk.Label(self, text="Requests pending Approval", font=LARGEFONT)
+        label = ttk.Label(self, text="Requests Pending Approval", font=LARGEFONT)
         label.grid(row='0', column='4', padx='220', pady='10')
 
     def showTree(self):
@@ -928,7 +916,7 @@ class AdminCompleteServicesPage(tk.Frame):
         # tk.Frame.__init__(self, parent)
         # style = ttk.Style(self)
         # style.theme_use('classic')
-        label = ttk.Label(self, text="Services pending Completion", font=LARGEFONT)
+        label = ttk.Label(self, text="Services Pending Completion", font=LARGEFONT)
         label.grid(row=0, column=4, padx=350, pady=10)
 
     def showTree(self):
