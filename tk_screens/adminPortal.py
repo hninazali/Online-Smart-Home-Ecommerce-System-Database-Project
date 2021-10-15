@@ -712,7 +712,7 @@ class AdminApproveRequestsPage(tk.Frame):
         # using grid
         backToAdminPortalButton.grid(row=10, column=4,  padx=5, pady=5)
 
-        label = ttk.Label(self, text="Requests pending Approval", font=LARGEFONT)
+        label = ttk.Label(self, text="Requests Pending Approval", font=LARGEFONT)
         label.grid(row='0', column='4', padx='220', pady='10')
 
     def showTree(self):
@@ -862,7 +862,7 @@ class AdminCompleteServicesPage(tk.Frame):
         # tk.Frame.__init__(self, parent)
         # style = ttk.Style(self)
         # style.theme_use('classic')
-        label = ttk.Label(self, text="Services pending Completion", font=LARGEFONT)
+        label = ttk.Label(self, text="Services Pending Completion", font=LARGEFONT)
         label.grid(row=0, column=4, padx=350, pady=10)
 
     def showTree(self):
