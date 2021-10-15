@@ -484,6 +484,7 @@ class AdminProductSearch(tk.Frame):
                              command=self.renderProductsList)
         button2.grid(row=2, column=3, padx=10, pady=10)
 
+    def showTree(self):
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
@@ -524,6 +525,63 @@ class AdminProductSearch(tk.Frame):
 
         re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], resSold[r["ProductID"]-1]["total"], resUnsold[r["ProductID"]-1]["total"])
         return re
+
+    def menuBar(self,root):
+        menubar = tk.Menu(root)
+        # self.controller = controller
+        # nestedProductMenu = tk.Menu(self)
+        # nestedItemMenu = tk.Menu(self)
+        # nestedRequestMenu = tk.Menu(self)
+        # nestedServiceMenu = tk.Menu(self)
+        # nestedProfileMenu = tk.Menu(self)
+
+        #back to admin main portal
+        
+        #product
+        productMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Products", menu=productMenu)
+        productMenu.add_command(label="Simple Search", command=lambda: self.controller.show_frame(AdminProductSearch))
+        productMenu.add_command(label="Advanced Search", command=lambda: self.controller.show_frame(AdminAdvancedSearch))
+        # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
+
+
+        #items
+        itemMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Items", menu=itemMenu)
+        itemMenu.add_command(label="View Items", command=lambda: self.controller.show_frame(AdminItemSearch))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #service requests
+        requestMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Service Requests", menu=requestMenu)
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
+        # requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+
+        #service 
+        serviceMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Services", menu=serviceMenu)#
+        serviceMenu.add_command(label="View Services", command=lambda: self.controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
+        # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
+
+        #profile
+        profileMenu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
+        profileMenu.add_separator()
+        profileMenu.add_command(label="Logout", command=self.handleLogout)
+
+        self.showTree()      
+        
+        return menubar
+
+    def hello(self):
+        print("hello")
+        print(self.userID)
+        print(self.domain)
+
+    def handleLogout(self):
+        self.controller.logout()
 
 class AdminAdvancedSearch(tk.Frame):
     def __init__(self, parent, controller):
