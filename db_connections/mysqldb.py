@@ -282,7 +282,7 @@ class SQLDatabase():
         self.connection.commit()
 
     def retrieveInventoryLevel(self):
-        retrieveInventoryLevel = "SELECT productID, sum(case when purchaseStatus='sold' then 1 else 0 end) AS 'Sold', sum(case when purchaseStatus='unsold' then 1 else 0 end) AS 'Unsold' FROM items GROUP BY productID;"
+        retrieveInventoryLevel = "SELECT i.productID, p.category, p.model, sum(case when purchaseStatus='sold' then 1 else 0 end) AS 'Sold', sum(case when purchaseStatus='unsold' then 1 else 0 end) AS 'Unsold' FROM items i, products p WHERE i.productID = p.productID GROUP BY productID;"
         self.c.execute(retrieveInventoryLevel, ())
         results = self.c.fetchall()
         return results

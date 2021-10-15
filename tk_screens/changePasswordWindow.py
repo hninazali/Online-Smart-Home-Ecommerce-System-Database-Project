@@ -52,6 +52,9 @@ class ChangePasswordWindow(Toplevel):
         if self.checkAuthState() == "User doesn't exist" or self.checkAuthState() =="Incorrect Password":
             messagebox.showinfo(title="Password Change Failed", message= "Auth Error! Please check password " + self.checkAuthState())
             # print("Auth Error! Please check password"+self.checkAuthState()) # TODO: Change to popup or warning
+        elif len(self.newPassword.get()) == 0:
+            print("New Password is empty")
+            messagebox.showwarning(title="Password Change Warning", message="New password cannot be empty!")
         else:
             print("Password Change Approved:", self.checkAuthState())
             self.db.changePassword(self.newPassword.get(), self.master.getUserID(), self.master.getDomain())
