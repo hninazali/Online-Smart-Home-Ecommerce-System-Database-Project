@@ -84,6 +84,9 @@ class tkinterApp(tk.Tk):
         frame.tkraise()
 
         if (cont == LoginPage or cont == RegisterPage or cont == StartPage):
+            print("Remove Menu Bar")
+            emptymenu = Menu(self)
+            self.configure(menu=emptymenu)
             if domain:
                 frame = self.frames[cont]
                 frame.setUserType(domain)
