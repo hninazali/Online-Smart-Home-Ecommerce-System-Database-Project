@@ -1,3 +1,4 @@
+from datetime import date
 import tkinter as tk
 import tkinter.ttk as ttk
 import pymysql
@@ -40,6 +41,7 @@ class SQLDatabase():
         tempconnection.commit()
         tempcursor.close()
         tempconnection.close()
+
 
     # Create Customer - DONE
     def createCustomer(self, custInfo):
@@ -114,8 +116,17 @@ class SQLDatabase():
         else:
             raise Exception("Check domain in changePassword")
 
+    def dropTables(self):
+        tables = ["Service","ServiceRequest","items","products","Customer","admin"]
+        for table in tables:
+            print("executing: Drop table "+table)
+            sql = "DROP TABLE IF EXISTS {}"
+            self.c.execute(sql.format(table))
+
     # Reset the whole database with the sql scripts in db_scripts/
     def resetMySQLState(self):
+        # import inspect
+        # print("Printed:",inspect.stack()[1].function)
         # dropDatabase()
         # self.createDB()
         rootdir = "./db_scripts"
@@ -128,11 +139,14 @@ class SQLDatabase():
             rootdir = "../db_scripts"
         
         # Drop Tables
-        tables = ["Service", "ServiceRequest", "items","products","Customer","admin"]
+        tables = ["Service","ServiceRequest","items","products","Customer","admin"]
         for table in tables:
             print("executing: Drop table "+table)
             sql = "DROP TABLE IF EXISTS {}"
             self.c.execute(sql.format(table))
+
+        dropEvent = "DROP EVENT IF EXISTS paymentOverdue"
+        self.c.execute(dropEvent)
 
         #table.sql creates admin, customer, product and item table while customer and admin sqls create new users
         files = ["table.sql", "customer.sql", "admin.sql"]
@@ -159,6 +173,36 @@ class SQLDatabase():
             print("Executing:", item)
             self.c.execute(itemStr, item)
             self.connection.commit()
+
+        # reqcreate = ("INSERT INTO ServiceRequest (serviceFee, requestStatus, dateOfRequest, itemID, dateOfPayment) VALUES (%s,%s,%s,%s,%s)")
+        # self.c.execute(reqcreate, ("30", "Submitted and Waiting for Payment", "2021-01-01", "1001", "2021-01-09"))
+        # self.connection.commit()
+       
+
+        # reqcreate1 = ("INSERT INTO ServiceRequest (serviceFee, requestStatus, dateOfRequest, itemID, dateOfPayment) VALUES (%s,%s,%s,%s,%s)")
+        # self.c.execute(reqcreate1, ("40", "Submitted", "2021-01-01", "1002", "2021-01-09"))
+        # self.connection.commit()
+       
+
+        # servicecreate = ("INSERT INTO Service (serviceStatus, itemID, requestID, adminID) VALUES (%s,%s,%s,%s)")
+        # self.c.execute(servicecreate, ("Waiting for Approval", "1001", "1", "admin1"))
+        # self.connection.commit()
+
+
+        # servicecreate1 = ("INSERT INTO Service (serviceStatus, itemID, requestID, adminID) VALUES (%s,%s,%s,%s)")
+        # self.c.execute(servicecreate1, ("In Progress", "1002", "2", "admin1"))
+        # self.connection.commit()
+
+
+        # upd = ("UPDATE Items SET customerID = 'customer1' WHERE itemID = %s")
+        # self.c.execute(upd, ("1001"))
+        # self.connection.commit()
+
+
+        # upd = ("UPDATE Items SET customerID = 'customer1' WHERE itemID = %s")
+        # self.c.execute(upd, ("1002"))
+        # self.connection.commit()
+
 
     def retrieveRequestsForApproval(self):
         retrieveRequestsForApproval = ("SELECT r.requestID, s.serviceID, s.itemID, r.dateOfRequest, r.serviceFee, r.requestStatus, s.serviceStatus FROM ServiceRequest r, Service s WHERE s.requestID = r.requestID AND (r.requestStatus='Submitted' OR r.requestStatus='In progress') AND s.serviceStatus = 'Waiting for Approval' ORDER BY requestID")
@@ -203,8 +247,10 @@ class SQLDatabase():
         return result
 
     def itemUnderService(self):
-        itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Items i, Products p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
-        self.c.execute(itemsList)
+        # itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Items i, Products p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID ORDER BY itemID")
+        # self.c.execute(itemsList)
+        itemsList = ("SELECT i.itemID, p.category, p.model, s.serviceStatus, (SELECT name FROM admin a WHERE a.adminID = s.adminID) as adminAssigned FROM Items i, Products p, Service s WHERE i.productID = p.productID AND s.itemID = i.itemID AND (s.serviceStatus = %s OR s.serviceStatus = %s) ORDER BY itemID")
+        self.c.execute(itemsList, ("Waiting for Approval", "In Progress"))
         results = self.c.fetchall()
         return results
     
@@ -213,6 +259,68 @@ class SQLDatabase():
         self.c.execute(custList, ("Submitted and Waiting for payment"))
         results = self.c.fetchall()
         return results
+    
+
+    def retrieveRequests(self, customerID):
+        # requestsList = ("SELECT r.requestID, i.itemID, r.requestStatus, r.dateOfRequest, ADDDATE(r.dateOfRequest, 10) as dueDate, r.serviceFee FROM Items i, ServiceRequest r WHERE i.itemID = r.itemID AND i.customerID = %s ORDER BY r.requestID")
+        requestsList = ("SELECT r.requestID, i.itemID, r.requestStatus, r.dateOfRequest, ADDDATE(r.dateOfRequest, 10) as dueDate, r.serviceFee, s.serviceStatus FROM Items i, ServiceRequest r, Service s WHERE i.itemID = r.itemID AND i.customerID = %s AND s.requestID = r.requestID ORDER BY r.requestID")
+        self.c.execute(requestsList, customerID)
+        results = self.c.fetchall()
+        return results
+
+    def payRequest(self, requestID):
+        cancelReq = ("UPDATE ServiceRequest SET requestStatus = %s, serviceFee = %s, dateOfPayment = CURDATE() WHERE requestID = %s")
+        self.c.execute(cancelReq, ("In Progress", 0, requestID))
+        self.connection.commit()
+
+    def cancelRequest(self, requestID):
+        cancelReq = ("UPDATE ServiceRequest SET requestStatus = %s WHERE requestID = %s")
+        self.c.execute(cancelReq, ("Canceled", requestID))
+        
+        cancelService = ("UPDATE Service SET serviceStatus = %s WHERE requestID = %s")
+        self.c.execute(cancelService, ("Completed", requestID))
+        self.connection.commit()
+
+    def retrieveInventoryLevel(self):
+        retrieveInventoryLevel = "SELECT productID, sum(case when purchaseStatus='sold' then 1 else 0 end) AS 'Sold', sum(case when purchaseStatus='unsold' then 1 else 0 end) AS 'Unsold' FROM items GROUP BY productID;"
+        self.c.execute(retrieveInventoryLevel, ())
+        results = self.c.fetchall()
+        return results
+
+    def loadPurchases(self, userID):
+        # purchasesList = ("SELECT i.itemID, category, model, price, dateOfPurchase, warranty, serviceStatus FROM (items i JOIN products p ON i.productID = p.productID) LEFT JOIN service s ON i.itemID = s.serviceID WHERE customerID = %s")
+
+        purchasesList = ("SELECT itemID, category, model, cost, price, dateOfPurchase, warranty FROM items i, products p WHERE i.productID = p.productID AND customerID = %s")
+        self.c.execute(purchasesList, (userID,))
+        results = self.c.fetchall()
+        return results
+
+    def createServiceRequest(self, reqInfo):
+        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s);")
+        try:   
+            self.c.execute(createReq, reqInfo)
+            self.connection.commit()
+            requestID = self.c.lastrowid
+            print(requestID)
+            self.createService([reqInfo[2], requestID])
+        except Exception as e:
+            return e
+
+    # def retrieveRequestID(self, reqInfo):
+    #     reqID  =  ("SELECT requestID FROM servicerequest WHERE dateOfRequest = %s AND itemID = %s")
+    #     self.c.execute(reqID, reqInfo)
+    #     results = self.c.fetchone()
+    #     return results
+
+    def createService(self, serviceInfo):
+        createService = ("INSERT INTO service (serviceStatus, itemID, requestID) VALUES ('Waiting for Approval', %s, %s)")
+        try:   
+            self.c.execute(createService, serviceInfo)
+            self.connection.commit()
+            print("created Service")
+        except Exception as e:
+            return e
+
 
     def getConnection(self):
         return self.connection
@@ -294,8 +402,8 @@ if __name__ == "__main__":
     # Testing Functions
 
     # # Create customer
-    db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
-    db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
+    # db.createCustomer(["brenda3","Brenda3","brenda3@gmail.com","password","1 Street", "4444", "F"])
+    # db.createAdmin(["admin2","Admin2","password", "F", "5555" ])
 
 
     # login

@@ -9,7 +9,7 @@ class MongoDB():
             # try to instantiate a client instance
             self.client = MongoClient("mongodb://localhost:27017")
             # print the version of MongoDB server if connection successful
-            print ("server version:", self.client.server_info()["version"])
+            # print ("server version:", self.client.server_info()["version"])
 
         except errors.ServerSelectionTimeoutError as err:
             print(err)

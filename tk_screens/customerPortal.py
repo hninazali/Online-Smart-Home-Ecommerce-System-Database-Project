@@ -2,15 +2,15 @@ import tkinter as tk
 from tkinter import *
 import tkinter.ttk as ttk
 import tkinter.messagebox as messagebox
+import datetime
 from datetime import date
+
+from pymysql import NULL
 from db_connections.mysqldb import SQLDatabase
 from db_connections.mongodb import MongoDB
 from tk_screens.myPurchases import MyPurchases
 from tk_screens.viewProfileWindow import ViewProfileWindow
 from tk_screens.changePasswordWindow import ChangePasswordWindow
-from tk_screens.adminProductSearch import AdminProductSearch 
-from tk_screens.adminItemSearch import AdminItemSearch
-from tk_screens.myPurchases import MyPurchases
 #connect to mongoDB to search
 global client
 global db
@@ -31,6 +31,8 @@ class CustomerPortal(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        self.userID = None
+        self.domain = None
     
         self.label = ttk.Label(self, text="Customer Home", font=LARGEFONT)
         self.label.grid(row=0, column=4, padx=10, pady=10)
@@ -52,6 +54,13 @@ class CustomerPortal(tk.Frame):
         self.buyButton.bind('<Button-1>', self.buyItem)
 
         self['background']='#F6F4F1'
+
+        # print("user id to req page") 
+        # print("======================") 
+        # print(self.controller.getUserID()) 
+        # reqButton = ttk.Button(self, text="View Service Requests", 
+        #                      command=lambda: controller.show_frame(RequestsPage, domain = "Customer", userID = self.controller.getUserID())) 
+        # reqButton.grid(row=2, column=8, padx=10, pady=10) 
 
         ####Comboboxes####
         vModel=[]
@@ -224,26 +233,59 @@ class CustomerPortal(tk.Frame):
         price = product['Price ($)']
         return (price)
 
+    # def buyItem(self, a):
+    #     curItem = self.itemTree.focus()
+    #     if not curItem is "":
+    #         extractID = self.itemTree.item(curItem)['values'][0]
+            
+    #         #update mysql database, need to get current customer id
+    #         updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s AND PurchaseStatus = 'Unsold' "
+    #         val = (date.today().isoformat(),self.controller.getUserID(), extractID)
+
+    #         con.ping()  # reconnecting mysql
+    #         with con.cursor() as cursor:         
+    #             cursor.execute(updateStatement, val)
+    #             if cursor.rowcount == 0:
+    #                 messagebox.showinfo(title="Purchase Unsuccessful", message= "Item has been sold!")
+    #             else:
+    #                 messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
+
+                
+    #         con.commit()
+    #         # con.close()
+
+    #         #delete item and show purchase success
+    #         self.itemTree.delete(self.itemTree.focus())
+            
+    #     else: 
+    #         # print("Current item does not exists")
+    #         messagebox.showwarning(title="Error", message="Please select an item to buy.")
+
     def buyItem(self, a):
-        curItem = self.itemTree.focus()
-        extractID = self.itemTree.item(curItem)['values'][0]
-        
-        #update mysql database, need to get current customer id
-        updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s"
-        val = (date.today().isoformat(),self.controller.getUserID(), extractID)
+        selection = self.itemTree.selection()
+        if not selection is "":
+            for curItem in selection:
+                extractID = self.itemTree.item(curItem)['values'][0]
+                
+                #update mysql database, need to get current customer id
+                updateStatement = "UPDATE items SET PurchaseStatus = 'Sold',dateOfPurchase = %s, customerID = %s  WHERE ItemID = %s AND PurchaseStatus = 'Unsold' "
+                val = (date.today().isoformat(),self.controller.getUserID(), extractID)
 
-        con.ping()  # reconnecting mysql
-        with con.cursor() as cursor:         
-            cursor.execute(updateStatement, val)
-        con.commit()
-        con.close()
+                con.ping()  # reconnecting mysql
+                with con.cursor() as cursor:         
+                    cursor.execute(updateStatement, val)
+                    if cursor.rowcount == 0:
+                        messagebox.showinfo(title="Purchase Unsuccessful", message= "Item has been sold!")
+                    else:
+                        messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
+                self.itemTree.delete(curItem)
+            con.commit()
+            # con.close()
+        else: 
+            # print("Current item does not exists")
+            messagebox.showwarning(title="Error", message="Please select an item to buy.")
 
-
-
-        #delete item and show purchase success
-        self.itemTree.delete(self.itemTree.focus())
-        messagebox.showinfo(title="Purchase Successful", message= "Thank you for your purchase!")
-        
+            
 
     def mongoToTree(self, r):
         price = self.findPrice(r["Category"], r["Model"])
@@ -255,7 +297,9 @@ class CustomerPortal(tk.Frame):
     #     file_new_frame.pack(fill="both", expand=1)
 
     def hello(self):
-        print("hello")
+        print("hello Test")
+        print(self.userID)
+        print(self.domain)
     
     def handleLogout(self):
         self.controller.logout()
@@ -278,13 +322,13 @@ class CustomerPortal(tk.Frame):
         #purchases
         purchasesMenu = tk.Menu(menubar, tearoff=0) 
         menubar.add_cascade(label = "My Purchases", menu=purchasesMenu)  
-        purchasesMenu.add_command(label="View My Purchases", command=lambda: self.controller.show_frame(MyPurchases))
+        purchasesMenu.add_command(label="View My Purchases", command=lambda: self.controller.show_frame(MyPurchases, domain = "Customer", userID = self.controller.getUserID()))
         # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
         
         #service requests
         requestMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="My Service Requests", menu=requestMenu)
-        requestMenu.add_command(label="View Service Requests", command=self.hello)
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(RequestsPage, domain = "Customer", userID = self.controller.getUserID()))
     #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
         # #service 
@@ -295,7 +339,7 @@ class CustomerPortal(tk.Frame):
 
         #profile
         profileMenu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        menubar.add_cascade(label="My Profile", menu=profileMenu) 
         profileMenu.add_command(label="View Profile", command= lambda: ViewProfileWindow(master=self.controller))
         profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
         profileMenu.add_separator()
@@ -364,6 +408,414 @@ class CustomerPortal(tk.Frame):
         
         # dropdownlist.grid(row=0, column=1, padx=10, pady=10)
 
-        
+class RequestsPage(tk.Frame): 
+    def __init__(self, parent, controller): 
+        tk.Frame.__init__(self, parent) 
+        self.controller = controller 
+        # self.db = SQLDatabase()
+        self.userID = None 
+        self.domain = None 
+     
+        self.label = ttk.Label(self, text="Requests List", font=LARGEFONT) 
+        self.label.grid(row=0, column=4, padx=10, pady=10) 
+
+        self.treeFrame= ttk.Frame(self) 
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400') 
+        self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10') 
+ 
+        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
+         
+        self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings') 
+        self.itemTree.pack(side='left') 
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview) 
+        scroll_y.pack(side = RIGHT, fill = Y) 
+        self.itemTree.configure(yscrollcommand = scroll_y.set) 
+
+        for col in cols: 
+            if col ==  "Request Status": 
+                self.itemTree.column(col, anchor="center", width=230) 
+                self.itemTree.heading(col, text=col) 
+            else: 
+                self.itemTree.column(col, anchor="center", width=150) 
+                self.itemTree.heading(col, text=col) 
+ 
+        self.payButton = ttk.Button(self) 
+        self.payButton.configure(text='Pay') 
+        self.payButton.grid(column='6', pady='20', row='11', sticky='e') 
+        self.payButton.bind('<Button-1>', self.payRequest) 
+ 
+        self.cancelButton = ttk.Button(self) 
+        self.cancelButton.configure(text='Cancel') 
+        self.cancelButton.grid(column='7', pady='20', row='11', sticky='e') 
+        self.cancelButton.bind('<Button-1>', self.cancelRequest) 
+ 
+        button1 = ttk.Button(self, text="Back to Home", 
+                             command=lambda: controller.show_frame(CustomerPortal)) 
+        button1.grid(row=0, column=1, padx=5, pady=5) 
+ 
+        self['background']='#F6F4F1' 
 
     
+    def showTree(self): 
+        # print("Running showtree")
+        ####Item display#### 
+        
+        # self.treeFrame= ttk.Frame(self) 
+        # self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400') 
+        # self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10') 
+ 
+        # cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
+         
+        # self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings') 
+        # self.itemTree.pack(side='left') 
+        # scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview) 
+        # scroll_y.pack(side = RIGHT, fill = Y) 
+        # self.itemTree.configure(yscrollcommand = scroll_y.set) 
+
+        print("Deleting itemTree")
+        self.itemTree.delete(*self.itemTree.get_children())
+ 
+        print(" Regenerating headings")
+        cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
+        for col in cols: 
+            if col ==  "Request Status": 
+                self.itemTree.column(col, anchor="center", width=230) 
+                self.itemTree.heading(col, text=col) 
+            else: 
+                self.itemTree.column(col, anchor="center", width=150) 
+                self.itemTree.heading(col, text=col) 
+ 
+        print("Retrieving requests")
+        allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
+        
+        for r in allRequestsList: 
+            self.itemTree.insert("", "end", values=self.polishData(r)) 
+
+    def polishData(self, r):
+        dueDate = r[4]
+        serviceFee = r[5]
+        
+        if serviceFee == 0:
+            dueDate = "N/A"
+
+        result = (r[0], r[1], r[2], r[3], dueDate, r[5], r[6])
+        return result
+
+         
+    # def showTree(self): 
+    #     # print("Running showtree")
+    #     ###Item display#### 
+    #     self.treeFrame= ttk.Frame(self) 
+    #     self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400') 
+    #     self.treeFrame.grid(column='2', columnspan='6', row='10', rowspan='1', pady ='10') 
+ 
+    #     cols = ("Request ID", "Item ID","Request Status","Request Date", "Payment Due Date", "Service Fee", "Service Status")
+         
+    #     self.itemTree = ttk.Treeview(self.treeFrame, columns = cols,show='headings') 
+    #     self.itemTree.pack(side='left') 
+    #     scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.itemTree.yview) 
+    #     scroll_y.pack(side = RIGHT, fill = Y) 
+    #     self.itemTree.configure(yscrollcommand = scroll_y.set) 
+        
+    #     # self.itemTree.delete(*self.itemTree.get_children())
+
+    #     for col in self.cols: 
+    #         if col ==  "Request Status": 
+    #             self.itemTree.column(col, anchor="center", width=230) 
+    #             self.itemTree.heading(col, text=col) 
+    #         else: 
+    #             self.itemTree.column(col, anchor="center", width=150) 
+    #             self.itemTree.heading(col, text=col) 
+        
+    #     allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
+
+    #     for r in allRequestsList: 
+    #         self.itemTree.insert("", "end", values=r) 
+  
+    def payRequest(self, a): 
+        curItem = self.itemTree.focus() 
+
+        if not curItem is "":
+            extractID = self.itemTree.item(curItem)['values'][0] 
+            requestStatus = self.itemTree.item(curItem)['values'][2] 
+            if requestStatus == "Submitted and Waiting for payment": 
+    
+                payReq = mysqlinit.payRequest(extractID) 
+    
+                # reload table 
+                messagebox.showinfo(title="Payment Successful", message= "Thank you for your payment!") 
+                for r in self.itemTree.get_children(): 
+                    self.itemTree.delete(r) 
+    
+                allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
+    
+                for r in allRequestsList: 
+                    self.itemTree.insert("", "end", values=self.polishData(r)) 
+            else: 
+                messagebox.showinfo(title="Payment Unsuccessful", message= "Payment is not required for this request!") 
+        else: 
+            # print("Current item does not exists")
+            messagebox.showwarning(title="Error", message="Please select a request to pay.")
+
+    # def cancelRequest(self, a): 
+    #     curItem = self.itemTree.focus() 
+    #     extractID = self.itemTree.item(curItem)['values'][0] 
+    #     requestStatus = self.itemTree.item(curItem)['values'][2] 
+    #     if requestStatus != "Canceled" and requestStatus != "Completed": 
+ 
+    #         payReq = mysqlinit.cancelRequest(extractID) 
+ 
+    #         # reload table 
+    #         messagebox.showinfo(title="Cancellation Successful", message= "Request {} has been successfully cancelled!".format(extractID)) 
+    #         for r in self.itemTree.get_children(): 
+    #             self.itemTree.delete(r) 
+ 
+    #         allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
+ 
+    #         for r in allRequestsList: 
+    #             self.itemTree.insert("", "end", values=r) 
+    #     else: 
+    #         messagebox.showinfo(title="Cancellation Unsuccessful", message= "This request cannot be cancelled!")        
+    
+    def cancelRequest(self, a): 
+        curItem = self.itemTree.focus() 
+        # print(curItem)
+
+        if not curItem is "":
+            # print("Current item exists")
+            extractID = self.itemTree.item(curItem)['values'][0] 
+            requestStatus = self.itemTree.item(curItem)['values'][2] 
+
+            if requestStatus != "Canceled" and requestStatus != "Completed": 
+ 
+                payReq = mysqlinit.cancelRequest(extractID) 
+ 
+            # reload table 
+                messagebox.showinfo(title="Cancellation Successful", message= "Request {} has been successfully cancelled!".format(extractID)) 
+                for r in self.itemTree.get_children(): 
+                    self.itemTree.delete(r) 
+ 
+                allRequestsList = mysqlinit.retrieveRequests(self.controller.getUserID()) 
+ 
+                for r in allRequestsList: 
+                    self.itemTree.insert("", "end", values=self.polishData(r)) 
+            else: 
+                messagebox.showinfo(title="Cancellation Unsuccessful", message= "This request cannot be cancelled!")        
+
+        else: 
+            # print("Current item does not exists")
+            messagebox.showwarning(title="Error", message="Please select a request to cancel.")
+            
+        
+        
+
+    # def approveRequests(self):
+
+    #     values = self.tree.selection()
+
+    #     for v in values:
+    #         self.selectedRequests.append(self.tree.item(v)['values'][0])
+    #         self.selectedServices.append(self.tree.item(v)['values'][1])     
+
+    #     res = db.approveRequests(self.selectedRequests, self.selectedServices, self.controller.getUserID())
+
+    #     if res is None:
+    #         messagebox.showwarning(title="Request Approval", message="Please select record(s) to proceed.")
+    #     elif res == len(self.selectedRequests):
+    #         messagebox.showinfo(title="Requests Approval", message="Selected record(s) have been approved successfully!")
+    #         for v in values:
+    #             self.tree.delete(v)
+    #     else:
+    #         messagebox.showerror(title="Requests Approval", message="An error has occurred while request(s) were processed.")
+        
+    #     self.selectedRequests.clear()
+    #     self.selectedServices.clear()
+
+    def menuBar(self,root): 
+        print(self.controller.getUserID())
+        menubar = tk.Menu(root) 
+        #purchases 
+        purchasesMenu = tk.Menu(menubar, tearoff=0)  
+        menubar.add_cascade(label = "My Purchases", menu=purchasesMenu)   
+        purchasesMenu.add_command(label="View My Purchases", command=lambda: self.controller.show_frame(MyPurchases, domain = "Customer", userID = self.controller.getUserID()))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu) 
+         
+        #service requests 
+        requestMenu = tk.Menu(menubar, tearoff=0)    
+        menubar.add_cascade(label="My Service Requests", menu=requestMenu) 
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(RequestsPage, domain = "Customer", userID = self.controller.getUserID()))
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu) 
+        #profile 
+        profileMenu = tk.Menu(menubar, tearoff=0) 
+        menubar.add_cascade(label="My Profile", menu=profileMenu) 
+        profileMenu.add_command(label="View Profile", command= lambda: ViewProfileWindow(master=self.controller)) 
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller)) 
+        profileMenu.add_separator() 
+        profileMenu.add_command(label="Logout", command=self.handleLogout) 
+
+        self.showTree() 
+
+        return menubar 
+     
+    def hello(self): 
+        print("hello") 
+     
+    def handleLogout(self): 
+        self.controller.logout() 
+
+
+class MyPurchases(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.db = SQLDatabase()
+        self.userID = None
+        self.domain = None
+        # self.domain = controller.getDomain()
+        # self.userID = controller.getUserID()
+        print("User ID:")
+        print(self.userID)
+
+        self['background']='#F6F4F1'
+
+        button1 = ttk.Button(self, text="Back to Home", 
+                             command=lambda: controller.show_frame(CustomerPortal)) 
+        button1.grid(row=0, column=1, padx=5, pady=5) 
+
+
+        self.label = ttk.Label(self, text="My Purchases", font=LARGEFONT)
+        self.label.grid(row=0, column=3, padx=10, pady=10)  
+
+        # self.loadButton = ttk.Button(self, text="Load Purchases", command=self.showTree)
+        # self.loadButton.grid(column='1', padx='10', pady='10', row='9')
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='7', row='6', rowspan='1')
+
+        self.cols = ("Item ID", "Category", "Model", "Price ($)", "Date of Purchase", "Warranty Expiry Date", "Warranty Status", "Service Fee ($)")
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols, show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
+
+        self.requestButton = ttk.Button(self, text="Request to Service", command=self.createRequest)
+        self.requestButton.grid(column='6', pady='20', row='11', sticky='e')
+
+    def showTree(self):
+        self.tree.delete(*self.tree.get_children())
+
+        # load the purchased items for the currently logged in user
+        results = self.db.loadPurchases(self.controller.getUserID())
+        # print("Purchases:")
+        # for r in results:
+        #     print(r)
+
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
+
+        for r in results:
+            # for field in r:
+            #     print(field)
+            #     print(type(field))
+            #     print("-----------")
+            self.tree.insert("", "end", values=self.polishData(r))       
+
+    def polishData(self, r):
+        dateOfPurchase = r[5]
+        warranty = r[6]
+        expiryDay = dateOfPurchase.day
+        expiryYear = dateOfPurchase.year
+
+        expiryMonth = dateOfPurchase.month + warranty
+        if expiryMonth > 12:
+            expiryMonth = expiryMonth - 12
+            expiryYear = expiryYear + 1
+
+        warrantyExpiry = datetime.date(expiryYear, expiryMonth, expiryDay)
+        print(warrantyExpiry)
+
+        today = datetime.date.today()
+        validity = ""
+        serviceFee = 0.0
+
+        if today < warrantyExpiry:
+            validity = "valid"
+        else:
+            validity = "expired"
+            cost = r[3]
+            serviceFee = 40 + (cost/5)
+
+        result = (r[0], r[1], r[2], r[4], r[5], warrantyExpiry, validity, serviceFee)
+        return result
+
+    def createRequest(self):
+        curItem = self.tree.focus()
+        serviceFee = self.tree.item(curItem)['values'][7]
+        itemID = self.tree.item(curItem)['values'][0]
+        dateOfRequest = datetime.date.today()
+        # print(serviceFee)
+        # print(itemID)
+        # print(dateOfRequest)
+
+        res = self.db.createServiceRequest([serviceFee, dateOfRequest, itemID])
+        if res: 
+            messagebox.showerror(title="Request Service Failed", message=res)
+        else : 
+            messagebox.showinfo(title="Request Service Success", message= "Succesfully requested for service!")
+
+        # requestID = self.db.retrieveRequestID([dateOfRequest, itemID])
+        # print("Request ID")
+        # print(requestID[0])
+
+        # service = self.db.createService([itemID, requestID])
+        # if res: 
+        #     messagebox.showerror(title="Service Creation Failed", message=res)
+        # else : 
+        #     messagebox.showinfo(title="Service Creation Success", message= "Succesfully created service!")
+
+
+        # refresh table
+        # self.showTree()
+    
+    def menuBar(self,root): 
+        print(self.controller.getUserID())
+        menubar = tk.Menu(root) 
+
+        #home 
+        homeMenu = tk.Menu(menubar, tearoff=0)  
+        menubar.add_cascade(label = "Home", menu=homeMenu)   
+        homeMenu.add_command(label="Buy Items", command=lambda: self.controller.show_frame(CustomerPortal))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #purchases 
+        purchasesMenu = tk.Menu(menubar, tearoff=0)  
+        menubar.add_cascade(label = "My Purchases", menu=purchasesMenu)   
+        purchasesMenu.add_command(label="View My Purchases", command=lambda: self.controller.show_frame(MyPurchases, domain = "Customer", userID = self.controller.getUserID()))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu) 
+         
+        #service requests 
+        requestMenu = tk.Menu(menubar, tearoff=0)    
+        menubar.add_cascade(label="My Service Requests", menu=requestMenu) 
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(RequestsPage, domain = "Customer", userID = self.controller.getUserID()))
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu) 
+        #profile 
+        profileMenu = tk.Menu(menubar, tearoff=0) 
+        menubar.add_cascade(label="My Profile", menu=profileMenu) 
+        profileMenu.add_command(label="View Profile", command= lambda: ViewProfileWindow(master=self.controller)) 
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller)) 
+        profileMenu.add_separator() 
+        profileMenu.add_command(label="Logout", command=self.handleLogout) 
+
+        self.showTree() 
+
+        return menubar 
+     
+    def hello(self): 
+        print("hello") 
+     
+    def handleLogout(self): 
+        self.controller.logout() 

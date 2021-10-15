@@ -1,6 +1,5 @@
-from tk_screens.adminPortal import AdminPortal
-from tk_screens.customerPortal import CustomerPortal
-from tk_screens.adminPortal import AdminPortal
+from tk_screens.adminPortal import *
+from tk_screens.customerPortal import *
 import tkinter as tk
 from tkinter import ttk, messagebox, PhotoImage, Label
 from tk_screens.tkinterCustomButton import TkinterCustomButton
@@ -28,7 +27,7 @@ class StartPage(tk.Frame):
         self.img = ImageTk.PhotoImage(Image.open("images/main_final.png").convert("RGB"))
         # self.img = tk.PhotoImage(file = "images/main_1.jpeg")
         self.label = ttk.Label(self, image=self.img)
-        self.label.grid(row=0, column=0, padx=100, pady=20)
+        self.label.grid(row=0, column=2, padx=250, pady=20)
         
         # putting the grid in its place by using
         # grid
@@ -40,7 +39,7 @@ class StartPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button1.grid(row=1, column=0, padx=5, pady=5)
+        button1.grid(row=1, column=2, padx=5, pady=5)
         
         # def button_function():
         #     print("Button pressed")
@@ -54,7 +53,7 @@ class StartPage(tk.Frame):
 
         # putting the button in its place by
         # using grid
-        button2.grid(row=2, column=0, padx=5, pady=5)
+        button2.grid(row=2, column=2, padx=5, pady=5)
 
 
         # Dropdown menu options
@@ -62,7 +61,7 @@ class StartPage(tk.Frame):
 
         dropdownlist = ttk.OptionMenu(self, self.domain, options[0], *options)
         
-        dropdownlist.grid(row=3, column=0, padx=5, pady=5)
+        dropdownlist.grid(row=3, column=2, padx=5, pady=5)
 
         # table = Table(parent= parent,columns=("FName", "LName", "Roll No"))
         # table.insertRow(('Amit', 'Kumar', '17701'))
@@ -159,7 +158,7 @@ class LoginPage(tk.Frame):
                 messagebox.showinfo(title="Login Success", message="Successfully logged in")
                 self.controller.setUserID(self.userID.get()) # Change the auth state
                 self.controller.setDomain(self.domain.get())
-                self.controller.show_frame(CustomerPortal)
+                self.controller.show_frame(CustomerPortal, domain = "Customer", userID = self.userID.get())
             elif isinstance(res, str):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)
@@ -171,7 +170,7 @@ class LoginPage(tk.Frame):
                 messagebox.showinfo(title="Login Success", message="Admin Successfully logged in")
                 self.controller.setUserID(self.userID.get()) # Change the auth state
                 self.controller.setDomain(self.domain.get())
-                self.controller.show_frame(AdminPortal)
+                self.controller.show_frame(AdminPortal, domain = "Administrator", userID = self.userID.get())
             elif isinstance(res, str):
                 print("login failed", type(res))
                 messagebox.showerror(title="Login Failed", message=res)
@@ -181,6 +180,9 @@ class LoginPage(tk.Frame):
         self.domain = usertype
         # Log
         print("gui.py>LoginPage> Domain Set:",self.domain.get())
+
+    def setUserID(self, userid):
+        self.userID = userid
 
 # third window frame page2
 class RegisterPage(tk.Frame):
@@ -255,7 +257,7 @@ class RegisterPage(tk.Frame):
 
         # button to show frame 3 with text
         # layout3
-        button2 = ttk.Button(self, text="Back to Home",
+        button2 = ttk.Button(self, text="Back to Welcome Page",
                              command=lambda: controller.show_frame(StartPage))
 
         # putting the button in its place by

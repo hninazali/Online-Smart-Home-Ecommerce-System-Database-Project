@@ -21,16 +21,16 @@ class ViewProfileWindow(Toplevel):
         cursor = connection.cursor()
         if self.domain == "Customer":
             sql = "SELECT * FROM Customer WHERE customerID = %s"
-            cursor.execute(sql, (self.userID))
+            cursor.execute(sql, (self.userID)) 
             details = cursor.fetchone()
-            print(details)
+            # print(details)
             userIDLabel = ttk.Label(self, text="User ID: {}\nName: {}\nEmail: {}\nAddress: {}\nPhone Number: {}\nGender: {}\n".format(details[0], details[1], details[2], details[4], details[5], details[6]))
             userIDLabel.grid(row=1, column=4, padx=5, pady=5)
         elif self.domain == "Administrator":
             sql = "SELECT * FROM admin WHERE adminID = %s"
             cursor.execute(sql, (self.userID))
             details = cursor.fetchone()
-            print(details)
+            # print(details)
             userIDLabel = ttk.Label(self, text="User ID: {}\nName: {}\nGender: {}\nPhone Number: {}\n".format(details[0], details[1], details[3], details[4]))
             userIDLabel.grid(row=1, column=4, padx=5, pady=5)
         else:

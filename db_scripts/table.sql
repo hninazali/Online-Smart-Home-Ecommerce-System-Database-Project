@@ -49,8 +49,8 @@ FOREIGN KEY (productID) REFERENCES products(productID)
 );
 
 CREATE TABLE ServiceRequest (
-	requestID 		MEDIUMINT 			NOT NULL AUTO_INCREMENT, 
-	serviceFee 		DOUBLE,
+	requestID 		MEDIUMINT 	NOT NULL AUTO_INCREMENT, 
+	serviceFee 		DOUBLE DEFAULT 0.0,
 	requestStatus 	ENUM('Submitted', 'Submitted and Waiting for payment', 'In progress', 'Approved', 'Canceled', 'Completed') NOT NULL,
 	dateOfRequest 	DATE NOT NULL,
 	itemID 			MEDIUMINT NOT NULL,
@@ -68,3 +68,9 @@ CREATE TABLE Service(
     FOREIGN KEY (itemID) REFERENCES items(itemID),
     FOREIGN KEY (requestID) REFERENCES ServiceRequest(requestID),
 	FOREIGN KEY (adminID) REFERENCES admin(adminID));
+
+CREATE EVENT paymentOverdue
+    ON SCHEDULE 
+        EVERY 1 MINUTE
+    DO 
+        UPDATE ServiceRequest, Service SET ServiceRequest.requestStatus = "Canceled", Service.serviceStatus = "Completed" WHERE ServiceRequest.requestID = Service.requestID AND current_date() > DATE_ADD(ServiceRequest.dateOfRequest, INTERVAL 10 DAY) AND ServiceRequest.requestStatus = "Submitted and Waiting for payment";

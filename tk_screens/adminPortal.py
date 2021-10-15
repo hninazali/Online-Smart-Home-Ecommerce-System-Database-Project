@@ -4,20 +4,20 @@ import tkinter.ttk as ttk
 from tkinter import *
 from tkinter import ttk, messagebox, PhotoImage, Label, Entry, Menu
 from db_connections.mysqldb import SQLDatabase
-from tk_screens.adminApproveRequestsPage import AdminApproveRequestsPage
-from tk_screens.adminCompleteServicesPage import AdminCompleteServicesPage
-from tk_screens.adminProductSearch import AdminProductSearch 
-from tk_screens.adminItemSearch import AdminItemSearch
-from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
+# from tk_screens.adminApproveRequestsPage import AdminApproveRequestsPage
+# from tk_screens.adminCompleteServicesPage import AdminCompleteServicesPage
+# from tk_screens.adminProductSearch import AdminProductSearch 
+# from tk_screens.adminItemSearch import AdminItemSearch
+# from tk_screens.adminAdvancedSearch import AdminAdvancedSearch
 from tk_screens.viewProfileWindow import ViewProfileWindow
 from db_connections.mongodb import MongoDB
 from tk_screens.changePasswordWindow import ChangePasswordWindow
 from PIL import Image, ImageTk
 
 mongo = MongoDB()
-mongo.dropCollection("items")
-mongo.dropCollection("products")
-mongo.resetMongoState()
+# mongo.dropCollection("items")
+# mongo.dropCollection("products")
+# mongo.resetMongoState()
 db = SQLDatabase()
 
 LARGEFONT = ("Calibri", 35, "bold")
@@ -26,20 +26,21 @@ class AdminPortal(tk.Frame):
     def __init__(self, parent, controller):
         
         tk.Frame.__init__(self, parent)
-
-
-        self.domain = tk.StringVar(self)
+        self.domain = controller.getDomain()
         self.adminFunc = tk.StringVar(self)
         self.controller = controller
+        self.userID = None
+        self.domain = None
 
         self.label = ttk.Label(self, text="Admin Home", font=LARGEFONT)
         self.label.grid(row=0, column=3, padx=10, pady=10)
 
         # Reset Button
-        self.resetButton = ttk.Button(self)
-        self.resetButton.configure(text='Reset database')
-        self.resetButton.grid(column='6', padx='5', pady='5', row='1')
-        self.resetButton.bind('<1>', self.resetDB, add='')
+        self.resetButton = ttk.Button(self, text="Initialise Data",
+                             command=self.resetDB)
+        self.resetButton.grid(row=1, column=6,padx=10, pady=10)
+        # self.resetButton.grid(column='6', padx='5', pady='5', row='1')
+        # self.resetButton.bind('<1>', self.resetDB, add='')
 
         createAdminButton = ttk.Button(self, text="Create New Admin",
                              command=lambda: controller.show_frame(CreateAdminPage, self.domain))
@@ -69,6 +70,20 @@ class AdminPortal(tk.Frame):
 
         self['background']='#F6F4F1'
 
+        # Approve requests button
+        self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
+        self.approveButton.grid(column=2, pady=5, padx=10, row=2)
+
+        # Complete services button
+        self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
+        self.completeButton.grid(column=2, pady=5, padx=10, row=3)
+        
+
+        self['background']='#F6F4F1'
+
+        # self.showTree()
+
+    def showTree(self):
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
@@ -84,19 +99,11 @@ class AdminPortal(tk.Frame):
 
         self.renderInventoryList()
 
-        # Approve requests button
-        self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain))
-        self.approveButton.grid(column=2, pady=5, padx=10, row=2)
-
-        # Complete services button
-        self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain))
-        self.completeButton.grid(column=2, pady=5, padx=10, row=3)
-        
-
-        self['background']='#F6F4F1'
-
     def hello(self):
         print("hello")
+        print(self.userID)
+        print(self.domain)
+        
 
     def handleLogout(self):
         self.controller.logout()
@@ -129,13 +136,13 @@ class AdminPortal(tk.Frame):
         #service requests
         requestMenu = tk.Menu(menubar, tearoff=0)   
         menubar.add_cascade(label="Service Requests", menu=requestMenu)
-        requestMenu.add_command(label="View Service Requests", command=self.hello)
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
     #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
 
         #service 
         serviceMenu = tk.Menu(menubar, tearoff=0)   
-        menubar.add_cascade(label="Services", menu=requestMenu)
-        serviceMenu.add_command(label="View Services", command=self.hello)
+        menubar.add_cascade(label="Services", menu=serviceMenu)
+        serviceMenu.add_command(label="View Services", command=lambda: self.controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
         # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
 
         #profile
@@ -144,7 +151,9 @@ class AdminPortal(tk.Frame):
         profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
         profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
         profileMenu.add_separator()
-        profileMenu.add_command(label="Logout", command=self.handleLogout)      
+        profileMenu.add_command(label="Logout", command=self.handleLogout)
+
+        self.showTree()      
         
         return menubar
 
@@ -184,9 +193,10 @@ class AdminPortal(tk.Frame):
         res = []
         if func == "inventory":
             w = 240
-            resSold = mongo.soldLevel()
-            resUnsold = mongo.unsoldLevel()
-            self.inventoryTable(w, cols, resSold, resUnsold)
+            res = db.retrieveInventoryLevel()
+            # resSold = mongo.soldLevel()
+            # resUnsold = mongo.unsoldLevel()
+            self.normalTable(w, cols, res)
         elif func == "service":
             w = 144
             res = db.itemUnderService()
@@ -199,7 +209,7 @@ class AdminPortal(tk.Frame):
     def inventoryTable(self, w, cols, resSold, resUnsold):
         for index, unsold in enumerate(resUnsold):
             resSold[index]["unsold"] = unsold["total"]
-            print(resSold)
+            # print("inventoryTable:",resSold)
         for col in cols:
             self.tree.column(col, anchor="center", width=w)
             self.tree.heading(col, text=col)
@@ -212,7 +222,7 @@ class AdminPortal(tk.Frame):
         self.tree.configure(yscrollcommand = self.scroll_y.set)
 
     def normalTable(self, w, cols, res):
-        print(res)
+        # print("normalTable:",res)
         for col in cols:
             self.tree.column(col, anchor="center", width=w)
             self.tree.heading(col, text=col)
@@ -347,7 +357,308 @@ class CreateAdminPage(tk.Frame):
                 print("Register success")
                 messagebox.showinfo(title="Registration Success", message= "Succesfully created an admin account!")
 
+class AdminItemSearch(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
 
+        self.itemID = tk.StringVar()
+        self['background']='#F6F4F1'
+
+        button1 = ttk.Button(self, text="Back to Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+        button1.grid(row=0, column=1, padx=5, pady=5)
+
+        label = ttk.Label(self, text="Items List", font=LARGEFONT)
+        label.grid(row=0, column=3, padx=10, pady=10)
+
+        itemIDLabel = ttk.Label(self, text="Item ID:")
+        itemIDLabel.grid(row=1, column=1, padx=10, pady=10)
+
+        itemIDInput = ttk.Entry(self, textvariable=self.itemID)
+        itemIDInput.grid(row=1, column=2, padx=10, pady=10)
+
+        button1 = ttk.Button(self, text="Filter",
+                             command=self.renderItemsList)
+        button1.grid(row=1, column=3, padx=10, pady=10)
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
+
+        self.cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status', 'Service Status')
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
+        
+        res = mongo.findItemByID(self.itemID.get())
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=130)
+            self.tree.heading(col, text=col)
+        for r in  res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+    def renderItemsList(self):
+        for r in self.tree.get_children():
+            self.tree.delete(r)
+
+        res = mongo.findItemByID(self.itemID.get())
+
+        for col in self.cols:
+            self.tree.heading(col, text=col)
+        for r in res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+    def mongoToTree(self, r):
+        serviceStatus = ""
+        if r["PurchaseStatus"] == "Sold" and r["ServiceStatus"] == "":
+            serviceStatus = "N/A"
+        else:
+            serviceStatus =  r["ServiceStatus"]
+        re = (r["ItemID"], r["Model"], r["Category"], r["Color"], r["Factory"], r["PowerSupply"], r["ProductionYear"], r["PurchaseStatus"], serviceStatus)
+        return re
+    
+class AdminProductSearch(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        self.category = tk.StringVar(self)
+        self.model = tk.StringVar(self)
+        
+        self['background']='#F6F4F1'
+
+        button1 = ttk.Button(self, text="Back to Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+        button1.grid(row=0, column=1, padx=5, pady=5)
+
+        self.label = ttk.Label(self, text="Products List", font=LARGEFONT)
+        self.label.grid(row=0, column=3, padx=10, pady=10)
+
+        # Dropdown menu options
+        optionsCategory = ("All", "Lights", "Locks")
+        optionsModel = ("All", "Light1", "Light2", "SmartHome1", "Safe1", "Safe2", "Safe3")
+
+        vModel=[]
+        self.modelLabel = ttk.Label(self, text="Model:")
+        self.modelLabel.grid(row=2, column=1, padx=5, pady=5)
+        self.modelBox = ttk.Combobox(self, values = vModel)
+        self.modelBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.modelBox.grid(row=2, column=2, sticky=tk.E, padx=10, pady=10)
+
+        def categoryAndModel(event):
+            if self.categoryBox.get()=="Lights":
+                vModel = ["Light1", "Light2", "SmartHome1",""]
+            elif self.categoryBox.get()=="Locks":
+                vModel = ["Safe1", "Safe2", "Safe3", "SmartHome1",""]
+            else:
+
+                vModel = []
+            self.modelBox.configure(values = vModel)
+
+        self.catLabel = ttk.Label(self, text="Model:")
+        self.catLabel.grid(row=1, column=1, padx=5, pady=5)
+        self.categoryBox = ttk.Combobox(self, values = ["Lights", "Locks",""])
+        self.categoryBox.bind('<<ComboboxSelected>>', categoryAndModel)
+        self.categoryBox.configure(state='readonly')
+        self.categoryBox.grid(row=1, column=2, sticky=tk.E, padx=10, pady=10)
+
+        button2 = ttk.Button(self, text="Filter",
+                             command=self.renderProductsList)
+        button2.grid(row=2, column=3, padx=10, pady=10)
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
+
+        self.cols = ('Product ID', 'Category', 'Model', 'Price', 'Cost', 'Warranty (months)', 'Inventory Level', 'Number sold')
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
+
+        res = mongo.adminProductSearch(self.category.get(), self.model.get())
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
+        for r in  res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+    def renderProductsList(self):
+        for r in self.tree.get_children():
+            self.tree.delete(r)
+
+        res = mongo.adminProductSearch(self.categoryBox.get(), self.modelBox.get())
+
+        for col in self.cols:
+            self.tree.heading(col, text=col)
+        for r in res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+
+        # self.tree.grid(row=6, column=1, columnspan=1)
+
+    def mongoToTree(self, r):
+        resSold = mongo.soldLevel()
+        resUnsold = mongo.unsoldLevel()
+
+        re = (r["ProductID"], r["Category"], r["Model"], r["Price ($)"], r["Cost ($)"], r["Warranty (months)"], resSold[r["ProductID"]-1]["total"], resUnsold[r["ProductID"]-1]["total"])
+        return re
+
+class AdminAdvancedSearch(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+
+        label = ttk.Label(self, text="Products List", font=LARGEFONT)
+        label.grid(row=0, column=3, padx=10, pady=10)
+
+        self['background']='#F6F4F1'
+
+        button1 = ttk.Button(self, text="Back to Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+        button1.grid(row=0, column=1, padx=5, pady=5)
+
+        self.priceBox = ttk.Combobox(self ,values = ["50", "60",
+        "70","100","120","125","200",""])
+        self.priceBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.priceBox.grid(column='2', padx='5', pady='5', row='2')
+        
+        self.colorBox = ttk.Combobox(self, values = ["White", "Blue",
+        "Yellow", "Green", "Black",""])
+        self.colorBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.colorBox.grid(column='2', padx='5', pady='5', row='3')
+
+        self.factoryBox = ttk.Combobox(self, values = ["Malaysia", "China", "Philippines",""])
+        self.factoryBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.factoryBox.grid(column='2', padx='5', pady='5', row='4')
+
+        self.productionYearBox = ttk.Combobox(self, values = ["2014", "2015",
+        "2016", "2017", "2018", "2019", "2020",""])
+        self.productionYearBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.productionYearBox.grid(column='2', padx='5', pady='5', row='5')
+
+        self.powerSupplyBox = ttk.Combobox(self, values = ["Battery", "USB",""])
+        self.powerSupplyBox.configure(cursor='arrow', state='readonly', takefocus=False)
+        self.powerSupplyBox.grid(column='2', padx='5', pady='5', row='6')
+
+        self.advancedSearchButton = ttk.Button(self, text="Filter", command=self.search)
+        self.advancedSearchButton.grid(column='3', padx='5', pady='5', row='6')
+
+        self.priceLabel = ttk.Label(self)
+        self.priceLabel.configure(text='Price')
+        self.priceLabel.grid(column='1', padx='5', pady='5', row='2')
+
+        self.colorLabel = ttk.Label(self)
+        self.colorLabel.configure(text='Color')
+        self.colorLabel.grid(column='1', padx='5', pady='5', row='3')
+
+        self.factoryLabel = ttk.Label(self)
+        self.factoryLabel.configure(text='Factory')
+        self.factoryLabel.grid(column='1', padx='5', pady='5', row='4')
+
+        self.productionYearLabel = ttk.Label(self)
+        self.productionYearLabel.configure(text='Production Year')
+        self.productionYearLabel.grid(column='1', padx='5', pady='5', row='5')
+
+        self.powerSupplyLabel = ttk.Label(self)
+        self.powerSupplyLabel.configure(text='Power Supply')
+        self.powerSupplyLabel.grid(column='1', padx='5', pady='5', row='6')
+
+        self.treeFrame= ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.grid(column='2', columnspan='6', row='7', rowspan='1')
+
+        self.cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status", "Service Status")
+
+        self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
+        self.tree.pack(side='left')
+        scroll_y = Scrollbar(self.treeFrame, orient = 'vertical', command = self.tree.yview)
+        scroll_y.pack(side = RIGHT, fill = Y)
+        self.tree.configure(yscrollcommand = scroll_y.set)
+        
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=100)
+            self.tree.heading(col, text=col)
+
+        res = mongo.adminAdvancedSearch(self.mongoSearch())
+        for r in  res:
+            result = self.mongoToTree(r)
+            self.tree.insert("", "end", values=result)
+    
+    def search(self):
+        for r in self.tree.get_children():
+            self.tree.delete(r)
+
+        for col in self.cols:
+            self.tree.heading(col, text=col)
+
+        stringsearch = self.mongoSearch()
+        allrecordsList = mongo.adminAdvancedSearch(stringsearch)
+        messagebox.showinfo(title="Search Results", message= "{} items available based on your search!".format(len(allrecordsList)))
+
+        if len(allrecordsList) == 0:
+            pass
+        else:
+            for record in allrecordsList:
+                result = self.mongoToTree(record)
+                self.tree.insert("", "end", values=result)
+
+    def mongoSearch(self):
+        mongoSearch = ""
+
+        price =  self.priceBox.get()
+        color = self.colorBox.get()
+        factory = self.factoryBox.get()
+        productionYear = self.productionYearBox.get()
+        powerSupply = self.powerSupplyBox.get()
+        category = ""
+        model = ""
+
+        if price:
+            catandmod = self.findModelfromPrice(price)
+            if category and category != catandmod[0]:
+                category = "no output"
+            if model and model != catandmod[1]:
+                model = "no output"
+            else:
+                category = catandmod[0]
+                model = catandmod[1]   
+        dictSearch = {}   
+
+        if category:
+             dictSearch["Category"] = category
+        if model:
+            dictSearch["Model"] = model
+        if color:
+             dictSearch["Color"] = color
+        if factory:
+            dictSearch["Factory"] = factory
+        if productionYear:
+            dictSearch["ProductionYear"] = productionYear
+        if powerSupply:
+            dictSearch["PowerSupply"] = powerSupply
+        return dictSearch
+
+    def findModelfromPrice(self, price):
+        product = mongo.findModelfromPrice(price)
+        Category = product["Category"]
+        Model = product["Model"]
+        return (Category, Model)
+
+    def mongoToTree(self, r):
+        # To get price, cost, warranty from product (not avail in item)
+        pcw = mongo.findPriceCostWarranty(r["Category"], r["Model"])
+        re = (r["ItemID"], r["Category"], r["Model"], pcw["Price"], pcw["Cost"], r["Color"], r["Factory"], pcw["Warranty"], r["ProductionYear"], r["PowerSupply"], r["PurchaseStatus"], r["ServiceStatus"])
+        return re
 
 # Winy can try with her table code too
 
@@ -374,4 +685,292 @@ class CreateAdminPage(tk.Frame):
 #     def getTree(self):
 #         return self.tree
 
+
+class AdminApproveRequestsPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.userID = None
+        self.domain = None
+        self.selectedRequests = []
+        self.selectedServices = []
+
+        self['background']='#F6F4F1'
+
+        # button to show frame 3 with text
+        # layout3
+        backToAdminPortalButton = ttk.Button(self, text="Back to Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+
+        # putting the button in its place by
+        # using grid
+        backToAdminPortalButton.grid(row=10, column=4,  padx=5, pady=5)
+
+        label = ttk.Label(self, text="Requests pending Approval", font=LARGEFONT)
+        label.grid(row='0', column='4', padx='220', pady='10')
+
+    def showTree(self):
+
+        self.treeFrame = ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400')
+        self.treeFrame.grid(column='2', columnspan='6', row='2', rowspan='1', pady='20', padx='170')
+
+        self.cols = ('Request ID', 'Service ID', 'Item ID', 'Request Date', 'Payment for Service', 'Request Status', 'Service Status')
+
+        self.tree = ttk.Treeview(self.treeFrame, columns=self.cols, show='headings', height='10')
+        self.tree.pack(side='left')
+        scrollbar = ttk.Scrollbar(self.treeFrame, orient="vertical", command=self.tree.yview)
+        scrollbar.pack(side = 'right', fill = 'y')
+        self.tree.configure(yscrollcommand=scrollbar.set)
+
+        results = db.retrieveRequestsForApproval()
+
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
+
+        for r in results:
+            self.tree.insert("", "end", values=self.polishData(r))
+
+        # approve button removes requests from the list and change the request & service statuses to approved and in progress
+        self.aButton = ttk.Button(self, text="Approve", command= lambda: self.approveRequests(), width=15)
+        self.aButton.grid(row='5', column='4', padx='45', pady='5')
+
+    def polishData(self, r):
+        paymentStatus = ""
+        if r[4] == 0:
+            paymentStatus = "Waived"
+        else:
+            paymentStatus = "Paid"
+
+        result = (r[0], r[1], r[2], r[3], paymentStatus, r[5], r[6])
+        return result
+
+    def approveRequests(self):
+
+        values = self.tree.selection()
+
+        for v in values:
+            self.selectedRequests.append(self.tree.item(v)['values'][0])
+            self.selectedServices.append(self.tree.item(v)['values'][1])     
+
+        res = db.approveRequests(self.selectedRequests, self.selectedServices, self.controller.getUserID())
+
+        if res is None:
+            messagebox.showwarning(title="Request Approval", message="Please select record(s) to proceed.")
+        elif res == len(self.selectedRequests):
+            messagebox.showinfo(title="Requests Approval", message="Selected record(s) have been approved successfully!")
+            for v in values:
+                self.tree.delete(v)
+        else:
+            messagebox.showerror(title="Requests Approval", message="An error has occurred while request(s) were processed.")
+        
+        self.selectedRequests.clear()
+        self.selectedServices.clear()
+
+    def hello(self):
+        print("hello")
+        print(self.userID)
+        print(self.domain)
+
+    def handleLogout(self):
+        self.controller.logout()
+
+    def menuBar(self,root):
+        menubar = tk.Menu(root)
+        # self.controller = controller
+        # nestedProductMenu = tk.Menu(self)
+        # nestedItemMenu = tk.Menu(self)
+        # nestedRequestMenu = tk.Menu(self)
+        # nestedServiceMenu = tk.Menu(self)
+        # nestedProfileMenu = tk.Menu(self)
+
+        #back to admin main portal
+        
+        #product
+        productMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Products", menu=productMenu)
+        productMenu.add_command(label="Simple Search", command=lambda: self.controller.show_frame(AdminProductSearch))
+        productMenu.add_command(label="Advanced Search", command=lambda: self.controller.show_frame(AdminAdvancedSearch))
+        # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
+
+
+        #items
+        itemMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Items", menu=itemMenu)
+        itemMenu.add_command(label="View Items", command=lambda: self.controller.show_frame(AdminItemSearch))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #service requests
+        requestMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Service Requests", menu=requestMenu)
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
+        # requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+
+        #service 
+        serviceMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Services", menu=serviceMenu)#
+        serviceMenu.add_command(label="View Services", command=lambda: self.controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
+        # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
+
+        #profile
+        profileMenu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
+        profileMenu.add_separator()
+        profileMenu.add_command(label="Logout", command=self.handleLogout)
+
+        self.showTree()      
+        
+        return menubar
+
+    def setUserType(self, userID):
+        self.domain = userID
+        # Log
+        print("gui.py>AdminApproveRequestsPage> Domain Set:",self.domain.get())
+
+class AdminCompleteServicesPage(tk.Frame):
+
+    def __init__(self, parent, controller):
+        
+        tk.Frame.__init__(self, parent)
+
+        self.controller = controller
+        self.userID = None
+        self.domain = None
+        self.selectedRequests = []
+        self.selectedServices = []
+        self['background']='#F6F4F1'
+
+        # button to show frame 3 with text
+        # layout3
+        backToAdminPortalButton = ttk.Button(self, text="Back to Home",
+                             command=lambda: controller.show_frame(AdminPortal))
+
+        # putting the button in its place by
+        # using grid
+        backToAdminPortalButton.grid(row=10, column=4,  padx=5, pady=5)
+
+        # set style to classic so that background can be changed, error on macbooks
+        # tk.Frame.__init__(self, parent)
+        # style = ttk.Style(self)
+        # style.theme_use('classic')
+        label = ttk.Label(self, text="Services pending Completion", font=LARGEFONT)
+        label.grid(row=0, column=4, padx=350, pady=10)
+
+    def showTree(self):
+
+        self.treeFrame = ttk.Frame(self)
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='400')
+        self.treeFrame.grid(column='2', columnspan='6', row='2', rowspan='1', pady='20', padx='245')
+
+        self.cols = ('Request ID', 'Service ID', 'Item ID', 'Request Date', 'Request Status', 'Service Status')
+
+        results = db.retrieveServicesToComplete(self.controller.getUserID())
+
+        self.tree = ttk.Treeview(self.treeFrame, columns=self.cols, show='headings', height='10')
+        self.tree.pack(side='left')
+        scrollbar = ttk.Scrollbar(self.treeFrame, orient="vertical", command=self.tree.yview)
+        scrollbar.pack(side = 'right', fill = 'y')
+        self.tree.configure(yscrollcommand=scrollbar.set)
+
+        for col in self.cols:
+            self.tree.column(col, anchor="center", width=150)
+            self.tree.heading(col, text=col)
+
+        for r in results:
+            self.tree.insert("", "end", values=r)
+
+        # approve button removes requests from the list and change the request & service statuses to approved and in progress
+        self.cButton = ttk.Button(self, text="Completed", command= lambda: self.completeServices(), width=15)
+        self.cButton.grid(row='5', column='4', padx='35', pady='5')
+
+    def completeServices(self):
+
+        values = self.tree.selection()
+
+        for v in values:
+            self.selectedRequests.append(self.tree.item(v)['values'][0])
+            self.selectedServices.append(self.tree.item(v)['values'][1])
+
+        res = db.completeService(self.selectedRequests, self.selectedServices)
+
+        if res is None:
+            messagebox.showwarning(title="Services Completion", message="Please select record(s) to proceed.")
+        elif res == len(self.selectedRequests):
+            messagebox.showinfo(title="Services Completion", message="Selected record(s) have been updated successfully!")
+            for v in values:
+                self.tree.delete(v)
+        else:
+            messagebox.showerror(title="Services Completion", message="An error has occurred while records(s) were processed.")
+        
+        self.selectedRequests.clear()
+        self.selectedServices.clear()
+
+    def hello(self):
+        print("hello")
+        print(self.userID)
+        print(self.domain)
+
+    def handleLogout(self):
+        self.controller.logout()
+
+    def menuBar(self,root):
+        menubar = tk.Menu(root)
+        # self.controller = controller
+        # nestedProductMenu = tk.Menu(self)
+        # nestedItemMenu = tk.Menu(self)
+        # nestedRequestMenu = tk.Menu(self)
+        # nestedServiceMenu = tk.Menu(self)
+        # nestedProfileMenu = tk.Menu(self)
+
+        #back to admin main portal
+        
+        #product
+        productMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Products", menu=productMenu)
+        productMenu.add_command(label="Simple Search", command=lambda: self.controller.show_frame(AdminProductSearch))
+        productMenu.add_command(label="Advanced Search", command=lambda: self.controller.show_frame(AdminAdvancedSearch))
+        # productMenu.add_cascade(label="hehehe", menu=nestedProductMenu) #only for adding more nested menus to menus
+
+
+        #items
+        itemMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Items", menu=itemMenu)
+        itemMenu.add_command(label="View Items", command=lambda: self.controller.show_frame(AdminItemSearch))
+        # itemMenu.add_cascade(label="wowooow",menu=nestedItemMenu)
+        
+        #service requests
+        requestMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Service Requests", menu=requestMenu)
+        requestMenu.add_command(label="View Service Requests", command=lambda: self.controller.show_frame(AdminApproveRequestsPage))
+    #     requestMenu.add_cascade(label="heloooo", menu=nestedRequestMenu)
+
+        #service 
+        serviceMenu = tk.Menu(menubar, tearoff=0)   
+        menubar.add_cascade(label="Services", menu=serviceMenu)
+        serviceMenu.add_command(label="View Services", command=lambda: self.controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
+        # serviceMenu.add_cascade(label="yayy", menu=nestedServiceMenu)
+
+        #profile
+        profileMenu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="My Profile", menu=profileMenu)
+        profileMenu.add_command(label="View Profile", command=lambda: ViewProfileWindow(master=self.controller))
+        profileMenu.add_command(label="Change Password", command= lambda: ChangePasswordWindow(master=self.controller))
+        profileMenu.add_separator()
+        profileMenu.add_command(label="Logout", command=self.handleLogout)
+
+        self.showTree()      
+        
+        return menubar
+    
+    def setUserType(self, userID):
+        self.domain = userID
+        # Log
+        print("gui.py>AdminCompleteServicesPage> Domain Set:", self.domain.get())
+
+        self.showTree()
 
