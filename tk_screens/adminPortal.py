@@ -387,7 +387,7 @@ class AdminItemSearch(tk.Frame):
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
 
-        self.cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status', 'Service Status')
+        self.cols = ('Item ID', 'Model', 'Category', 'Color', 'Factory', 'Power Supply', 'Production Year', 'Purchase Status')
 
         self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
         self.tree.pack(side='left')
@@ -419,12 +419,7 @@ class AdminItemSearch(tk.Frame):
             messagebox.showinfo(title="Search Results", message= "Item ID {} does not exist!".format(self.itemID.get()))
 
     def mongoToTree(self, r):
-        serviceStatus = ""
-        if r["PurchaseStatus"] == "Sold" and r["ServiceStatus"] == "":
-            serviceStatus = "N/A"
-        else:
-            serviceStatus =  r["ServiceStatus"]
-        re = (r["ItemID"], r["Model"], r["Category"], r["Color"], r["Factory"], r["PowerSupply"], r["ProductionYear"], r["PurchaseStatus"], serviceStatus)
+        re = (r["ItemID"], r["Model"], r["Category"], r["Color"], r["Factory"], r["PowerSupply"], r["ProductionYear"], r["PurchaseStatus"])
         return re
     
 class AdminProductSearch(tk.Frame):
@@ -581,7 +576,7 @@ class AdminAdvancedSearch(tk.Frame):
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
         self.treeFrame.grid(column='2', columnspan='6', row='7', rowspan='1')
 
-        self.cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status", "Service Status")
+        self.cols = ("Item ID", "Category", "Model", "Price", "Cost", "Color", "Factory", "Warranty", "Production Year", "Power Supply", "Purchase Status")
 
         self.tree = ttk.Treeview(self.treeFrame, columns = self.cols,show='headings')
         self.tree.pack(side='left')
