@@ -283,7 +283,8 @@ class RegisterPage(tk.Frame):
             else:
                 res = db.createCustomer([self.userID.get(), self.name.get(), self.email.get(), self.password.get(), self.address.get(), self.phoneNumber.get(), self.gender.get()])
                 if res : 
-                    messagebox.showerror(title="Registration Failed", message=res)
+                    # messagebox.showerror(title="Registration Failed", message=res)
+                    messagebox.showerror(title="Registration Failed", message="There is an existing user with the given User ID! Please use a different User ID.")
                 else : 
                     messagebox.showinfo(title="Registration Success", message= "Succesfully created a customer account!")
         

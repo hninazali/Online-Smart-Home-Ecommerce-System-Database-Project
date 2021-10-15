@@ -352,7 +352,8 @@ class CreateAdminPage(tk.Frame):
         else:
             res = db.createAdmin([self.adminID.get(), self.name.get(), self.password.get(), self.gender.get(), self.phoneNumber.get()])
             if res : 
-                messagebox.showerror(title="Registration Failed", message=res)
+                # messagebox.showerror(title="Registration Failed", message=res)
+                messagebox.showerror(title="Registration Failed", message="There is an existing user with the given Admin ID. Please use a different Admin ID")
             else : 
                 print("Register success")
                 messagebox.showinfo(title="Registration Success", message= "Succesfully created an admin account!")
