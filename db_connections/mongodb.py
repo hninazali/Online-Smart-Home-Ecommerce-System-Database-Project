@@ -61,8 +61,15 @@ class MongoDB():
             cursor = self.client[database_name]["products"].find({"Category": category, "Model": model})
             return list(cursor)
 
+    # def findItemByID(self, itemID, database_name="oshes"):
+    #     cursor = self.client[database_name]["items"].find({"ItemID": itemID})
+    #     return list(cursor)
+
     def findItemByID(self, itemID, database_name="oshes"):
-        cursor = self.client[database_name]["items"].find({"ItemID": itemID})
+        if not itemID:
+            cursor = self.client[database_name]["items"].find()
+        else:
+            cursor = self.client[database_name]["items"].find({"ItemID": itemID})
         return list(cursor)
 
     def adminProductSearch(self, category, model, database_name="oshes"):

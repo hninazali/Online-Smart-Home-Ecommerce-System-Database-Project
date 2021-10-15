@@ -295,14 +295,26 @@ class SQLDatabase():
         results = self.c.fetchall()
         return results
 
+    def findExistingServices(self, itemID):
+        findServices = ("SELECT * FROM service WHERE itemID = %s AND (serviceStatus = 'Waiting for Approval' OR serviceStatus = 'In Progress')")
+        self.c.execute(findServices, (itemID))
+        results = self.c.fetchall()
+        return results
+
     def createServiceRequest(self, reqInfo):
-        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s);")
+        # createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, 'Submitted and Waiting for payment', %s, %s);")
+        # print(reqInfo[0])
+        # print(reqInfo[1])
+        # print(reqInfo[2])
+        # print(reqInfo[3])
+        createReq = ("INSERT INTO servicerequest (serviceFee, requestStatus, dateOfRequest, itemID) VALUES (%s, %s, %s, %s);")
+
         try:   
             self.c.execute(createReq, reqInfo)
             self.connection.commit()
             requestID = self.c.lastrowid
             print(requestID)
-            self.createService([reqInfo[2], requestID])
+            self.createService([reqInfo[3], requestID])
         except Exception as e:
             return e
 

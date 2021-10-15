@@ -672,8 +672,8 @@ class MyPurchases(tk.Frame):
         self.domain = None
         # self.domain = controller.getDomain()
         # self.userID = controller.getUserID()
-        print("User ID:")
-        print(self.userID)
+        # print("User ID:")
+        # print(self.userID)
 
         self['background']='#F6F4F1'
 
@@ -760,12 +760,27 @@ class MyPurchases(tk.Frame):
         # print(itemID)
         # print(dateOfRequest)
 
-        res = self.db.createServiceRequest([serviceFee, dateOfRequest, itemID])
-        if res: 
-            messagebox.showerror(title="Request Service Failed", message=res)
-        else : 
-            messagebox.showinfo(title="Request Service Success", message= "Succesfully requested for service!")
-
+        # res = self.db.createServiceRequest([serviceFee, dateOfRequest, itemID])
+        existingServices = self.db.findExistingServices(itemID) 
+        # print(existingServices) 
+        # print(type(existingServices)) 
+        print(existingServices) 
+        print(type(existingServices)) 
+        if not existingServices: 
+            # no existing services that are waiting for approval/in progress, proceed to create request 
+            if serviceFee == "0.0": 
+                reqInfo = [serviceFee, "Submitted", dateOfRequest, itemID] 
+            else: 
+                reqInfo = [serviceFee, "Submitted and Waiting for payment", dateOfRequest, itemID] 
+ 
+            res = self.db.createServiceRequest(reqInfo) 
+            if res:  
+                messagebox.showerror(title="Request Service Failed", message=res) 
+            else :  
+                messagebox.showinfo(title="Request Service Success", message= "Succesfully requested for service!") 
+        else: 
+            messagebox.showwarning(title="Error", message="This item already has a service that is waiting for approval/in progress.") 
+ 
         # requestID = self.db.retrieveRequestID([dateOfRequest, itemID])
         # print("Request ID")
         # print(requestID[0])

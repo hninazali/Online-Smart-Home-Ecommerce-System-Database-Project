@@ -50,33 +50,33 @@ class AdminPortal(tk.Frame):
 
         dropdownlist = ttk.OptionMenu(self, self.adminFunc, options[0], *options)
 
-        dropdownlist.grid(row=1, column=1, padx=10, pady=10)
+        dropdownlist.grid(row=4, column=2, padx=10, pady=10)
 
         button1 = ttk.Button(self, text="Display",
                              command=self.display)
-        button1.grid(row=1, column=2, padx=10, pady=10)
+        button1.grid(row=4, column=4, padx=10, pady=10)
 
         button2 = ttk.Button(self, text="Search Product",
                              command=lambda: controller.show_frame(AdminProductSearch))
-        button2.grid(row=3, column=6, padx=10, pady=10)
+        button2.grid(row=1, column=3, padx=10, pady=10)
 
         button3 = ttk.Button(self, text="Search Item",
                              command=lambda: controller.show_frame(AdminItemSearch))
-        button3.grid(row=4, column=6, padx=10, pady=10)
+        button3.grid(row=2, column=3, padx=10, pady=10)
 
         button4 = ttk.Button(self, text="Advanced Search",
                              command=lambda: controller.show_frame(AdminAdvancedSearch))
-        button4.grid(row=5, column=6, padx=10, pady=10)
+        button4.grid(row=3, column=3, padx=10, pady=10)
 
         self['background']='#F6F4F1'
 
         # Approve requests button
         self.approveButton = ttk.Button(self, text="Approve Requests", command= lambda: controller.show_frame(AdminApproveRequestsPage, self.domain, self.userID))
-        self.approveButton.grid(column=2, pady=5, padx=10, row=2)
+        self.approveButton.grid(column=2, pady=5, padx=10, row=1)
 
         # Complete services button
         self.completeButton = ttk.Button(self, text="Complete Services", command= lambda: controller.show_frame(AdminCompleteServicesPage, self.domain, self.userID))
-        self.completeButton.grid(column=2, pady=5, padx=10, row=3)
+        self.completeButton.grid(column=2, pady=5, padx=10, row=2)
         
 
         self['background']='#F6F4F1'
@@ -85,7 +85,7 @@ class AdminPortal(tk.Frame):
 
     def showTree(self):
         self.treeFrame= ttk.Frame(self)
-        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='300')
+        self.treeFrame.configure(height='400', padding='5', relief='ridge', width='200')
         self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
 
         cols = ('Product ID', 'Sold', 'Unsold')
@@ -408,11 +408,14 @@ class AdminItemSearch(tk.Frame):
 
         res = mongo.findItemByID(self.itemID.get())
 
-        for col in self.cols:
-            self.tree.heading(col, text=col)
-        for r in res:
-            result = self.mongoToTree(r)
-            self.tree.insert("", "end", values=result)
+        if res:
+            for col in self.cols:
+                self.tree.heading(col, text=col)
+            for r in res:
+                result = self.mongoToTree(r)
+                self.tree.insert("", "end", values=result)
+        else:
+            messagebox.showinfo(title="Search Results", message= "Item ID {} does not exist!".format(self.itemID.get()))
 
     def mongoToTree(self, r):
         serviceStatus = ""
