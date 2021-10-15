@@ -465,7 +465,7 @@ class AdminProductSearch(tk.Frame):
                 vModel = []
             self.modelBox.configure(values = vModel)
 
-        self.catLabel = ttk.Label(self, text="Model:")
+        self.catLabel = ttk.Label(self, text="Category:")
         self.catLabel.grid(row=1, column=1, padx=5, pady=5)
         self.categoryBox = ttk.Combobox(self, values = ["Lights", "Locks",""])
         self.categoryBox.bind('<<ComboboxSelected>>', categoryAndModel)
