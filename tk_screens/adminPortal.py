@@ -86,7 +86,7 @@ class AdminPortal(tk.Frame):
     def showTree(self):
         self.treeFrame= ttk.Frame(self)
         self.treeFrame.configure(height='400', padding='5', relief='ridge', width='200')
-        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1')
+        self.treeFrame.grid(column='2', columnspan='6', row='6', rowspan='1', padx=10, pady=10)
 
         cols = ('Product ID', 'Category', 'Model', 'Sold', 'Unsold')
         
