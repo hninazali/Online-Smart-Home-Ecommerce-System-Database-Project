@@ -54,7 +54,7 @@ class AdminPortal(tk.Frame):
 
         button1 = ttk.Button(self, text="Display",
                              command=self.display)
-        button1.grid(row=4, column=4, padx=10, pady=10)
+        button1.grid(row=4, column=6, padx=10, pady=10)
 
         button2 = ttk.Button(self, text="Search Product",
                              command=lambda: controller.show_frame(AdminProductSearch))
